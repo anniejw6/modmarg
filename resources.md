@@ -5,3 +5,5 @@
 [EconBS](http://www.econometricsbysimulation.com/2012/12/the-delta-method-to-estimate-standard.html)
 
 [Stata Blog](http://www.stata.com/support/faqs/statistics/compute-standard-errors-with-margins/)
+
+[Sandwich Estimators](http://thestatsgeek.com/2013/10/12/the-robust-sandwich-variance-estimator-for-linear-regression/)
