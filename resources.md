@@ -7,3 +7,5 @@
 [Stata Blog](http://www.stata.com/support/faqs/statistics/compute-standard-errors-with-margins/)
 
 [Sandwich Estimators](http://thestatsgeek.com/2013/10/12/the-robust-sandwich-variance-estimator-for-linear-regression/)
+
+[Delta Method](http://www.phidot.org/software/mark/docs/book/pdf/app_2.pdf)
