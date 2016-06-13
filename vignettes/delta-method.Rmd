@@ -1,0 +1,97 @@
+---
+title: "What is the Delta Method?"
+author: "Alex Gold, Annie Wang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Say that you fit a logistic regression. The coefficients are basically uninterpretable, so you want to know the predicted *levels* given various covariates and the error term around the covariates. How do you do that?
+
+The delta method is a form of numerical approximation that allows one to calculate the variance of a function of a statistical estimator, e.g., the predicted margins or effects.
+
+If you just want to calculate the standard error of a predictive margin, you might wish you could just take the variance of the predictive margin -- but the predictive margin is just a single number with no variation. We could (maybe) derive a probability density function (pdf) for the predictive margin and then use method of moments estimation to get the variance -- but there’s a good chance that the pdf doesn’t exist or is monstrously hard to deal with. 
+
+Instead, we’ll approximate the function using a [taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion to look at the variation of a local neighborhood of the predictive margin. Assuming we have a closed form solution for the derivative of the predictive margin (which is true for most common forms of linear regression), we also have a closed form solution for the variance of the predictive levels (i.e., a transformation in terms of parameters that are estimated during the regression). 
+
+The Taylor Series is useful because it allows us to approximate a function **$G$** in terms of (an infinite sum of) the derivatives of the function $G$ itself. In this case, it means we have a **function** to describe the value we care about (e.g., predictive margins/effects) and the variation of $G$ near that function.
+
+The delta method calculates the variance around the first-order taylor expansion of a column vector of predictive margins (the estimated outcome) or predictive effects (first difference (changing categories or levels) or the first derivative (instantaneous rate of change)) at a specified set of covariates. 
+
+For a predictive margin, with link function $link$, the column vector of predictions $P$ at $X \beta$ is $$P = \text{link}^{-1}(X \beta)$$.[^1] 
+
+For a predictive effect, with link function $link$, the column vector of predictions $P$ at $X \beta$ is $$P = d(\text{link}^{-1}(X \beta))/d(X \beta)$$. Depending on whether the effect is over a continuous or categorical variable, this may be an actual derivative or the subtraction of $P$ calculated at one value of $X$ from another. 
+
+Thus, the first-order [taylor expansion](https://en.wikipedia.org/wiki/Taylor_series) of $P$ with respect to $X \beta$ is 
+
+FOR PREDICTED LEVELS
+$$P = \text{link}^{-1}(X \beta) + d( \text{link}^{-1})/d(x \beta)(\bar(X) \beta)(X - \bar(X))$$.
+
+FOR CATEGORICAL VARIABLE EFFECT
+$$d(\text{link}^(-1)/d(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
+
+FOR CONTINUOUS VARIABLE EFFECT
+$$d^2(\text{link}^(-1)/d^2(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
+
+(Note that the Taylor Series expansion is **not** centered on the estimated model but rather a transformation of a set of covariates *by* the estimated model)
+
+Delta method takes advantage of closed form solution to $d( \text{link}^{-1})/d(x \beta)$ to improve computational time relative to completely nonparametric methods. The delta method is a semi-parametric method for numerical approximation of the standard errors of functions of parameters. There are other completely non-parametric methods for approximation like bootstrap or simulation. 
+
+[Are there better statistical properties?]
+
+# How does the Delta Method Work?
+
+The predicted levels are a function of the $\beta$s of the regression. Therefore, we’ll need to multiply the variance of the $\beta$s, given by the variance-covariance matrix of the regression, by a function describing their transformation during prediction, given by the jacobian. 
+
+To do this in matrix form, we’ll use the “sandwich” method of deriving the variance of a function. The sandwich method is a general method for deriving the variance of a function of random variables. That multiplies the square of the gradient of the function by the original variance/covariance matrix. The matrix form $ABA^T$ is the matrix analog of $Var(a * b)$ where a is a constant, i.e. $a^2*Var(b)$.
+
+We’ll use the jacobian matrix of the predicted level to relate the predicted level/effect to the $\beta$s. For any predicted level indexed by $i$ in a regression, the $i,j$th element of the jacobian will be the derivative of predicted level $i$ with respect to regressor $j$. 
+
+The variance-covariance matrix captures the variance structure of the coefficients. If your model contains coefficients b_0 to b_n (each with mean mu_b_n and standard deviation sd_b_n), then each cell i,j of your variance-covariance matrix is cov(b_i, b_j).
+
+
+# Step-By-Step
+
+1. Calculate the jacobian.
+
+2. Calculate the variance-covariance matrix (get it from the regression output of any standard package).
+
+3. Multiply the matrices: $jacobian^{T} x variance-covariance x jacobian$. You’ll end up with a k x 1 matrix for the k predicted levels/effects.
+
+## Calculating the Jacobian
+
+### Predictive Levels 
+
+#### Categorical or Continuous Variables
+
+1. Create the covariates at which you would like predicted levels. Call these matrices $A_1, A_2, ..., A_k$. 
+
+1. Calculate predicted levels for each of these matrices, call each of the resulting 1 x n column vectors $q_1, q_2, ..., q_k$.
+
+1. Calculate the derivative of the link function with respect to $X \beta$ (e.g for a simple logit with predicted level $p$, $p*(1-p)$). 
+
+1. Run each vector of predicted levels through the scalar-valued to end up with another 1 x n column vector. Call this $q*_i$
+
+1. Take the cross product of each $q*_i$ and $A_i$ to get a row vector. Divide by the number of observations in $A_i$.
+
+1. Row bind your vectors together. This is your Jacobian.
+
+### Predictive Effects
+
+The big change from the section above is that you are now calculating the variance on predictive effects, so you need to take the second derivative of the link function. (Because the first derivative is the effect.)
+
+#### Categorical Variables
+
+Take the second derivative by subtracting each of the levels from the base level and return that as the jacobian. 
+
+#### Continuous Variables
+
+Compute the second derivative of the link function and use that in place of the first derivative above. You need to explicitly compute the second derivative because you want an instantaneous rate of change as opposed to the rate of change over a range as with categorical variables above.
+
+(Calculate predicted effects at treat = 0, call the set of outcomes p_0.
+WHY IS SE(p_0) NOT THE QUANTITY WE’RE LOOKING FOR?)
+
+[^1]: For example, the predictive margin of a logistic regression is expressed in probabilities rather than … 
