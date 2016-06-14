@@ -7,10 +7,14 @@
 [Stata Blog](http://www.stata.com/support/faqs/statistics/compute-standard-errors-with-margins/)
 
 
-http://www.phidot.org/software/mark/docs/book/pdf/app_2.pdf
-
 https://en.wikipedia.org/wiki/Delta_method
 
 http://stats.stackexchange.com/questions/50778/sandwich-estimator-intuition
 
 https://www.math.ntnu.no/~hek/Optimering2010/LeastSquaresOptimization2010.pdf
+
+[Sandwich Estimators](http://thestatsgeek.com/2013/10/12/the-robust-sandwich-variance-estimator-for-linear-regression/)
+
+[Delta Method](http://www.phidot.org/software/mark/docs/book/pdf/app_2.pdf)
+
+[Stata and Margins](https://www3.nd.edu/~rwilliam/stats/Margins01.pdf)
