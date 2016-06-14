@@ -9,57 +9,60 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Say that you fit a logistic regression. The coefficients are basically uninterpretable, so you want to know the predicted *levels* given various covariates and the error term around the covariates. How do you do that?
+Let's say that you fit a logistic regression. The coefficients are basically uninterpretable, but you want to know the average impact of one of your variables (the predicted effect) expressed in probabilities and the associated error term. Or maybe you want to know the average outcome level (the predicted margins) across different groups and the associated error term.
 
-The delta method is a form of numerical approximation that allows one to calculate the variance of a function of a statistical estimator, e.g., the predicted margins or effects.
+Unfortunately, you can't just take the variance of the predictive margin or effect becauase...it's just a single number with no variation. We could (maybe) derive a probability density function for the predictive margin and then use method of moments estimation to get the variance, but there’s a good chance that the probability density function doesn’t exist or is monstrously hard to deal with.
 
-If you just want to calculate the standard error of a predictive margin, you might wish you could just take the variance of the predictive margin -- but the predictive margin is just a single number with no variation. We could (maybe) derive a probability density function (pdf) for the predictive margin and then use method of moments estimation to get the variance -- but there’s a good chance that the pdf doesn’t exist or is monstrously hard to deal with. 
+The delta method uses an approximation of the variation of a local neighborhood of the predictive margin using a [Taylor Series](https://en.wikipedia.org/wiki/Taylor_series) expansion to estimate the variance of a function of a statistical estimator, e.g., the predicted margins or effects. Assuming we have a closed-form solution for the derivative of the predictive margin, which is true for most common forms of linear regression---but more on this later---we also have a closed-form solution for the variance of the predictive levels or effects.
 
-Instead, we’ll approximate the function using a [taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion to look at the variation of a local neighborhood of the predictive margin. Assuming we have a closed form solution for the derivative of the predictive margin (which is true for most common forms of linear regression), we also have a closed form solution for the variance of the predictive levels (i.e., a transformation in terms of parameters that are estimated during the regression). 
+The Taylor Series is useful because it allows us to approximate a function **$G$** in terms of (an infinite sum of) the derivatives of the function $G$ itself. In this case, it means we have a **function** to describe the value we care about (e.g., predictive margins/effects) and the variation near that function.
 
-The Taylor Series is useful because it allows us to approximate a function **$G$** in terms of (an infinite sum of) the derivatives of the function $G$ itself. In this case, it means we have a **function** to describe the value we care about (e.g., predictive margins/effects) and the variation of $G$ near that function.
+The delta method calculates the variance around the first-order Taylor expansion of a column vector of predictive margins or effects at a specified set of covariates. 
 
-The delta method calculates the variance around the first-order taylor expansion of a column vector of predictive margins (the estimated outcome) or predictive effects (first difference (changing categories or levels) or the first derivative (instantaneous rate of change)) at a specified set of covariates. 
+For a predictive margin with [link function](https://en.wikipedia.org/wiki/Generalized_linear_model#Link_function) $link$, the column vector of predictions $P$ at $X \beta$ is $$P = \text{link}^{-1}(X \beta)$$ For example, the logit is the link function for a bernoulli distribution and provides the link between probabilities and log-odds.
 
-For a predictive margin, with link function $link$, the column vector of predictions $P$ at $X \beta$ is $$P = \text{link}^{-1}(X \beta)$$.[^1] 
+For a predictive effect with link function $link$, the column vector of predictions $P$ at $X \beta$ is $$P = \frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)}$$ Depending on whether the effect is over a continuous or categorical variable, this may be an actual derivative (the instantaneous rate of change) or the subtraction of $P$ calculated at one value of $X$ from another (the first difference).
 
-For a predictive effect, with link function $link$, the column vector of predictions $P$ at $X \beta$ is $$P = d(\text{link}^{-1}(X \beta))/d(X \beta)$$. Depending on whether the effect is over a continuous or categorical variable, this may be an actual derivative or the subtraction of $P$ calculated at one value of $X$ from another. 
+Thus, the first-order [Taylor Expansion](https://en.wikipedia.org/wiki/Taylor_series) of $P$ with respect to $X \beta$ is
 
-Thus, the first-order [taylor expansion](https://en.wikipedia.org/wiki/Taylor_series) of $P$ with respect to $X \beta$ is 
+$$\text{link}^{-1}(X \beta) + \frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)} (X - \bar{X})$$
 
-FOR PREDICTED LEVELS
-$$P = \text{link}^{-1}(X \beta) + d( \text{link}^{-1})/d(x \beta)(\bar(X) \beta)(X - \bar(X))$$.
+for predicted levels;
 
-FOR CATEGORICAL VARIABLE EFFECT
-$$d(\text{link}^(-1)/d(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
+$$d(\text{link}^{-1}/d(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
 
-FOR CONTINUOUS VARIABLE EFFECT
-$$d^2(\text{link}^(-1)/d^2(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
+for the predicted effects of categorical variables; and 
 
-(Note that the Taylor Series expansion is **not** centered on the estimated model but rather a transformation of a set of covariates *by* the estimated model)
+$$d^2(\text{link}^{-1}/d^2(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
 
-Delta method takes advantage of closed form solution to $d( \text{link}^{-1})/d(x \beta)$ to improve computational time relative to completely nonparametric methods. The delta method is a semi-parametric method for numerical approximation of the standard errors of functions of parameters. There are other completely non-parametric methods for approximation like bootstrap or simulation. 
+for the predicted effects of continuous variables.
+
+Note that the Taylor Series expansion is **not** centered on the estimated model but rather a *transformation* of a set of covariates by the estimated model.
+
+The Delta Method is a semi-parametric method that takes advantage of closed form solution to $\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)}$ to improve computational time relative to completely nonparametric methods. There are other completely non-parametric methods for approximation like bootstrap or simulation.
 
 [Are there better statistical properties?]
 
 # How does the Delta Method Work?
 
-The predicted levels are a function of the $\beta$s of the regression. Therefore, we’ll need to multiply the variance of the $\beta$s, given by the variance-covariance matrix of the regression, by a function describing their transformation during prediction, given by the jacobian. 
+Conditional on understanding why the Taylor series expansion matters, [Wikipedia contains a really nice derivation](https://en.wikipedia.org/wiki/Delta_method#Multivariate_delta_method).
+
+The predicted levels are a function of the $\beta$s of the regression. Therefore, we’ll need to multiply the variance of the $\beta$s, given by the variance-covariance matrix of the regression, by a function describing their transformation during prediction, given by the Jacobian. 
 
 To do this in matrix form, we’ll use the “sandwich” method of deriving the variance of a function. The sandwich method is a general method for deriving the variance of a function of random variables. That multiplies the square of the gradient of the function by the original variance/covariance matrix. The matrix form $ABA^T$ is the matrix analog of $Var(a * b)$ where a is a constant, i.e. $a^2*Var(b)$.
 
-We’ll use the jacobian matrix of the predicted level to relate the predicted level/effect to the $\beta$s. For any predicted level indexed by $i$ in a regression, the $i,j$th element of the jacobian will be the derivative of predicted level $i$ with respect to regressor $j$. 
+We’ll use the Jacobian matrix of the predicted level to relate the predicted level/effect to the $\beta$s. For any predicted level indexed by $i$ in a regression, the $i,j$th element of the jacobian will be the derivative of predicted level $i$ with respect to regressor $j$. 
 
-The variance-covariance matrix captures the variance structure of the coefficients. If your model contains coefficients b_0 to b_n (each with mean mu_b_n and standard deviation sd_b_n), then each cell i,j of your variance-covariance matrix is cov(b_i, b_j).
+The variance-covariance matrix captures the variance structure of the coefficients. If your model contains coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_n}$ and standard deviation $\sigma_{b_n}$), the $i,j$th element of the variance-covariance matrix is $cov(b_i, b_j)$.
 
 
 # Step-By-Step
 
-1. Calculate the jacobian.
+1. Calculate the Jacobian matrix $J$.
 
-2. Calculate the variance-covariance matrix (get it from the regression output of any standard package).
+2. Calculate the variance-covariance matrix (or get it from the regression output of any standard package) $V$.
 
-3. Multiply the matrices: $jacobian^{T} x variance-covariance x jacobian$. You’ll end up with a k x 1 matrix for the k predicted levels/effects.
+3. Multiply the matrices: $J^{T} \times V \times J$. You’ll end up with a $k \times 1$ matrix for the $k$ predicted levels/effects.
 
 ## Calculating the Jacobian
 
@@ -93,5 +96,3 @@ Compute the second derivative of the link function and use that in place of the 
 
 (Calculate predicted effects at treat = 0, call the set of outcomes p_0.
 WHY IS SE(p_0) NOT THE QUANTITY WE’RE LOOKING FOR?)
-
-[^1]: For example, the predictive margin of a logistic regression is expressed in probabilities rather than … 
