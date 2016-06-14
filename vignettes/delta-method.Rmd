@@ -23,19 +23,23 @@ For a predictive margin with [link function](https://en.wikipedia.org/wiki/Gener
 
 For a predictive effect with link function $link$, the column vector of predictions $P$ at $X \beta$ is $$P = \frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)}$$ Depending on whether the effect is over a continuous or categorical variable, this may be an actual derivative (the instantaneous rate of change) or the subtraction of $P$ calculated at one value of $X$ from another (the first difference).
 
-Thus, the first-order [Taylor Expansion](https://en.wikipedia.org/wiki/Taylor_series) of $P$ with respect to $X \beta$ is
+Note that $P$ is a random variable with mean $\bar{P}$ and variance $\text{Var}(P)$. Thus, the first-order [Taylor Expansion](https://en.wikipedia.org/wiki/Taylor_series) around $\overline{P}$ with respect to $X \beta$ is, generally,
 
-$$\text{link}^{-1}(X \beta) + \frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)} (X - \bar{X})$$
+$$P(\overline{X\beta}) + 
+\frac{d(P(\overline{X\beta}))}{d(X\beta)}(X\beta - \overline{X\beta})$$
 
-for predicted levels;
+For predicted levels, the Taylor expansion is 
 
+$$\text{link}^{-1}(\overline{X\beta}) + 
+\frac{d(\text{link}^{-1}(\overline{X\beta}))}{d(X \beta)}(X\beta - \overline{X\beta})$$
+
+for the predicted effects of categorical variables,
 $$d(\text{link}^{-1}/d(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
 
-for the predicted effects of categorical variables; and 
+and for the predicted effects of continuous variables,
 
-$$d^2(\text{link}^{-1}/d^2(x \beta)(\bar(X) \beta)(X_1 - X_2)$$
-
-for the predicted effects of continuous variables.
+$$\frac{d(\text{link}^{-1}(\overline{X\beta}))}{d(X \beta)} + 
+\frac{d^2(\text{link}^{-1}(\overline{X\beta}))}{d(X\beta)}(X\beta - \overline{X\beta})$$
 
 Note that the Taylor Series expansion is **not** centered on the estimated model but rather a *transformation* of a set of covariates by the estimated model.
 
