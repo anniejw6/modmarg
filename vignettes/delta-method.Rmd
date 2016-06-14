@@ -41,8 +41,6 @@ Note that the Taylor Series expansion is **not** centered on the estimated model
 
 The Delta Method is a semi-parametric method that takes advantage of closed form solution to $\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)}$ to improve computational time relative to completely nonparametric methods. There are other completely non-parametric methods for approximation like bootstrap or simulation.
 
-[Are there better statistical properties?]
-
 # How does the Delta Method Work?
 
 Conditional on understanding why the Taylor series expansion matters, [Wikipedia contains a really nice derivation](https://en.wikipedia.org/wiki/Delta_method#Multivariate_delta_method).
@@ -93,6 +91,3 @@ Take the second derivative by subtracting each of the levels from the base level
 #### Continuous Variables
 
 Compute the second derivative of the link function and use that in place of the first derivative above. You need to explicitly compute the second derivative because you want an instantaneous rate of change as opposed to the rate of change over a range as with categorical variables above.
-
-(Calculate predicted effects at treat = 0, call the set of outcomes p_0.
-WHY IS SE(p_0) NOT THE QUANTITY WE’RE LOOKING FOR?)
