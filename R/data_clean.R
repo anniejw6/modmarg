@@ -17,9 +17,10 @@
 #' str(df3)
 #' str(df)
 #' all(df == df3)
-apply_transform <- function(df, var_name, value){
+at_transform <- function(df, var_name, value){
 
-  stopifnot( is.factor(df[[var_name]]) | is.numeric(df[[var_name]]) )
+  stopifnot( is.factor(df[[var_name]]) | is.numeric(df[[var_name]]),
+             is.data.frame(df) )
 
   # figure out if factor
   if(is.factor(df[[var_name]])){
@@ -33,3 +34,26 @@ apply_transform <- function(df, var_name, value){
 
 }
 
+
+#' Apply multiple transformations
+#'
+#' @param df dataframe
+#' @param var_name variable
+#' @param values vector of values for that variable
+#'
+#' @return list of transformed dataframes
+#' @export
+#'
+#' @examples
+#' data(mtcars)
+#' mtcars$gear <- factor(mtcars$gear)
+#' df3 <- transform(mtcars, gear = factor(3, levels = levels(mtcars$gear)))
+#' df <- at_transforms(df = mtcars, var_name = 'gear', values = c(3, 5))
+at_transforms <- function(df, var_name, values){
+
+  stopifnot(is.vector(values), is.character(var_name), var_name %in% names(df),
+            is.data.frame(df) )
+
+  lapply(values, function(x) at_transform(df, var_name, x))
+
+}

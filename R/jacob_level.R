@@ -17,15 +17,15 @@
 #' ld_fun <- binom_family$mu.eta
 #'
 #' x3 <- predict_modelmat(model = mm,
-#' transformed_df = apply_transform(df = mtcars, var_name = 'gear', value = 3)
+#' transformed_df = at_transform(df = mtcars, var_name = 'gear', value = 3)
 #' )
 #'
 #' x4 <- predict_modelmat(model = mm,
-#' transformed_df = apply_transform(df = mtcars, var_name = 'gear', value = 4)
+#' transformed_df = at_transform(df = mtcars, var_name = 'gear', value = 4)
 #' )
 #'
 #' x5 <- predict_modelmat(model = mm,
-#' transformed_df = apply_transform(df = mtcars, var_name = 'gear', value = 5)
+#' transformed_df = at_transform(df = mtcars, var_name = 'gear', value = 5)
 #' )
 #'
 #' jacob_level(x3$pred, x3$covar, ld_fun)

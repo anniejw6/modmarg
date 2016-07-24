@@ -6,11 +6,25 @@ test_that("applying a single transformation", {
   data(mtcars)
   mtcars$gear <- factor(mtcars$gear)
 
-  expect_identical(apply_transform(df = mtcars, var_name = 'gear', value = 3),
+  expect_identical(at_transform(df = mtcars, var_name = 'gear', value = 3),
                    transform(mtcars, gear = factor(3, levels = levels(mtcars$gear))))
 
-  expect_identical(apply_transform(df = mtcars, var_name = 'mpg', value = 20),
+  expect_identical(at_transform(df = mtcars, var_name = 'mpg', value = 20),
                    transform(mtcars, mpg = 20))
+
+})
+
+
+test_that("applying multiple transformations", {
+
+  data(mtcars)
+  mtcars$gear <- factor(mtcars$gear)
+
+  expect_identical(at_transforms(df = mtcars, var_name = 'gear', values = c(3,5)),
+                   list(transform(mtcars, gear = factor(3, levels = levels(mtcars$gear))),
+                        transform(mtcars, gear = factor(5, levels = levels(mtcars$gear))))
+  )
+
 
 })
 
