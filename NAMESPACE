@@ -3,3 +3,4 @@
 export(apply_transform)
 export(jacob_level)
 export(pred_se)
+export(predict_modelmat)
