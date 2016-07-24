@@ -28,22 +28,21 @@ mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
 binom_family <- make.link('logit')
 ld_fun <- binom_family$mu.eta
 
-df3 <- transform(mm$data, gear = factor(3, levels = levels(mtcars$gear)))
-df4 <- transform(mm$data, gear = factor(4, levels = levels(mtcars$gear)))
-df5 <- transform(mm$data, gear = factor(5, levels = levels(mtcars$gear)))
+x3 <- predict_modelmat(model = mm,
+transformed_df = apply_transform(df = mtcars, var_name = 'gear', value = 3)
+)
 
-covar3 <- model.matrix(mm$formula, df3)
-covar4 <- model.matrix(mm$formula, df4)
-covar5 <- model.matrix(mm$formula, df5)
+x4 <- predict_modelmat(model = mm,
+transformed_df = apply_transform(df = mtcars, var_name = 'gear', value = 4)
+)
 
-# Note type != response
-p3 <- predict(mm, newdata = df3)
-p4 <- predict(mm, newdata = df4)
-p5 <- predict(mm, newdata = df5)
+x5 <- predict_modelmat(model = mm,
+transformed_df = apply_transform(df = mtcars, var_name = 'gear', value = 5)
+)
 
-jacob_level(p3, as.matrix(covar3), ld_fun)
-jacob_level(p4, as.matrix(covar4), ld_fun)
-jacob_level(p5, as.matrix(covar5), ld_fun)
+jacob_level(x3$pred, x3$covar, ld_fun)
+jacob_level(x4$pred, x4$covar, ld_fun)
+jacob_level(x5$pred, x5$covar, ld_fun)
 
 }
 
