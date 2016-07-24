@@ -1,0 +1,39 @@
+#' Format margins output
+#'
+#' @param se vector, standard errors
+#' @param cofint vector, confidence intervals defaults to c(0.025, 0.975)
+#' @param margin_labels vector, label of what the margins mean
+#' @param pred_margins vector, predictive margins
+#'
+#' @return dataframe of label, margin, se, z-value, p-value, and confidence interval bounds
+#' @export
+#'
+#' @examples
+#' format_output(margin_labels = c('hello', 'goodbye', 'whatever'),
+#' pred_margins = c(1, 0.25, 3.1),
+#' se = c(0.25, 0.75, 0.5))
+format_output <- function(margin_labels, pred_margins, se, cofint = c(0.025, 0.975)){
+
+  stopifnot(is.numeric(pred_margins), is.numeric(se),
+            is.numeric(cofint),
+            cofint[1] > 0, cofint[2] < 1,
+            cofint[2] > cofint[1], length(cofint) == 2,
+            length(margin_labels) == length(pred_margins),
+            length(se) == length(pred_margins)
+            )
+
+  res <- data.frame(
+    Label = margin_labels,
+    Margin = pred_margins,
+    `Standard Error` = se,
+    `Z Value` = pred_margins/se,
+    `P Value` = 1 - pnorm(pred_margins/se),
+    lower_ci = pred_margins + (qnorm(min(cofint)) * se ),
+    upper_ci = pred_margins + (qnorm(max(cofint)) * se )
+  )
+
+  names(res)[names(res) %in% c('lower_ci', 'upper_ci')] <-
+    sprintf("%s (%s)", c('Lower CI', 'Upper CI'), scales::percent(cofint[2] - cofint[1]) )
+
+  res
+}
