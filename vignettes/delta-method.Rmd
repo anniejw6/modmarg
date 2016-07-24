@@ -10,7 +10,7 @@ vignette: >
 ---
 
 # Why Margins?
-Let's say that you fit a logistic regression. The coefficients are basically uninterpretable, but you want to know the average impact of one of your variables (the predicted effect) expressed in probabilities and the associated error term. Or maybe you want to know the average outcome level (the predicted margins) across different groups and the associated error term.
+Let's say that you fit a logistic regression. You are trying to figure out the marginal relationship between a covariate and the outcome of the regression (say, a treatement effect, for example). Or perhaps you want to know the average outcome level given a covariate being set to a particular level. In both cases, you also care about some measure of variation.
 
 While predictive levels or effects are pretty easy to estimate given predictions from a regression, estimating the measures of central tendency (variance or standard deviation) are much harder to estimate. Unfortunately, you can't just take the variance of the predictive margin or effect becauase...it's just a single number. We could (maybe) derive a probability density function for the predictive margin and then use method of moments estimation to get the variance, but there’s a good chance that the probability density function doesn’t exist or is monstrously hard to deal with.
 
@@ -59,7 +59,7 @@ $$
 For continuous variables, the marginal effect is a derivative, so 
 $$\begin{aligned}
 P_e(X_1 \beta) &= \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)} + 
-\frac{d^2(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}(X\beta - X_1 \beta)
+\frac{d^2(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}(\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)} - \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)})
 \end{aligned}
 $$
 
