@@ -2,6 +2,9 @@
 
 export(at_transform)
 export(at_transforms)
+export(format_output)
+export(get_margins)
+export(jacob_effect)
 export(jacob_level)
 export(pred_se)
 export(predict_modelmat)

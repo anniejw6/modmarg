@@ -58,3 +58,20 @@ test_that("jacobian works correctly", {
                tolerance = .0001)
 
 })
+
+
+test_that("multiple jacobian works correctly", {
+
+  z <- as.matrix(data.frame(a = 1:3,
+                            b = 4:6,
+                            c = 8:10))
+
+  expect_equivalent(as.matrix(jacob_effect(z, 2)),
+                   matrix(c(-1, -1, -1, 0, 0, 0, 1, 1, 1),
+                          ncol = 3, nrow = 3, byrow = T))
+
+  expect_equivalent(as.matrix(jacob_effect(z, 3)),
+                    matrix(c(rep(-2, 3), rep(-1, 3), rep(0, 3)),
+                           ncol = 3, nrow = 3, byrow = T))
+
+})
