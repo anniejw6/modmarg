@@ -28,10 +28,14 @@
 #' jacob_level(pred_values = z, covar_matrix = covar, inv_link_deriv = ld_fun)
 jacob_level <- function(pred_values, covar_matrix, inv_link_deriv){
 
-  x1 <- do.call(inv_link_deriv, list(pred_values)) # derivative of the predicted valeus
+  stopifnot(is.numeric(pred_values), is.matrix(covar_matrix),
+            is.numeric(covar_matrix), is.function(inv_link_deriv))
+
+  # caluclate derivative of the predicted values
+  x1 <- do.call(inv_link_deriv, list(pred_values))
 
   as.numeric(
-    crossprod(x1, as.matrix(covar_matrix))/nrow(covar_matrix)
+    crossprod(x1, covar_matrix)/nrow(covar_matrix)
   )
 
 }
