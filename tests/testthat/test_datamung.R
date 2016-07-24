@@ -56,3 +56,10 @@ test_that("make sure we format output correctly", {
   expect_equal(z$Z.Value, c(11.39, 23.26), tolerance = 0.01)
 
 })
+
+test_that("get means of a list correctly",{
+
+  expect_equal(get_margins(list(1:3, 8:10)),
+               c(2, 9))
+
+})
