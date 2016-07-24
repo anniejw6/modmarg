@@ -10,7 +10,7 @@ vignette: >
 ---
 
 # Why Margins?
-Let's say that you fit a logistic regression. The coefficients are basically uninterpretable, but you want to know the average impact of one of your variables (the predicted effect) expressed in probabilities and the associated error term. Or maybe you want to know the average outcome level (the predicted margins) across different groups and the associated error term.
+Let's say that you fit a logistic regression. You are trying to figure out the marginal relationship between a covariate and the outcome of the regression (say, a treatement effect, for example). Or perhaps you want to know the average outcome level given a covariate being set to a particular level. In both cases, you also care about some measure of variation.
 
 While predictive levels or effects are pretty easy to estimate given predictions from a regression, estimating the measures of central tendency (variance or standard deviation) are much harder to estimate. Unfortunately, you can't just take the variance of the predictive margin or effect becauase...it's just a single number. We could (maybe) derive a probability density function for the predictive margin and then use method of moments estimation to get the variance, but there’s a good chance that the probability density function doesn’t exist or is monstrously hard to deal with.
 
@@ -22,30 +22,46 @@ There's another way to think of the predictive margin or effect--it's a function
 The Delta Method is a general method for deriving the variance of a function of random variables with known variance. In this case, the random variables are the $\beta$s of the regression and the function is our inverse link function. Therefore, we’ll need to multiply the variance of the $\beta$s, given by the variance-covariance matrix of the regression, by the derivative of their transformation during prediction, given by the Jacobian. 
 
 ## A reminder about Taylor Series
-The [Taylor Expansion](https://en.wikipedia.org/wiki/Taylor_series) is a useful tool because it allows us to approximate a differentiable function, $G$, in terms of (an infinite sum of) the derivatives of $G$. To be more precise, an infinitely differentiable $G$ evaluated at $y$ can be written in terms of another point, $x$, and the differences,
-$$G(y) = G'(x) + G''(y-x) + G'''(y-x) + ...$$
+The [Taylor Expansion](https://en.wikipedia.org/wiki/Taylor_series) is a useful tool because it allows us to approximate a differentiable function, $G(x)$, in terms of (an infinite sum of) the derivatives of $G(x)$. To be more precise, an infinitely differentiable $G(x)$ evaluated at $a$ can be written as
+$$G(x) = G(a) + \frac{G'(a)}{1!}(x - a) + \frac{G''(a)}{2!}(x-a)^2 + 
+\frac{G'''(a)}{3!}(x-a)^3 + \dots$$
 
-In the case of the delta method for predictive margins (levels), with [link function](https://en.wikipedia.org/wiki/Generalized_linear_model#Link_function) $link$, the column vector of predictions $P$ is a function of $X \beta$ given by $$P(X_1) = \text{link}^{-1}(X_1 \beta)$$. The exact form of the link function and its inverse will depend on the type of regression. For example, the logit function is the canonical link function for logistic regression and allows transformations between probabilities and log-odds.
+In the case of the delta method for predictive margins (levels), with [link function](https://en.wikipedia.org/wiki/Generalized_linear_model#Link_function) $link$, the column vector of predictions $P_m$ at covariates $X_1$ is 
+$$P_m(X_1) = \text{link}^{-1}(X_1 \beta)$$
 
-For the predictive effect of a regression run with link function $link$, the column vector of predictions $P$ is a function of $X \beta$ such that $$P(X_1 \beta) = \frac{d(\text{link}^{-1}))}{d(X \beta)}(X_1 \beta)$$ Depending on whether the effect is over a continuous or categorical variable, this may be an actual derivative (the instantaneous rate of change) or the subtraction of $P(X \beta)$ calculated at one value of $X$ from another (the first difference). Therefore, we can expand $P$, a function of the random variable $X \beta$ around the mean of $X \beta$, $\bar{X \beta}$. 
+The exact form of the link function and its inverse will depend on the type of regression. For example, the logit function is the canonical link function for logistic regression and allows transformations between probabilities and log-odds.
 
-Thus, we can write
+For the predictive effect of a regression run with link function $link$, the column vector of predictions $P_m$ is a function of $X \beta$ such that 
 
-$$P(X\beta) = P(\overline{X\beta}) + 
-\frac{d(P(\overline{X\beta}))}{d(X\beta)}(X\beta - \overline{X\beta})$$
+$$P_e(X_1 \beta) = \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}$$ 
 
-Recall that for predicted margins (levels), the $P(X \beta)$ function is $link^{-1}(X \beta)$, thus the Taylor expansion is 
+Depending on whether the effect is over a continuous or categorical variable, this may be an actual derivative (the instantaneous rate of change) or the subtraction of $P(X \beta)$ calculated at one value of $X$ from another (the first difference). 
 
-$$P(X_1 \beta) = \text{link}^{-1}(\overline{X\beta}) + 
-\frac{d(\text{link}^{-1}(\overline{X\beta}))}{d(X \beta)}(X\beta - \overline{X\beta})$$
+Using the Taylor expansion, we can express $P$, a function of the random variable $X \beta$ around the point $X_1 \beta$, as
 
-In the case that we are trying to estimate marginal effects of categorical variables, we are trying to estimate $P(X_1 \beta - X_2 \beta)$, and so the linearity of derivatives gives us the Taylor expansion 
+$$P(X \beta) = P(X_1 \beta) + 
+\frac{d(P(X_1 \beta))}{d(X\beta)}(X\beta - X_1 \beta)$$
 
-$$P(X_1 \beta - X_2 \beta) = \text{link}^{-1} (X_1 \beta - X_2 \beta) + \frac{d(\text{link}^{-1})}{d(X \beta)}(X_1 \beta - X_2 \beta) = \text{link}^{-1} (X_1 \beta) - \text{link}^{-1} (X_2 \beta) + \frac{d(\text{link}^{-1})}{d(X \beta)}(X_1) - \frac{d(\text{link}^{-1})}{d(X \beta)}(X_2)$$.
+For predicted margins (levels), the Taylor expansion is 
+
+$$P_m(X \beta) = \text{link}^{-1}(X_1 \beta) + 
+\frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}(X\beta - X_1 \beta)$$
+
+In the case that we are trying to estimate marginal effects of categorical variables, we are trying to estimate the effects at $P_e(X_1 \beta - X_2 \beta)$, which gives us
+
+$$ \begin{aligned}
+P_e(X \beta) &= \text{link}^{-1} (X_1 \beta - X_2 \beta) + 
+\frac{d(\text{link}^{-1}(X_1 \beta - X_2 \beta))}{d(X \beta)}(X\beta - (X_1 \beta - X_2 \beta)) \\
+% &= \text{link}^{-1} (X_1 \beta) - \text{link}^{-1} (X_2 \beta) + \frac{d(\text{link}^{-1})}{d(X \beta)}(X_1) - \frac{d(\text{link}^{-1})}{d(X \beta)}(X_2)
+\end{aligned}
+$$
 
 For continuous variables, the marginal effect is a derivative, so 
-$$\frac{d(P)}{d(X \beta)}(X_1 \beta)= \frac{d(\text{link}^{-1}}{d(X \beta)}(X_1 \beta) + 
-\frac{d^2(\text{link}^{-1})}{d^2 (X \beta)}(X_1 \beta)$$
+$$\begin{aligned}
+P_e(X_1 \beta) &= \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)} + 
+\frac{d^2(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}(\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)} - \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)})
+\end{aligned}
+$$
 
 # How does the Delta Method Work?
 
