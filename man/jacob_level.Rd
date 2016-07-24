@@ -4,14 +4,14 @@
 \alias{jacob_level}
 \title{Calculate the Jacobian matrix for predictive levels}
 \usage{
-jacob_level(pred_values, covar_matrix, inv_link_deriv)
+jacob_level(pred_values, covar_matrix, link_deriv)
 }
 \arguments{
 \item{pred_values}{numeric vector of predicted values}
 
 \item{covar_matrix}{numeric matrix of covariates}
 
-\item{inv_link_deriv}{function for the derivative of the inverse link function with respect to eta}
+\item{link_deriv}{function for the derivative of the link function with respect to eta}
 }
 \value{
 numeric vector row of jacobian
@@ -21,22 +21,29 @@ Calculate the Jacobian matrix for predictive levels
 }
 \examples{
 
-# Run model
 data(mtcars)
-mtcars$carb <- factor(mtcars$carb)
-mm <- glm(vs ~ carb + mpg * disp, mtcars, family = 'binomial')
+mtcars$gear <- factor(mtcars$gear)
+mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
 
-# Create transformed covariates
-covar <- transform(mm$model, carb = 1)
-covar$`mpg:disp` <- covar$mpg * covar$disp
-
-# Generate predictions
-z <- predict(mm, data = covar)
-
-# Specify derivative of link function
 binom_family <- make.link('logit')
 ld_fun <- binom_family$mu.eta
 
-jacob_level(pred_values = z, covar_matrix = covar, inv_link_deriv = ld_fun)
+df3 <- transform(mm$data, gear = factor(3, levels = levels(mtcars$gear)))
+df4 <- transform(mm$data, gear = factor(4, levels = levels(mtcars$gear)))
+df5 <- transform(mm$data, gear = factor(5, levels = levels(mtcars$gear)))
+
+covar3 <- model.matrix(mm$formula, df3)
+covar4 <- model.matrix(mm$formula, df4)
+covar5 <- model.matrix(mm$formula, df5)
+
+# Note type != response
+p3 <- predict(mm, newdata = df3)
+p4 <- predict(mm, newdata = df4)
+p5 <- predict(mm, newdata = df5)
+
+jacob_level(p3, as.matrix(covar3), ld_fun)
+jacob_level(p4, as.matrix(covar4), ld_fun)
+jacob_level(p5, as.matrix(covar5), ld_fun)
+
 }
 
