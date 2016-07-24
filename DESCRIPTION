@@ -1,0 +1,14 @@
+Package: modmarg
+Title: Calculating Marginal Effects and Levels with Errors 
+Version: 0.0.0.9000
+Authors@R: c(
+	person("Alex", "Gold", email = "alex.k.gold@gmail.com", role = c("aut", "cre")),
+	person("Annie", "Wang", email = "anniejw6@gmail.com.", role = c("aut", "cre")))
+Description: What the package does (one paragraph).
+Depends: R (>= 3.2.2)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
