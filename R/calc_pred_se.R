@@ -7,7 +7,8 @@
 #' the variable of interest
 #' @param var_interest the variable of interest
 #' @param model model
-#'
+#' @param type either effects or levels, defaults to levels
+#' @param base_rn row number of the base level, defaults to 1
 #' @return dataframe of formatted output
 #' @export
 #'
@@ -19,7 +20,13 @@
 #' df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
 #' df <- df[[1]]
 #' calc_jac_se(df, var_interest = 'gear', model = mm)
-calc_pred_se <- function(df_trans, var_interest, model){
+calc_pred_se <- function(df_trans, var_interest, model,
+                         type = 'levels', base_rn = 1){
+
+  stopifnot(is.data.frame(df_trans),
+            is.character(var_interest),
+            var_interest %in% names(df_trans),
+            type %in% c('effects', 'levels'))
 
   df_levels <- at_transforms(df_trans, gen_at_list(df_trans, var_interest))
 
@@ -37,12 +44,16 @@ calc_pred_se <- function(df_trans, var_interest, model){
       link_deriv = model$family$mu.eta)
   }))
 
+  if(type == 'effects'){
+    jacobs <- jacob_effect(jacobs, base_rn)
+    preds <- pred_effect(preds, base_rn)
+  }
   # TODO: figure out whether you want levels or effects
 
   format_output( # maybe reformat this to var, value, at?
     margin_labels = names(cov_preds),
     pred_margins = preds,
-    se = pred_se(vcov(mod), jacobs)
+    se = pred_se(vcov(model), jacobs)
   )
 
 }

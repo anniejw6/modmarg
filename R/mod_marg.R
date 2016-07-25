@@ -5,9 +5,10 @@
 #' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
 #' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 #' This calculates the margins of the variable at these particular variables.
+#' @param base_rn if 'effects', this is the base level (this is an index of the ordered unique values in var_interest)
 #'
-#' @return
-#'
+#' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
+#' @export
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
@@ -18,9 +19,10 @@
 #' margex$treatment <- factor(margex$treatment)
 #' mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
 #' mod_marg2(mod, 'treatment', 'levels', at = NULL)
+#' mod_marg2(mod, 'treatment', 'effects', at = NULL)
 mod_marg2 <- function(mod, var_interest,
                       type = 'levels',
-                      at = NULL){
+                      at = NULL, base_rn = 1){
 
   stopifnot(
     'glm' %in% class(mod),
@@ -29,9 +31,7 @@ mod_marg2 <- function(mod, var_interest,
     # TODO: warning if at contains extrapolated values
     )
 
-  # Transform things ----
-
-  # Transform the ats
+  # Transform the ats ---
   if(!is.null(at)){
 
     df <- at_transforms(mod$model, at)
@@ -44,7 +44,9 @@ mod_marg2 <- function(mod, var_interest,
 
 
   # Calculate pred and se ---
-  lapply(df, function(x) calc_pred_se(x, var_interest, mod))
+
+  lapply(df, function(x) calc_pred_se(x, var_interest, mod,
+                                      type = type, base_rn = base_rn))
 }
 
 
