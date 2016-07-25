@@ -4,7 +4,8 @@
 \alias{mod_marg2}
 \title{Estimating predictive margins on a model}
 \usage{
-mod_marg2(mod, var_interest, type = "levels", at = NULL, base_rn = 1)
+mod_marg2(mod, var_interest, type = "levels", at = NULL, base_rn = 1,
+  at_var_interest = NULL)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class glm}
@@ -17,6 +18,9 @@ mod_marg2(mod, var_interest, type = "levels", at = NULL, base_rn = 1)
 This calculates the margins of the variable at these particular variables.}
 
 \item{base_rn}{if 'effects', this is the base level (this is an index of the ordered unique values in var_interest)}
+
+\item{at_var_interest}{vector of levels for variable of interest, if NULL, indicates all levels for a
+factor variable, defaults to NULL}
 }
 \value{
 list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
@@ -35,5 +39,6 @@ margex$treatment <- factor(margex$treatment)
 mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
 mod_marg2(mod, 'treatment', 'levels', at = NULL)
 mod_marg2(mod, 'treatment', 'effects', at = NULL)
+mod_marg2(mod, 'distance', 'levels', at = NULL, at_var_interest = c(10, 20, 30))
 }
 

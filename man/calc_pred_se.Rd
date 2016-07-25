@@ -4,7 +4,8 @@
 \alias{calc_pred_se}
 \title{Calculate margins and se}
 \usage{
-calc_pred_se(df_trans, var_interest, model, type = "levels", base_rn = 1)
+calc_pred_se(df_trans, var_interest, model, type = "levels", base_rn = 1,
+  at_var_interest = NULL)
 }
 \arguments{
 \item{df_trans}{data.frame, should already be transformed for variables not related to

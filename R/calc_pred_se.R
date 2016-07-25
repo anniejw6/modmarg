@@ -21,14 +21,15 @@
 #' df <- df[[1]]
 #' calc_jac_se(df, var_interest = 'gear', model = mm)
 calc_pred_se <- function(df_trans, var_interest, model,
-                         type = 'levels', base_rn = 1){
+                         type = 'levels', base_rn = 1,
+                         at_var_interest = NULL){
 
   stopifnot(is.data.frame(df_trans),
             is.character(var_interest),
             var_interest %in% names(df_trans),
             type %in% c('effects', 'levels'))
 
-  df_levels <- at_transforms(df_trans, gen_at_list(df_trans, var_interest))
+  df_levels <- at_transforms(df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
 
   # Get predicted values and covariates
   cov_preds <- lapply(df_levels, function(x)

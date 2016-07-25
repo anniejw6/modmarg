@@ -4,12 +4,14 @@
 \alias{gen_at_list}
 \title{Generate "at" transformation list for a single variable}
 \usage{
-gen_at_list(df, var_interest)
+gen_at_list(df, var_interest, at_var_interest = NULL)
 }
 \arguments{
 \item{df}{dataframe to be transformed}
 
 \item{var_interest}{variable of interest}
+
+\item{at_var_interest}{at levels for variables of interest, defaults to NULL}
 }
 \value{
 named list of all values for variable of interest
