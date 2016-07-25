@@ -2,8 +2,10 @@
 
 export(at_transform)
 export(at_transforms)
+export(calc_pred_se)
 export(format_output)
 export(get_margins)
+export(jacob_discrete)
 export(jacob_effect)
 export(jacob_level)
 export(pred_se)
