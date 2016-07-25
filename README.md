@@ -3,11 +3,14 @@ predicted margins and marginals effects
 
 # v1.0
 
-* Can take the predictive levels of a continuous or discrete variable
-* Can take the predictive effects (dydx) of a discrete variable
-* Supports interactions
+* Can take the predictive levels of a discrete variable [done]
+* Can take the predictive levels of a continuous variable [not done?]
+* Can take the predictive effects (dydx) of a discrete variable [done]
+* Supports interactions [need to test]
 * Models: OLS, Logit
-* Test suite
+* Test suite [done - could probably do more]
+  * Add https://github.com/jimhester/covr?
+  * Add Travis CI
 
 # v2.0
 
@@ -33,7 +36,7 @@ x <- seq(-10, 10, 0.5)
 inv_log_link <- function(x){ 1 / (1 + exp( -1 * x))}
 testthat::expect_equal(inv_log_link(x), binom_family$linkinv(x))
 
-# this is the derivative of the inverse link
+# this is the derivative of the link (not the inverse link!)
 x <- seq(0, 1, 0.01)
 # p = 0.5 --> p * (1 - p) = 0.25
 binom_family$mu.eta( 0 ) 
