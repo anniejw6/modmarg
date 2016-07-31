@@ -1,62 +1,33 @@
-#' Calculate margins and se
+#' Calculate standard errors for predictive margins
 #'
-#' For one set of transformed covariates (not including the variable of interest),
-#' calculate the predicted level and se for the variable of interest.
+#' @param vcov_model variance-covariance matrix of the model
+#' @param jacobian jacobian matrix of the predictions
 #'
-#' @param df_trans data.frame, should already be transformed for variables not related to
-#' the variable of interest
-#' @param var_interest the variable of interest
-#' @param model model
-#' @param type either effects or levels, defaults to levels
-#' @param base_rn row number of the base level, defaults to 1
-#' @return dataframe of formatted output
+#' @return vector of standard errors
 #' @export
-#'
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
 #' mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
-#' # apply at transformations
-#' df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
-#' df <- df[[1]]
-#' calc_jac_se(df, var_interest = 'gear', model = mm)
-calc_pred_se <- function(df_trans, var_interest, model,
-                         type = 'levels', base_rn = 1,
-                         at_var_interest = NULL){
+#'
+#' binom_family <- make.link('logit')
+#' ld_fun <- binom_family$mu.eta
+#'
+#' df3 <- transform(mm$data, gear = factor(3, levels = levels(mtcars$gear)))
+#' covar3 <- model.matrix(mm$formula, df3)
+#' p3 <- predict(mm, newdata = df3)
+#'
+#' z <-jacob_level(p3, as.matrix(covar3), ld_fun)
+#'
+#' calc_pred_se(vcov(mm), z)
+#' calc_pred_se(vcov(mm), rbind(z, z))
+calc_pred_se <- function(vcov_model, jac){
 
-  stopifnot(is.data.frame(df_trans),
-            is.character(var_interest),
-            var_interest %in% names(df_trans),
-            type %in% c('effects', 'levels'))
+  stopifnot( (is.matrix(jac) | is.numeric(jac)),
+             is.matrix(vcov_model), is.numeric(vcov_model))
 
-  df_levels <- at_transforms(df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
+  if(!is.matrix(jac)) jac <- matrix(jac, ncol = length(jac))
 
-  # Get predicted values and covariates
-  cov_preds <- lapply(df_levels, function(x)
-    predict_modelmat(model = model, transformed_df = x))
-
-  # calculate predictions
-  preds <- sapply(cov_preds, function(x){ mean(x$pred_resp) })
-
-  # calculate jacobian
-  jacobs <- do.call(rbind, lapply(cov_preds, function(x){
-    jacob_level(
-      pred_values = x$pred_link, covar_matrix = x$covar,
-      link_deriv = model$family$mu.eta)
-  }))
-
-  if(type == 'effects'){
-    jacobs <- jacob_effect(jacobs, base_rn)
-    preds <- pred_effect(preds, base_rn)
-  }
-  # TODO: figure out whether you want levels or effects
-
-  format_output( # maybe reformat this to var, value, at?
-    margin_labels = names(cov_preds),
-    pred_margins = preds,
-    se = pred_se(vcov(model), jacobs)
-  )
+  sqrt(diag(jac %*% vcov_model %*% t(jac)))
 
 }
-
-

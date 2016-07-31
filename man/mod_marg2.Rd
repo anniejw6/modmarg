@@ -17,9 +17,11 @@ mod_marg2(mod, var_interest, type = "levels", at = NULL, base_rn = 1,
 \item{at}{list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 This calculates the margins of the variable at these particular variables.}
 
-\item{base_rn}{if 'effects', this is the base level (this is an index of the ordered unique values in var_interest)}
+\item{base_rn}{numeric, if type == 'effects', the base level (taken as the index of one of
+the ordered unique values in var_interest). if type == 'levels', this param is ignored.
+Defaults to 1.}
 
-\item{at_var_interest}{vector of levels for variable of interest, if NULL, indicates all levels for a
+\item{at_var_interest}{vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
 factor variable, defaults to NULL}
 }
 \value{
