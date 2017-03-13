@@ -75,10 +75,3 @@ test_that("make sure we format output correctly", {
 
   # TODO: add check in here for negative values!
 })
-
-test_that("get means of a list correctly",{
-
-  expect_equal(get_margins(list(1:3, 8:10)),
-               c(2, 9))
-
-})

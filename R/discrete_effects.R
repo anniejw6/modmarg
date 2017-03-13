@@ -31,8 +31,8 @@
 #' jacob_level(x4$pred, x4$covar, ld_fun),
 #' jacob_level(x5$pred, x5$covar, ld_fun)
 #' )
-#' jacob_effect(z, 1)
-jacob_effect <- function(jacobian, base_rn = 1){
+#' discrete_effect_jacob(z, 1)
+discrete_effect_jacob <- function(jacobian, base_rn = 1){
 
   stopifnot(is.numeric(jacobian), is.matrix(jacobian), base_rn <= nrow(jacobian))
 
@@ -50,8 +50,8 @@ jacob_effect <- function(jacobian, base_rn = 1){
 #' @export
 #'
 #' @examples
-#' pred_effect(c(1,3),1)
-pred_effect <- function(pred, base_rn = 1){
+#' discrete_effect_pred(c(1,3),1)
+discrete_effect_pred <- function(pred, base_rn = 1){
 
   stopifnot(is.numeric(pred), is.vector(pred), base_rn <= length(pred))
 

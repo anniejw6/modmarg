@@ -19,11 +19,11 @@ test_that("jacobian works correctly", {
   binom_family <- make.link('logit')
   ld_fun <- binom_family$mu.eta
 
-  expect_equal(jacob_level(p0, as.matrix(covar0), ld_fun),
+  expect_equal(calc_jacob(p0, as.matrix(covar0), ld_fun),
                c(0, 0.74390659, 0.07240388)[c(3, 1, 2)],
                tolerance = .0001)
 
-  expect_equal(jacob_level(p1, as.matrix(covar1), ld_fun),
+  expect_equal(calc_jacob(p1, as.matrix(covar1), ld_fun),
                c(0.18766468, 2.1907626, 0.18766468)[c(3, 1, 2)],
                tolerance = .0001)
 
@@ -45,32 +45,32 @@ test_that("jacobian works correctly", {
   p4 <- predict(mm, newdata = df4)
   p5 <- predict(mm, newdata = df5)
 
-  expect_equal(jacob_level(p3, as.matrix(covar3), ld_fun),
+  expect_equal(calc_jacob(p3, as.matrix(covar3), ld_fun),
                c(0, 0, 0.090535558, 1.316670875, 24.040145060, 0.004931502)[c(6, 1:5)],
                tolerance = .0001)
 
-  expect_equal(jacob_level(p4, as.matrix(covar4), ld_fun),
+  expect_equal(calc_jacob(p4, as.matrix(covar4), ld_fun),
                c(0.02704185, 0, 0.56997483, 4.31214, 90.5598, 0.02704185)[c(6, 1:5)],
                tolerance = .0001)
 
-  expect_equal(jacob_level(p5, as.matrix(covar5), ld_fun),
+  expect_equal(calc_jacob(p5, as.matrix(covar5), ld_fun),
                c(0, 0.00469992, 0.12826647, 0.52297052, 13.961691, 0.00469992)[c(6, 1:5)],
                tolerance = .0001)
 
 })
 
 
-test_that("multiple jacobian works correctly", {
+test_that("jacobian of discrete variables works correctly", {
 
   z <- as.matrix(data.frame(a = 1:3,
                             b = 4:6,
                             c = 8:10))
 
-  expect_equivalent(as.matrix(jacob_effect(z, 2)),
+  expect_equivalent(as.matrix(discrete_effect_jacob(z, 2)),
                    matrix(c(-1, -1, -1, 0, 0, 0, 1, 1, 1),
                           ncol = 3, nrow = 3, byrow = T))
 
-  expect_equivalent(as.matrix(jacob_effect(z, 3)),
+  expect_equivalent(as.matrix(discrete_effect_jacob(z, 3)),
                     matrix(c(rep(-2, 3), rep(-1, 3), rep(0, 3)),
                            ncol = 3, nrow = 3, byrow = T))
 

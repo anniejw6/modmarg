@@ -82,21 +82,27 @@ at_transforms <- function(model_df, at_list){
 #'
 #' @param df dataframe to be transformed
 #' @param var_interest variable of interest
-#'
+#' @param at_var_interest at levels for variables of interest, defaults to NULL
 #'
 #' @return named list of all values for variable of interest
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
 #' gen_at_list(mtcars, 'gear')
-gen_at_list <- function(df, var_interest){
+gen_at_list <- function(df, var_interest, at_var_interest = NULL){
 
-  stopifnot(is.factor(df[[var_interest]]))
+  stopifnot(var_interest %in% names(df))
+  if(is.null(at_var_interest) & !is.factor(df[[var_interest]])) stop('Must specify at_var_interest for continuous variables')
 
-  # Get all unique values
-  val_interest <- unique(df[[var_interest]])
-  # order and put into list
-  val_interest <- list(val_interest[order(val_interest)])
+  if(is.null(at_var_interest)){
+    # Get all unique values
+    val_interest <- unique(df[[var_interest]])
+    # order and put into list
+    val_interest <- list(val_interest[order(val_interest)])
+  } else {
+    val_interest <- list(at_var_interest)
+  }
+
   # Give name to list
   names(val_interest) <- var_interest
 

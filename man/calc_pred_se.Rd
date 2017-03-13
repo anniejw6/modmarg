@@ -2,36 +2,36 @@
 % Please edit documentation in R/calc_pred_se.R
 \name{calc_pred_se}
 \alias{calc_pred_se}
-\title{Calculate margins and se}
+\title{Calculate standard errors for predictive margins}
 \usage{
-calc_pred_se(df_trans, var_interest, model, type = "levels", base_rn = 1)
+calc_pred_se(vcov_model, jac)
 }
 \arguments{
-\item{df_trans}{data.frame, should already be transformed for variables not related to
-the variable of interest}
+\item{vcov_model}{variance-covariance matrix of the model}
 
-\item{var_interest}{the variable of interest}
-
-\item{model}{model}
-
-\item{type}{either effects or levels, defaults to levels}
-
-\item{base_rn}{row number of the base level, defaults to 1}
+\item{jacobian}{jacobian matrix of the predictions}
 }
 \value{
-dataframe of formatted output
+vector of standard errors
 }
 \description{
-For one set of transformed covariates (not including the variable of interest),
-calculate the predicted level and se for the variable of interest.
+Calculate standard errors for predictive margins
 }
 \examples{
 data(mtcars)
 mtcars$gear <- factor(mtcars$gear)
 mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
-# apply at transformations
-df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
-df <- df[[1]]
-calc_jac_se(df, var_interest = 'gear', model = mm)
+
+binom_family <- make.link('logit')
+ld_fun <- binom_family$mu.eta
+
+df3 <- transform(mm$data, gear = factor(3, levels = levels(mtcars$gear)))
+covar3 <- model.matrix(mm$formula, df3)
+p3 <- predict(mm, newdata = df3)
+
+z <-jacob_level(p3, as.matrix(covar3), ld_fun)
+
+calc_pred_se(vcov(mm), z)
+calc_pred_se(vcov(mm), rbind(z, z))
 }
 
