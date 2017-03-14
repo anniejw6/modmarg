@@ -4,8 +4,8 @@
 \alias{mod_marg2}
 \title{Estimating predictive margins on a model}
 \usage{
-mod_marg2(mod, var_interest, type = "levels", at = NULL, base_rn = 1,
-  at_var_interest = NULL)
+mod_marg2(mod, var_interest, type = "levels", vcov_mat = vcov(mod),
+  at = NULL, base_rn = 1, at_var_interest = NULL)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class glm}
@@ -13,6 +13,8 @@ mod_marg2(mod, var_interest, type = "levels", at = NULL, base_rn = 1,
 \item{var_interest}{variable of interest}
 
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
+
+\item{vcov_mat}{the variance-covariance matrix, defaults to vcov(model)}
 
 \item{at}{list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 This calculates the margins of the variable at these particular variables.}
