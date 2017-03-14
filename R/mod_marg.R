@@ -2,6 +2,7 @@
 #'
 #' @param mod model object, currently only support those of class glm
 #' @param var_interest variable of interest
+#' @param df dataframe, defaults to mod$model
 #' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
 #' @param vcov_mat the variance-covariance matrix, defaults to vcov(model)
 #' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
@@ -17,15 +18,18 @@
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
 #' mod <- glm(vs ~ gear + mpg * disp, data = mtcars, family = 'binomial')
-#' mod_marg2(mod, 'gear', 'levels', list(mpg = c(15, 21), disp = c(140, 180)))
+#' mod_marg2(mod, var_interest = 'gear',
+#'           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
 #'
 #' data(margex)
 #' margex$treatment <- factor(margex$treatment)
 #' mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
-#' mod_marg2(mod, 'treatment', 'levels', at = NULL)
-#' mod_marg2(mod, 'treatment', 'effects', at = NULL)
-#' mod_marg2(mod, 'distance', 'levels', at = NULL, at_var_interest = c(10, 20, 30))
+#' mod_marg2(mod, var_interest = 'treatment', type = 'levels', at = NULL)
+#' mod_marg2(mod, var_interest = 'treatment', type = 'effects', at = NULL)
+#' mod_marg2(mod, var_interest = 'distance', type = 'levels',
+#'           at = NULL, at_var_interest = c(10, 20, 30))
 mod_marg2 <- function(mod, var_interest,
+                      df = mod$model,
                       type = 'levels',
                       vcov_mat = vcov(mod),
                       at = NULL, base_rn = 1,
@@ -33,8 +37,8 @@ mod_marg2 <- function(mod, var_interest,
 
   stopifnot(
     'glm' %in% class(mod),
-    var_interest %in% names(mod$model),
-    all(names(at) %in% names(mod$model))
+    var_interest %in% names(df),
+    all(names(at) %in% names(df))
     # TODO: warning if at contains extrapolated values
     )
   if( any(grepl('factor', attr(terms(mod$formula), 'term.labels'))) )
@@ -43,11 +47,11 @@ mod_marg2 <- function(mod, var_interest,
   # Transform the ats ---
   if(!is.null(at)){
 
-    df <- at_transforms(mod$model, at)
+    df <- at_transforms(df, at)
 
   } else {
 
-    df <- list(mod$model)
+    df <- list(df)
 
   }
 
