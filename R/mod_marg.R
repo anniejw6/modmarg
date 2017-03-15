@@ -41,7 +41,7 @@ mod_marg2 <- function(mod, var_interest,
   # Transform the ats ---
   if(!is.null(at)){
 
-    df <- at_transforms(mod$model, at)
+    df <- at_transforms(mod$model, at, mod = mod)
 
   } else {
 
