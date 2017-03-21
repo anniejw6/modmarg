@@ -4,7 +4,7 @@
 \alias{at_transform}
 \title{Transform data}
 \usage{
-at_transform(df, var_name, value)
+at_transform(mod, df, var_name, value)
 }
 \arguments{
 \item{df}{dataframe}
@@ -23,8 +23,10 @@ the syntax for factors is really annoying.
 \examples{
 data(mtcars)
 mtcars$gear <- factor(mtcars$gear)
-df3 <- transform(mtcars, gear = factor(3, levels = levels(mtcars$gear)))
-df <- apply_transform(df = mtcars, var_name = 'gear', value = 3)
+mod <- glm(cyl ~ gear + mpg, data = mtcars)
+df3 <- transform(mtcars[, c('cyl', 'gear', 'mpg')],
+                 gear = factor(3, levels = levels(mtcars$gear)))
+df <- at_transform(mod = mod, df = mtcars, var_name = 'gear', value = 3)
 str(df3)
 str(df)
 all(df == df3)
