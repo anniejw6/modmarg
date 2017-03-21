@@ -14,7 +14,8 @@ predict_modelmat(model, transformed_df, formula = model$formula)
 \item{formula}{model formula, defaults to model$formula}
 }
 \value{
-list of covariates (covar) and predictions (pred)
+list of covariates (covar), predictions on the link function scale (pred_link),
+and predictions on the response variable scale (pred_response), e.g., probabilities
 }
 \description{
 Generate predictions and model matrix
@@ -24,12 +25,12 @@ data(mtcars)
 mtcars$gear <- factor(mtcars$gear)
 mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
 
-df3 <- apply_transform(df = mtcars, var_name = 'gear', value = 3)
+df3 <- at_transform(df = mtcars, var_name = 'gear', value = 3)
 covar3 <- model.matrix(mm$formula, df3)
-p3 <- predict(mm, newdata = df3)
 
 z <- predict_modelmat(model = mm, transformed_df = df3)
 expect_identical(z$covar, covar3)
-expect_identical(z$pred, p3)
+expect_identical(z$pred_link, predict(mm, newdata = df3))
+expect_identical(z$pred_resp, predict(mm, newdata = df3, type = 'response'))
 }
 

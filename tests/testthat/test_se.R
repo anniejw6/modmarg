@@ -19,13 +19,13 @@ test_that("se is calculated correctly", {
   binom_family <- make.link('logit')
   ld_fun <- binom_family$mu.eta
 
-  expect_equal(pred_se(vcov_model = vcov(mm),
-                       jac = jacob_level(p0, as.matrix(covar0), ld_fun)),
+  expect_equal(calc_pred_se(vcov_model = vcov(mm),
+                       jac = calc_jacob(p0, as.matrix(covar0), ld_fun)),
                c(.0069456),
                tolerance = .0001)
 
-  expect_equal(pred_se(vcov_model = vcov(mm),
-                       jac = jacob_level(p1, as.matrix(covar1), ld_fun)),
+  expect_equal(calc_pred_se(vcov_model = vcov(mm),
+                       jac = calc_jacob(p1, as.matrix(covar1), ld_fun)),
                c(.0111772),
                tolerance = .0001)
 
@@ -46,18 +46,18 @@ test_that("se is calculated correctly", {
   p4 <- predict(mm, newdata = df4)
   p5 <- predict(mm, newdata = df5)
 
-  expect_equal(pred_se(vcov_model = vcov(mm),
-                       jac = jacob_level(p3, as.matrix(covar3), ld_fun)),
+  expect_equal(calc_pred_se(vcov_model = vcov(mm),
+                       jac = calc_jacob(p3, as.matrix(covar3), ld_fun)),
                c(0.0124141),
                tolerance = .0001)
 
-  expect_equal(pred_se(vcov_model = vcov(mm),
-                       jac = jacob_level(p4, as.matrix(covar4), ld_fun)),
+  expect_equal(calc_pred_se(vcov_model = vcov(mm),
+                       jac = calc_jacob(p4, as.matrix(covar4), ld_fun)),
                c(0.0290699),
                tolerance = .0001)
 
-  expect_equal(pred_se(vcov_model = vcov(mm),
-                       jac = jacob_level(p5, as.matrix(covar5), ld_fun)),
+  expect_equal(calc_pred_se(vcov_model = vcov(mm),
+                       jac = calc_jacob(p5, as.matrix(covar5), ld_fun)),
                c(0.0121496),
                tolerance = .0001)
 

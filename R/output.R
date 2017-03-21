@@ -27,7 +27,7 @@ format_output <- function(margin_labels, pred_margins, se, cofint = c(0.025, 0.9
     Margin = pred_margins,
     `Standard Error` = se,
     `Z Value` = pred_margins/se,
-    `P Value` = 1 - pnorm(pred_margins/se),
+    `P Value` = 1 - pnorm(abs(pred_margins/se)),
     lower_ci = pred_margins + (qnorm(min(cofint)) * se ),
     upper_ci = pred_margins + (qnorm(max(cofint)) * se )
   )
@@ -35,5 +35,6 @@ format_output <- function(margin_labels, pred_margins, se, cofint = c(0.025, 0.9
   names(res)[names(res) %in% c('lower_ci', 'upper_ci')] <-
     sprintf("%s (%s)", c('Lower CI', 'Upper CI'), scales::percent(cofint[2] - cofint[1]) )
 
+  row.names(res) <- NULL
   res
 }

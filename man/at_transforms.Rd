@@ -4,25 +4,22 @@
 \alias{at_transforms}
 \title{Apply multiple transformations}
 \usage{
-at_transforms(df, var_name, values)
+at_transforms(model_df, at_list)
 }
 \arguments{
-\item{df}{dataframe}
+\item{model_df}{dataframe used in model (not model.matrix)}
 
-\item{var_name}{variable}
-
-\item{values}{vector of values for that variable}
+\item{at_list}{list of transformations, in the format of list("variable" = c("values"))}
 }
 \value{
-list of transformed dataframes
+list of dataframes, each transformed
 }
 \description{
 Apply multiple transformations
 }
 \examples{
 data(mtcars)
-mtcars$gear <- factor(mtcars$gear)
-df3 <- transform(mtcars, gear = factor(3, levels = levels(mtcars$gear)))
-df <- at_transforms(df = mtcars, var_name = 'gear', values = c(3, 5))
+at_list <- list("mpg" = c(15, 21), "disp" = c(140, 180))
+at_transforms(mtcars, at_list)
 }
 

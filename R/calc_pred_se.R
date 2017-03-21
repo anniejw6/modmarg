@@ -19,9 +19,9 @@
 #'
 #' z <-jacob_level(p3, as.matrix(covar3), ld_fun)
 #'
-#' pred_se(vcov(mm), z)
-#' pred_se(vcov(mm), rbind(z, z))
-pred_se <- function(vcov_model, jac){
+#' calc_pred_se(vcov(mm), z)
+#' calc_pred_se(vcov(mm), rbind(z, z))
+calc_pred_se <- function(vcov_model, jac){
 
   stopifnot( (is.matrix(jac) | is.numeric(jac)),
              is.matrix(vcov_model), is.numeric(vcov_model))
