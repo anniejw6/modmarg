@@ -45,6 +45,11 @@ discrete_wrap <- function(df_trans, var_interest, model,
       deriv_func = model$family$mu.eta)
   }))
 
+  # if covariates are dropped from the model, remove those columns from cov_preds
+  for(i in 1:length(cov_preds)){
+    cov_preds[[i]]$covar <- cov_preds[[i]]$covar[, !is.na(coef(model))]
+  }
+
   if(type == 'effects'){
     jacobs <- discrete_effect_jacob(jacobs, base_rn)
     preds <- discrete_effect_pred(preds, base_rn)

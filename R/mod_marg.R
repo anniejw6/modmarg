@@ -32,7 +32,7 @@ mod_marg2 <- function(mod, var_interest,
   stopifnot(
     'glm' %in% class(mod),
     var_interest %in% names(mod$model),
-    all(names(at) %in% names(mod$model))
+    all(names(at) %in% names(mod$data))
     # TODO: warning if at contains extrapolated values
     )
   if( any(grepl('factor', attr(terms(mod$formula), 'term.labels'))) )
