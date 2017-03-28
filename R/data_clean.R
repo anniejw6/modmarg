@@ -26,11 +26,8 @@ at_transform <- function(mod, df, var_name, value){
   } else {
     df[[var_name]] <- value
   }
-
-  # grabbing this from ?predict.lm
-  model.frame(formula = mod$formula,
-              data = df,
-              xlev = mod$xlevels)
+  
+  df
 }
 
 #' Apply multiple transformations
