@@ -5,7 +5,7 @@
 \title{Calculate margins and se for continuous variables}
 \usage{
 continuous_wrap(df_trans, var_interest, model, at_var_interest = NULL,
-  type = "levels")
+  type = "levels", vcov_mat = NULL)
 }
 \arguments{
 \item{df_trans}{data.frame, should already be transformed for variables not related to
@@ -15,7 +15,11 @@ the variable of interest}
 
 \item{model}{model}
 
+\item{at_var_interest}{levels of variable of interest}
+
 \item{type}{either effects or levels, defaults to levels}
+
+\item{vcov_mat}{variance-covariance matrix, defaults to NULL}
 }
 \value{
 dataframe of formatted output

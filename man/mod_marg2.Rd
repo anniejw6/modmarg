@@ -4,15 +4,19 @@
 \alias{mod_marg2}
 \title{Estimating predictive margins on a model}
 \usage{
-mod_marg2(mod, var_interest, type = "levels", at = NULL, base_rn = 1,
-  at_var_interest = NULL)
+mod_marg2(mod, var_interest, df = mod$model, type = "levels",
+  vcov_mat = vcov(mod), at = NULL, base_rn = 1, at_var_interest = NULL)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class glm}
 
 \item{var_interest}{variable of interest}
 
+\item{df}{dataframe, defaults to mod$model}
+
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
+
+\item{vcov_mat}{the variance-covariance matrix, defaults to vcov(model)}
 
 \item{at}{list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 This calculates the margins of the variable at these particular variables.}
@@ -34,13 +38,15 @@ Estimating predictive margins on a model
 data(mtcars)
 mtcars$gear <- factor(mtcars$gear)
 mod <- glm(vs ~ gear + mpg * disp, data = mtcars, family = 'binomial')
-mod_marg2(mod, 'gear', 'levels', list(mpg = c(15, 21), disp = c(140, 180)))
+mod_marg2(mod, var_interest = 'gear',
+          type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
 
 data(margex)
 margex$treatment <- factor(margex$treatment)
 mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
-mod_marg2(mod, 'treatment', 'levels', at = NULL)
-mod_marg2(mod, 'treatment', 'effects', at = NULL)
-mod_marg2(mod, 'distance', 'levels', at = NULL, at_var_interest = c(10, 20, 30))
+mod_marg2(mod, var_interest = 'treatment', type = 'levels', at = NULL)
+mod_marg2(mod, var_interest = 'treatment', type = 'effects', at = NULL)
+mod_marg2(mod, var_interest = 'distance', type = 'levels',
+          at = NULL, at_var_interest = c(10, 20, 30))
 }
 
