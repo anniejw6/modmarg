@@ -31,10 +31,8 @@ continuous_wrap <- function(df_trans, var_interest, model,
             var_interest %in% names(df_trans),
             type %in% c('effects', 'levels'))
 
-  df_levels <- at_transforms(df_trans, 
-                             gen_at_list(df_trans, 
-                                         var_interest, 
-                                         at_var_interest))
+  df_levels <- at_transforms(
+    df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
 
   # Get predicted values and covariates
   cov_preds <- lapply(df_levels, function(x)
@@ -43,7 +41,8 @@ continuous_wrap <- function(df_trans, var_interest, model,
   # calculate predictions
   preds <- sapply(cov_preds, function(x){ mean(x$pred_resp) })
 
-  # if covariates are dropped from the model, remove those columns from cov_preds
+  # if covariates are dropped from the model,
+  # remove those columns from cov_preds
   for(i in 1:length(cov_preds)){
     cov_preds[[i]]$covar <- cov_preds[[i]]$covar[, !is.na(coef(model))]
   }
