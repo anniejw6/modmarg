@@ -30,6 +30,12 @@ test_that("output is calculated correctly", {
   
   mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
   z <- mod_marg2(mod, 'treatment', 'levels', at = NULL)[[1]]
-  
+  expect_equal(z$Margin, c(0.07911049, 0.25890416), tolerance = 0.0001)
+  expect_equal(z$Standard.Error, c(0.006945149, 0.011181260), 
+               tolerance = 0.0001)
+  expect_equal(z$Z.Value, c(11.39, 23.16), tolerance = 0.001)
+  expect_equal(z$P.Value, c(0, 0), tolerance = 0.001)
+  expect_equal(z$`Lower CI (95%)`, c(.0654982, .2369893), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(.0927227,.280819), tolerance = 0.0001)
   
 })
