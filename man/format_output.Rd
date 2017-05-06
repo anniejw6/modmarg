@@ -4,7 +4,8 @@
 \alias{format_output}
 \title{Format margins output}
 \usage{
-format_output(margin_labels, pred_margins, se, cofint = c(0.025, 0.975))
+format_output(margin_labels, pred_margins, se, family, dof, cofint = c(0.025,
+  0.975))
 }
 \arguments{
 \item{margin_labels}{vector, label of what the margins mean}
@@ -12,6 +13,10 @@ format_output(margin_labels, pred_margins, se, cofint = c(0.025, 0.975))
 \item{pred_margins}{vector, predictive margins}
 
 \item{se}{vector, standard errors}
+
+\item{family}{character, type of model (e.g. gaussian, binomial)}
+
+\item{dof}{integer, residual degrees of freedom}
 
 \item{cofint}{vector, confidence intervals defaults to c(0.025, 0.975)}
 }

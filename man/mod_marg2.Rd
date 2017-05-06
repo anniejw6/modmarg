@@ -4,15 +4,13 @@
 \alias{mod_marg2}
 \title{Estimating predictive margins on a model}
 \usage{
-mod_marg2(mod, var_interest, df = mod$model, type = "levels",
-  vcov_mat = vcov(mod), at = NULL, base_rn = 1, at_var_interest = NULL)
+mod_marg2(mod, var_interest, type = "levels", vcov_mat = vcov(mod),
+  at = NULL, base_rn = 1, at_var_interest = NULL)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class glm}
 
 \item{var_interest}{variable of interest}
-
-\item{df}{dataframe, defaults to mod$model}
 
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
 
@@ -33,6 +31,9 @@ list of dataframes with predicted margins/effects, se, p-values, and confidence 
 }
 \description{
 Estimating predictive margins on a model
+}
+\details{
+P values are calculated with T tests for OLS, and Z tests otherwise.
 }
 \examples{
 data(mtcars)
