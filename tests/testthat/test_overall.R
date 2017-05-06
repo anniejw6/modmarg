@@ -70,3 +70,28 @@ test_that("interaction terms", {
   expect_equal(eff1$`disp = 425`$P.Value, c(NaN, 0.1158436), tolerance = 0.0001)
 
 })
+
+test_that("cols getting dropped", {
+
+  data(mtcars)
+  mtcars$am <- factor(mtcars$am)
+  mtcars$cyl <- factor(mtcars$cyl)
+  mtcars$gear <- factor(mtcars$gear)
+  mtcars$mpg_colin <- mtcars$mpg * 2 + 5
+
+  ols1 <- glm(mpg ~ am*poly(disp,2) + mpg_colin, data = mtcars)
+
+  eff1 <- mod_marg2(
+    mod = ols1, var_interest = 'am', type = 'effects',
+    at = list('disp' = seq(70, 475, 5)))
+  
+  expect_equal(eff1$`disp = 90`$Margin, c(0, 6.7650630), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 90`$Standard.Error, c(0, 2.509522), 
+               tolerance = 0.0001)
+  expect_equal(eff1$`disp = 90`$P.Value, c(NaN, 0.0135366), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 425`$Margin, c(0, 9.7177810), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 425`$Standard.Error, c(0, 5.924503), 
+               tolerance = 0.0001)
+  expect_equal(eff1$`disp = 425`$P.Value, c(NaN, 0.1158436), tolerance = 0.0001)
+
+})
