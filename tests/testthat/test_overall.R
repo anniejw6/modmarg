@@ -25,3 +25,36 @@ test_that("output is calculated correctly", {
   expect_equal(z$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
 })
+
+test_that("interaction terms", {
+
+  data(mtcars)
+  mtcars$am <- factor(mtcars$am)
+  mtcars$cyl <- factor(mtcars$cyl)
+  mtcars$gear <- factor(mtcars$gear)
+
+  ols1 <- glm(mpg ~ am * poly(disp, degree = 2, raw = TRUE) +
+                cyl + hp + gear, data = mtcars)
+
+  eff1 <- mod_marg2(
+    mod = ols1, var_interest = 'am', type = 'effects',
+    df = ols1$data,
+    at = list('disp' = seq(70, 475, 5)))
+
+  ols2 <- glm(mpg ~ am * disp + am * I(disp^2) +
+                cyl + hp + gear, data = mtcars)
+
+  eff2 <- mod_marg2(
+    mod = ols2, var_interest = 'am', type = 'effects',
+    df = ols2$data,
+    at = list('disp' = seq(70, 475, 5)))
+
+  expect_equal(eff1, eff2)
+  expect_equal(eff1$`disp = 90`$Margin, c(0, 6.7650630), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 90`$Standard.Error, c(0, 2.509522), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 90`$P.Value, c(NaN, 0.0135366), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 425`$Margin, c(0, 9.7177810), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 425`$Standard.Error, c(0, 5.924503), tolerance = 0.0001)
+  expect_equal(eff1$`disp = 425`$P.Value, c(NaN, 0.1158436), tolerance = 0.0001)
+
+})
