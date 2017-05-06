@@ -6,9 +6,10 @@
 #' @param df_trans data.frame, should already be transformed for variables not related to
 #' the variable of interest
 #' @param var_interest the variable of interest
-#' @param at_var_interest
+#' @param at_var_interest levels of variable of interest
 #' @param model model
 #' @param type either effects or levels, defaults to levels
+#' @param vcov_mat variance-covariance matrix, defaults to NULL
 #' @return dataframe of formatted output
 #' @export
 #'
@@ -22,14 +23,18 @@
 #' continuous_wrap(df, var_interest = 'gear', model = mm)
 continuous_wrap <- function(df_trans, var_interest, model,
                             at_var_interest = NULL,
-                         type = 'levels'){
+                         type = 'levels',
+                         vcov_mat = NULL){
 
   stopifnot(is.data.frame(df_trans),
             is.character(var_interest),
             var_interest %in% names(df_trans),
             type %in% c('effects', 'levels'))
 
-  df_levels <- at_transforms(df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
+  df_levels <- at_transforms(
+    model_df = df_trans,
+    at_list = gen_at_list(df_trans, var_interest, at_var_interest),
+    mod = model)
 
   # Get predicted values and covariates
   cov_preds <- lapply(df_levels, function(x)
@@ -53,7 +58,7 @@ continuous_wrap <- function(df_trans, var_interest, model,
   format_output( # maybe reformat this to var, value, at?
     margin_labels = names(cov_preds),
     pred_margins = preds,
-    se = calc_pred_se(vcov(model), jacobs)
+    se = calc_pred_se(vcov_mat, jacobs)
   )
 
 }

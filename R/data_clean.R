@@ -12,33 +12,32 @@
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
-#' df3 <- transform(mtcars, gear = factor(3, levels = levels(mtcars$gear)))
-#' df <- apply_transform(df = mtcars, var_name = 'gear', value = 3)
+#' mod <- glm(cyl ~ gear + mpg, data = mtcars)
+#' df3 <- transform(mtcars[, c('cyl', 'gear', 'mpg')],
+#'                  gear = factor(3, levels = levels(mtcars$gear)))
+#' df <- at_transform(mod = mod, df = mtcars, var_name = 'gear', value = 3)
 #' str(df3)
 #' str(df)
 #' all(df == df3)
-at_transform <- function(df, var_name, value){
+at_transform <- function(mod, df, var_name, value){
 
-  stopifnot( is.factor(df[[var_name]]) | is.numeric(df[[var_name]]),
-             is.data.frame(df) )
-
-  # figure out if factor
-  if(is.factor(df[[var_name]])){
-    # necessary because of factors
-    df[[var_name]] <- factor(value, levels = levels(df[[var_name]]))
+  if( is.factor(df[[var_name]]) ){
+    df[[var_name]] <- as.character(value)
   } else {
     df[[var_name]] <- value
   }
 
-  df
-
+  # grabbing this from ?predict.lm
+  model.frame(formula = mod$formula,
+              data = df,
+              xlev = mod$xlevels)
 }
 
 #' Apply multiple transformations
 #'
 #' @param model_df dataframe used in model (not model.matrix)
 #' @param at_list list of transformations, in the format of list("variable" = c("values"))
-#'
+#' @param model model used to generate model_df
 #' @return list of dataframes, each transformed
 #' @export
 #'
@@ -46,7 +45,7 @@ at_transform <- function(df, var_name, value){
 #' data(mtcars)
 #' at_list <- list("mpg" = c(15, 21), "disp" = c(140, 180))
 #' at_transforms(mtcars, at_list)
-at_transforms <- function(model_df, at_list){
+at_transforms <- function(model_df, at_list, mod){
 
   # Figure out all transformations
   all_combos <- expand.grid(at_list)
@@ -61,7 +60,8 @@ at_transforms <- function(model_df, at_list){
 
     for(j in names(all_combos)){
 
-      df_tmp <- at_transform(df = df_tmp, var_name = j, value = all_combos[i, j])
+      df_tmp <- at_transform(df = df_tmp, mod = mod,
+                             var_name = j, value = all_combos[i, j])
     }
 
     df[[i]] <- df_tmp

@@ -4,12 +4,14 @@
 \alias{at_transforms}
 \title{Apply multiple transformations}
 \usage{
-at_transforms(model_df, at_list)
+at_transforms(model_df, at_list, mod)
 }
 \arguments{
 \item{model_df}{dataframe used in model (not model.matrix)}
 
 \item{at_list}{list of transformations, in the format of list("variable" = c("values"))}
+
+\item{model}{model used to generate model_df}
 }
 \value{
 list of dataframes, each transformed

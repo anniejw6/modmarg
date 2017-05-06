@@ -1,6 +1,8 @@
 # modmarg
 predicted margins and marginals effects
 
+added travis
+
 # v1.0
 
 * Can take the predictive levels of a discrete variable [done]
