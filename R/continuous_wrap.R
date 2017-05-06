@@ -31,7 +31,10 @@ continuous_wrap <- function(df_trans, var_interest, model,
             var_interest %in% names(df_trans),
             type %in% c('effects', 'levels'))
 
-  df_levels <- at_transforms(df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
+  df_levels <- at_transforms(df_trans, 
+                             gen_at_list(df_trans, 
+                                         var_interest, 
+                                         at_var_interest))
 
   # Get predicted values and covariates
   cov_preds <- lapply(df_levels, function(x)
