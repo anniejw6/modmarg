@@ -13,7 +13,7 @@
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
 #' df3 <- transform(mtcars, gear = factor(3, levels = levels(mtcars$gear)))
-#' df <- apply_transform(df = mtcars, var_name = 'gear', value = 3)
+#' df <- at_transform(df = mtcars, var_name = 'gear', value = 3)
 #' str(df3)
 #' str(df)
 #' all(df == df3)
@@ -92,10 +92,10 @@ at_transforms <- function(model_df, at_list){
 gen_at_list <- function(df, var_interest, at_var_interest = NULL){
 
   stopifnot(var_interest %in% names(df))
-  if(is.null(at_var_interest) & !is.factor(df[[var_interest]])) 
+  if(is.null(at_var_interest) & !is.factor(df[[var_interest]]))
     stop(sprintf(paste('You either need to specify at_var_interest if %s is',
-               'continuous, or you need to transform %s into a',  
-               'factor before', 
+               'continuous, or you need to transform %s into a',
+               'factor before',
                'running glm.'), var_interest, var_interest))
 
   if(is.null(at_var_interest)){
