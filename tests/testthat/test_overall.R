@@ -24,4 +24,12 @@ test_that("output is calculated correctly", {
   expect_equal(z$P.Value, c(0), tolerance = 0.001)
   expect_equal(z$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
+  
+  # Check that works correctly with NAs in dataset
+  margex$distance[1:5] <- NA
+  
+  mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
+  z <- mod_marg2(mod, 'treatment', 'levels', at = NULL)[[1]]
+  
+  
 })
