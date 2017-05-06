@@ -20,7 +20,7 @@
 #' # apply at transformations
 #' df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
 #' df <- df[[1]]
-#' continuous_wrap(df, var_interest = 'gear', model = mm)
+#' continuous_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
 continuous_wrap <- function(df_trans, var_interest, model,
                             at_var_interest = NULL,
                          type = 'levels',
@@ -50,9 +50,9 @@ continuous_wrap <- function(df_trans, var_interest, model,
   # calculate jacobian
   jacobs <- do.call(rbind, lapply(cov_preds, function(x){
     if(type == 'levels'){
-      jacob_level(
+      calc_jacob(
         pred_values = x$pred_link, covar_matrix = x$covar,
-        link_deriv = model$family$mu.eta)
+        deriv_func = model$family$mu.eta)
     } else {
       stop('We do not support effects for continuous variables at this time.')
     }
