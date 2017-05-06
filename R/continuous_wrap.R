@@ -60,7 +60,9 @@ continuous_wrap <- function(df_trans, var_interest, model,
   format_output( # maybe reformat this to var, value, at?
     margin_labels = names(cov_preds),
     pred_margins = preds,
-    se = calc_pred_se(vcov_mat, jacobs)
+    se = calc_pred_se(vcov_mat, jacobs),
+    family = model$family$family,
+    dof = model$df.residual
   )
 
 }

@@ -13,6 +13,9 @@
 #' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
 #' factor variable, defaults to NULL
 #' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
+#'
+#' @details P values are calculated with T tests for OLS, and Z tests otherwise.
+#'
 #' @export
 #' @examples
 #' data(mtcars)
