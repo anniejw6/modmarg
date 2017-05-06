@@ -20,7 +20,7 @@
 #' # apply at transformations
 #' df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
 #' df <- df[[1]]
-#' discrete_wrap(df, var_interest = 'gear', model = mm)
+#' discrete_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
 discrete_wrap <- function(df_trans, var_interest, model,
                          type = 'levels', base_rn = 1,
                          at_var_interest = NULL,

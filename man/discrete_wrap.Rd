@@ -35,6 +35,6 @@ mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
 # apply at transformations
 df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
 df <- df[[1]]
-discrete_wrap(df, var_interest = 'gear', model = mm)
+discrete_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
 }
 
