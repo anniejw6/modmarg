@@ -66,12 +66,14 @@ test_that("make sure we format output correctly", {
 
   z <- format_output(margin_labels = c('hello', 'goodbye'),
                 pred_margins = c(.0791146, .2600204),
-                se = c(.0069456, .0111772))
+                se = c(.0069456, .0111772),
+                family = "gaussian",
+                dof = 20)
 
   expect_equal(z$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
   expect_equal(z$P.Value, c(0, 0))
-  expect_equal(z$Z.Value, c(11.39, 23.26), tolerance = 0.01)
+  expect_equal(z$Test.Stat, c(11.39, 23.26), tolerance = 0.01)
 
   # TODO: add check in here for negative values!
 })
