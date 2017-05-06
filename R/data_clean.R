@@ -61,14 +61,16 @@ at_transforms <- function(model_df, at_list){
 
     for(j in names(all_combos)){
 
-      df_tmp <- at_transform(df = df_tmp, var_name = j, value = all_combos[i, j])
+      df_tmp <- at_transform(df = df_tmp,
+                             var_name = j, value = all_combos[i, j])
     }
 
     df[[i]] <- df_tmp
   }
 
   # Give names to list
-  named_mat <- sapply(names(at_list), function(name){ sprintf("%s = %s", name, all_combos[[name]]) })
+  named_mat <- sapply(names(at_list), function(name){
+    sprintf("%s = %s", name, all_combos[[name]]) })
   names(df) <- do.call(paste, data.frame(named_mat))
 
   # Return
@@ -92,7 +94,8 @@ at_transforms <- function(model_df, at_list){
 gen_at_list <- function(df, var_interest, at_var_interest = NULL){
 
   stopifnot(var_interest %in% names(df))
-  if(is.null(at_var_interest) & !is.factor(df[[var_interest]])) stop('Must specify at_var_interest for continuous variables')
+  if(is.null(at_var_interest) & !is.factor(df[[var_interest]]))
+    stop('Must specify at_var_interest for continuous variables')
 
   if(is.null(at_var_interest)){
     # Get all unique values

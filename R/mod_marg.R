@@ -43,9 +43,10 @@ mod_marg2 <- function(mod, var_interest,
     var_interest %in% names(df),
     all(names(at) %in% names(df))
     # TODO: warning if at contains extrapolated values
-    )
+  )
   if( any(grepl('factor', attr(terms(mod$formula), 'term.labels'))) )
-    stop('Must create all factors OUTSIDE of the model formula (see example in documentation)')
+    stop(c('Must create all factors OUTSIDE of the model',
+           'formula (see example in documentation)'))
 
   # Transform the ats ---
   if(!is.null(at)){
@@ -63,20 +64,21 @@ mod_marg2 <- function(mod, var_interest,
   if(!is.numeric(df[[var_interest]])){
 
     return(
-      lapply(df,
-             function(x) discrete_wrap(df_trans = x, var_interest = var_interest,
-                                          model = mod, type = type, base_rn = base_rn,
-                                          at_var_interest = at_var_interest,
-                                       vcov_mat = vcov_mat) )
+      lapply(df, function(x){
+        discrete_wrap(df_trans = x, var_interest = var_interest,
+                      model = mod, type = type, base_rn = base_rn,
+                      at_var_interest = at_var_interest,
+                      vcov_mat = vcov_mat)
+      })
     )
   } else {
 
     return(
-      lapply(df,
-             function(x) continuous_wrap(df_trans = x, var_interest = var_interest,
-                                       model = mod, type = type,
-                                       at_var_interest = at_var_interest,
-                                       vcov_mat = vcov_mat) )
+      lapply(df, function(x){
+        continuous_wrap(df_trans = x, var_interest = var_interest,
+                        model = mod, type = type,
+                        at_var_interest = at_var_interest,
+                        vcov_mat = vcov_mat)}  )
     )
 
 
