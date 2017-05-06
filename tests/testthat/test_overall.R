@@ -26,6 +26,20 @@ test_that("output is calculated correctly", {
   expect_equal(z$P.Value, c(0), tolerance = 0.001)
   expect_equal(z$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
+  
+  # Check that works correctly with NAs in dataset
+  margex$distance[1:5] <- NA
+  
+  mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
+  z <- mod_marg2(mod, 'treatment', 'levels', at = NULL)[[1]]
+  expect_equal(z$Margin, c(0.07911049, 0.25890416), tolerance = 0.0001)
+  expect_equal(z$Standard.Error, c(0.006945149, 0.011181260), 
+               tolerance = 0.0001)
+  expect_equal(z$Test.Stat, c(11.39, 23.16), tolerance = 0.001)
+  expect_equal(z$P.Value, c(0, 0), tolerance = 0.001)
+  expect_equal(z$`Lower CI (95%)`, c(.0654982, .2369893), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(.0927227,.280819), tolerance = 0.0001)
+  
 })
 
 test_that("interaction terms", {
@@ -40,7 +54,6 @@ test_that("interaction terms", {
 
   eff1 <- mod_marg2(
     mod = ols1, var_interest = 'am', type = 'effects',
-    df = ols1$data,
     at = list('disp' = seq(70, 475, 5)))
 
   ols2 <- glm(mpg ~ am * disp + am * I(disp^2) +
@@ -48,7 +61,6 @@ test_that("interaction terms", {
 
   eff2 <- mod_marg2(
     mod = ols2, var_interest = 'am', type = 'effects',
-    df = ols2$data,
     at = list('disp' = seq(70, 475, 5)))
 
   expect_equal(eff1, eff2)
@@ -65,4 +77,25 @@ test_that("interaction terms", {
   expect_equal(eff1$`disp = 425`$P.Value, c(NaN, 0.1158436),
                tolerance = 0.0001)
 
+  # Missing values in factor for interaction
+  mtcars$cyl[c(1,10,20,31)] <- NA
+  ols3 <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) +
+                hp + gear, data = mtcars)
+  eff3 <- mod_marg2(
+    mod = ols3, var_interest = 'cyl', type = 'effects',
+    at = list('disp' = seq(70, 475, 5)))
+  
+  expect_equal(eff3$`disp = 90`$Margin, c(0, 1.475092, -26.624940), 
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 90`$Standard.Error, c(0, 10.06496, 11.51925), 
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 90`$P.Value, c(NaN, 0.8853123, 0.0344676), 
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 425`$Margin, c(0, -164.3417, -205.5133), 
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 425`$Standard.Error, c(0, 168.0473, 154.9123), 
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 425`$P.Value, c(NaN, 0.3426556, 0.2032512), 
+               tolerance = 0.0001)
+  
 })
