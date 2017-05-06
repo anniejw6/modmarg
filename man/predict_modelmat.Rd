@@ -29,8 +29,8 @@ df3 <- at_transform(df = mtcars, var_name = 'gear', value = 3)
 covar3 <- model.matrix(mm$formula, df3)
 
 z <- predict_modelmat(model = mm, transformed_df = df3)
-expect_identical(z$covar, covar3)
-expect_identical(z$pred_link, predict(mm, newdata = df3))
-expect_identical(z$pred_resp, predict(mm, newdata = df3, type = 'response'))
+all(z$covar == covar3)
+all(z$pred_link == predict(mm, newdata = df3))
+all(z$pred_resp == predict(mm, newdata = df3, type = 'response'))
 }
 

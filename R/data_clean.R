@@ -87,6 +87,7 @@ at_transforms <- function(model_df, at_list){
 #' @param at_var_interest at levels for variables of interest, defaults to NULL
 #'
 #' @return named list of all values for variable of interest
+#' @export
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
