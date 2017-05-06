@@ -38,9 +38,9 @@ transformed_df = at_transform(df = mtcars, var_name = 'gear', value = 5)
 )
 
 z <- rbind(
-jacob_level(x3$pred, x3$covar, ld_fun),
-jacob_level(x4$pred, x4$covar, ld_fun),
-jacob_level(x5$pred, x5$covar, ld_fun)
+calc_jacob(x3$pred_link, x3$covar, ld_fun),
+calc_jacob(x4$pred_link, x4$covar, ld_fun),
+calc_jacob(x5$pred_link, x5$covar, ld_fun)
 )
 discrete_effect_jacob(z, 1)
 }
