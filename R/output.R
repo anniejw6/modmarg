@@ -1,6 +1,8 @@
 #' Format margins output
 #'
 #' @param se vector, standard errors
+#' @param family character, type of model (e.g. gaussian, binomial)
+#' @param dof integer, residual degrees of freedom
 #' @param cofint vector, confidence intervals defaults to c(0.025, 0.975)
 #' @param margin_labels vector, label of what the margins mean
 #' @param pred_margins vector, predictive margins
@@ -12,7 +14,8 @@
 #' format_output(margin_labels = c('hello', 'goodbye', 'whatever'),
 #' pred_margins = c(1, 0.25, 3.1),
 #' se = c(0.25, 0.75, 0.5))
-format_output <- function(margin_labels, pred_margins, se, cofint = c(0.025, 0.975)){
+format_output <- function(margin_labels, pred_margins, se, family, dof,
+                          cofint = c(0.025, 0.975)){
 
   stopifnot(is.numeric(pred_margins), is.numeric(se),
             is.numeric(cofint),
@@ -22,12 +25,19 @@ format_output <- function(margin_labels, pred_margins, se, cofint = c(0.025, 0.9
             length(se) == length(pred_margins)
             )
 
+  test_stat <- pred_margins/se
+  if(family == "gaussian"){
+    pval <- 2 * pt(-1 * abs(test_stat), df = dof)
+  } else {
+    pval <- 2 * pnorm(-1 * abs(test_stat))
+  }
+
   res <- data.frame(
     Label = margin_labels,
     Margin = pred_margins,
     `Standard Error` = se,
-    `Z Value` = pred_margins/se,
-    `P Value` = 2 * pnorm(-1 * abs(pred_margins/se)),
+    `Test Stat` = test_stat,
+    `P Value` = pval,
     lower_ci = pred_margins + (qnorm(min(cofint)) * se ),
     upper_ci = pred_margins + (qnorm(max(cofint)) * se )
   )
