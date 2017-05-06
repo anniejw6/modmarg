@@ -2,7 +2,6 @@
 #'
 #' @param mod model object, currently only support those of class glm
 #' @param var_interest variable of interest
-#' @param df dataframe, defaults to mod$model
 #' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
 #' @param vcov_mat the variance-covariance matrix, defaults to vcov(model)
 #' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
@@ -32,12 +31,14 @@
 #' mod_marg2(mod, var_interest = 'distance', type = 'levels',
 #'           at = NULL, at_var_interest = c(10, 20, 30))
 mod_marg2 <- function(mod, var_interest,
-                      df = mod$model,
                       type = 'levels',
                       vcov_mat = vcov(mod),
                       at = NULL, base_rn = 1,
                       at_var_interest = NULL){
 
+  df <- mod$data[, all.vars(mod$formula)]
+  df <- df[complete.cases(df), ]
+  
   stopifnot(
     'glm' %in% class(mod),
     var_interest %in% names(df),
@@ -65,20 +66,20 @@ mod_marg2 <- function(mod, var_interest,
     return(
       lapply(df,
              function(x) discrete_wrap(df_trans = x, var_interest = var_interest,
-                                          model = mod, type = type, base_rn = base_rn,
-                                          at_var_interest = at_var_interest,
-                                       vcov_mat = vcov_mat) )
-    )
-  } else {
-
-    return(
-      lapply(df,
-             function(x) continuous_wrap(df_trans = x, var_interest = var_interest,
-                                       model = mod, type = type,
+                                       model = mod, type = type, base_rn = base_rn,
                                        at_var_interest = at_var_interest,
                                        vcov_mat = vcov_mat) )
     )
-
+  } else {
+    
+    return(
+      lapply(df,
+             function(x) continuous_wrap(df_trans = x, var_interest = var_interest,
+                                         model = mod, type = type,
+                                         at_var_interest = at_var_interest,
+                                         vcov_mat = vcov_mat) )
+    )
+    
 
   }
 
