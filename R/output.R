@@ -44,7 +44,7 @@ format_output <- function(margin_labels, pred_margins, se, family, dof,
 
   names(res)[names(res) %in% c('lower_ci', 'upper_ci')] <-
     sprintf("%s (%s)", c('Lower CI', 'Upper CI'),
-            scales::percent(cofint[2] - cofint[1]) )
+            paste0(round(100 * (cofint[2] - cofint[1])), '%'))
 
   row.names(res) <- NULL
   res
