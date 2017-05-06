@@ -7,7 +7,7 @@ test_that("output is calculated correctly", {
   data(margex)
   margex$treatment <- factor(margex$treatment)
   mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
-  z <- mod_marg2(mod, 'treatment', 'levels', at = NULL)[[1]]
+  z <- mod_marg2(mod, var_interest = 'treatment', type = 'levels', at = NULL)[[1]]
 
   expect_equal(z$Margin, c(.0791146, .2600204), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(.0069456, .0111772), tolerance = 0.0001)
@@ -16,7 +16,7 @@ test_that("output is calculated correctly", {
   expect_equal(z$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
 
-  z <- mod_marg2(mod, 'treatment', 'effects', at = NULL)[[1]]
+  z <- mod_marg2(mod, var_interest = 'treatment', type = 'effects', at = NULL)[[1]]
   z <- z[2, ]
   expect_equal(z$Margin, c(.1809057), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(.0131684), tolerance = 0.0001)
