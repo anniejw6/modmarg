@@ -45,9 +45,10 @@ test_that("jacobian works correctly", {
   p4 <- predict(mm, newdata = df4)
   p5 <- predict(mm, newdata = df5)
 
-  expect_equal(calc_jacob(p3, as.matrix(covar3), ld_fun),
-               c(0, 0, 0.090535558, 1.316670875, 24.040145060, 0.004931502)[c(6, 1:5)],
-               tolerance = .0001)
+  expect_equal(
+    calc_jacob(p3, as.matrix(covar3), ld_fun),
+    c(0, 0, 0.090535558, 1.316670875, 24.040145060, 0.004931502)[c(6, 1:5)],
+    tolerance = .0001)
 
   expect_equal(calc_jacob(p4, as.matrix(covar4), ld_fun),
                c(0.02704185, 0, 0.56997483, 4.31214, 90.5598, 0.02704185)[c(6, 1:5)],
@@ -67,8 +68,8 @@ test_that("jacobian of discrete variables works correctly", {
                             c = 8:10))
 
   expect_equivalent(as.matrix(discrete_effect_jacob(z, 2)),
-                   matrix(c(-1, -1, -1, 0, 0, 0, 1, 1, 1),
-                          ncol = 3, nrow = 3, byrow = T))
+                    matrix(c(-1, -1, -1, 0, 0, 0, 1, 1, 1),
+                           ncol = 3, nrow = 3, byrow = T))
 
   expect_equivalent(as.matrix(discrete_effect_jacob(z, 3)),
                     matrix(c(rep(-2, 3), rep(-1, 3), rep(0, 3)),

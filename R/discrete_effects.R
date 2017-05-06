@@ -34,7 +34,9 @@
 #' discrete_effect_jacob(z, 1)
 discrete_effect_jacob <- function(jacobian, base_rn = 1){
 
-  stopifnot(is.numeric(jacobian), is.matrix(jacobian), base_rn <= nrow(jacobian))
+  stopifnot(is.numeric(jacobian),
+            is.matrix(jacobian),
+            base_rn <= nrow(jacobian))
 
   t(apply(jacobian, 1, function(x) x - jacobian[base_rn, ]))
 
