@@ -11,6 +11,7 @@
 #' @param type either effects or levels, defaults to levels
 #' @param vcov_mat variance-covariance matrix, defaults to NULL
 #' @return dataframe of formatted output
+#' @importFrom stats coef
 #' @export
 #'
 #' @examples
