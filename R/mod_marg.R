@@ -62,29 +62,14 @@ mod_marg2 <- function(mod, var_interest,
 
 
   # Calculate pred and se ---
-  if(!is.numeric(df[[var_interest]])){
-
-    return(
-      lapply(df, function(x){
-        discrete_wrap(df_trans = x, var_interest = var_interest,
-                      model = mod, type = type, base_rn = base_rn,
-                      at_var_interest = at_var_interest,
-                      vcov_mat = vcov_mat)
-      })
-    )
-  } else {
-
-    return(
-
-      lapply(df, function(x){
-        continuous_wrap(df_trans = x, var_interest = var_interest,
-                        model = mod, type = type,
-                        at_var_interest = at_var_interest,
-                        vcov_mat = vcov_mat)}  )
-    )
-
-
-  }
+  return(
+    lapply(df, function(x){
+      pred_se_wrap(df_trans = x, var_interest = var_interest,
+                   model = mod, type = type, base_rn = base_rn,
+                   at_var_interest = at_var_interest,
+                   vcov_mat = vcov_mat)
+    })
+  )
 
 }
 
