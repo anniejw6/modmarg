@@ -10,6 +10,7 @@
 #' @param type either effects or levels, defaults to levels
 #' @param base_rn row number of the base level, defaults to 1
 #' @param vcov_mat variance-covariance matrix, defaults to NULL
+#' @importFrom stats coef
 #' @return dataframe of formatted output
 #' @export
 #'

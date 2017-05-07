@@ -7,6 +7,7 @@
 #' @param margin_labels vector, label of what the margins mean
 #' @param pred_margins vector, predictive margins
 #'
+#' @importFrom stats pt qnorm pnorm
 #' @return dataframe of label, margin, se, z-value, p-value, and confidence interval bounds
 #' @export
 #'
