@@ -32,9 +32,8 @@ calculate the predicted level and se for the variable of interest.
 data(mtcars)
 mtcars$gear <- factor(mtcars$gear)
 mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
-# apply at transformations
-df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
-df <- df[[1]]
-continuous_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
+continuous_wrap(mm$model, var_interest = 'mpg',
+                at_var_interest = c(15, 21), model = mm,
+                vcov_mat = vcov(mm))
 }
 
