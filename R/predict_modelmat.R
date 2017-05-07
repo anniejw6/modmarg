@@ -6,6 +6,7 @@
 #'
 #' @return list of covariates (covar), predictions on the link function scale (pred_link),
 #' and predictions on the response variable scale (pred_response), e.g., probabilities
+#' @importFrom stats model.frame model.matrix predict
 #' @export
 #'
 #' @examples

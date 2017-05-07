@@ -9,7 +9,7 @@ calc_pred_se(vcov_model, jac)
 \arguments{
 \item{vcov_model}{variance-covariance matrix of the model}
 
-\item{jacobian}{jacobian matrix of the predictions}
+\item{jac}{jacobian matrix of the predictions}
 }
 \value{
 vector of standard errors

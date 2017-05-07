@@ -14,7 +14,7 @@
 #' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 #'
 #' @details P values are calculated with T tests for OLS, and Z tests otherwise.
-#'
+#' @importFrom stats complete.cases terms vcov
 #' @export
 #' @examples
 #' data(mtcars)
@@ -38,7 +38,7 @@ mod_marg2 <- function(mod, var_interest,
 
   df <- mod$data[, all.vars(mod$formula)]
   df <- df[complete.cases(df), ]
-  
+
   stopifnot(
     'glm' %in% class(mod),
     var_interest %in% names(df),
@@ -73,16 +73,16 @@ mod_marg2 <- function(mod, var_interest,
       })
     )
   } else {
-    
+
     return(
-      
+
       lapply(df, function(x){
         continuous_wrap(df_trans = x, var_interest = var_interest,
                         model = mod, type = type,
                         at_var_interest = at_var_interest,
                         vcov_mat = vcov_mat)}  )
     )
-    
+
 
   }
 
