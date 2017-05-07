@@ -19,6 +19,9 @@ the variable of interest}
 
 \item{base_rn}{row number of the base level, defaults to 1}
 
+\item{at_var_interest}{vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
+factor variable, defaults to NULL}
+
 \item{vcov_mat}{variance-covariance matrix, defaults to NULL}
 }
 \value{

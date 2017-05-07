@@ -1,7 +1,7 @@
 #' Calculate standard errors for predictive margins
 #'
 #' @param vcov_model variance-covariance matrix of the model
-#' @param jacobian jacobian matrix of the predictions
+#' @param jac jacobian matrix of the predictions
 #'
 #' @return vector of standard errors
 #' @export
