@@ -70,7 +70,7 @@ pred_se_wrap <- function(df_trans, var_interest, model,
     }
   }
 
-  format_output( # maybe reformat this to var, value, at?
+  format_output(
     margin_labels = names(cov_preds),
     pred_margins = preds,
     se = calc_pred_se(vcov_mat, jacobs),
