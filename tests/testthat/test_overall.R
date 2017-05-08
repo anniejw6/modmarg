@@ -116,14 +116,14 @@ test_that("interaction terms", {
 
   eff1 <- mod_marg2(
     mod = ols1, var_interest = 'am', type = 'effects',
-    at = list('disp' = seq(70, 475, 5)))
+    at = list('disp' = seq(75, 470, 5)))
 
   ols2 <- glm(mpg ~ am * disp + am * I(disp^2) +
                 cyl + hp + gear, data = mtcars)
 
   eff2 <- mod_marg2(
     mod = ols2, var_interest = 'am', type = 'effects',
-    at = list('disp' = seq(70, 475, 5)))
+    at = list('disp' = seq(75, 470, 5)))
 
   expect_equal(eff1, eff2)
   expect_equal(eff1$`disp = 90`$Margin, c(0, 6.7650630),
@@ -140,12 +140,16 @@ test_that("interaction terms", {
                tolerance = 0.0001)
 
   # Missing values in factor for interaction
-  mtcars$cyl[c(1,10,20,31)] <- NA
+  data(mtcars)
+  mtcars$am <- factor(mtcars$am)
+  mtcars$cyl <- factor(mtcars$cyl)
+  mtcars$gear <- factor(mtcars$gear)
+  mtcars$cyl[c(1,1 0, 20, 31)] <- NA
   ols3 <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) +
                 hp + gear, data = mtcars)
   eff3 <- mod_marg2(
     mod = ols3, var_interest = 'cyl', type = 'effects',
-    at = list('disp' = seq(70, 475, 5)))
+    at = list('disp' = seq(80, 470, 5)))
 
   expect_equal(eff3$`disp = 90`$Margin, c(0, 1.475092, -26.624940),
                tolerance = 0.0001)
@@ -223,11 +227,6 @@ test_that("Effects and Levels of Continuous Covariates", {
 })
 
 test_that("mod_marg2 input is checked", {
-
-  # var_interest shouldn't be a character
-  data(margex)
-  mm <- glm(y ~ sex + age, margex, family = 'gaussian')
-  expect_error(mod_marg2(mod = mm, var_interest = 'sex'))
 
   # lm should fail
   margex$sex <- factor(margex$sex)
