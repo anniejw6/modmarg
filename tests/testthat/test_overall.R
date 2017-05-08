@@ -144,7 +144,7 @@ test_that("interaction terms", {
   mtcars$am <- factor(mtcars$am)
   mtcars$cyl <- factor(mtcars$cyl)
   mtcars$gear <- factor(mtcars$gear)
-  mtcars$cyl[c(1,1 0, 20, 31)] <- NA
+  mtcars$cyl[c(1, 10, 20, 31)] <- NA
   ols3 <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) +
                 hp + gear, data = mtcars)
   eff3 <- mod_marg2(
