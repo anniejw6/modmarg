@@ -51,6 +51,7 @@ test_that("effects are calculated correctly despite different input types", {
               data = margex, family = 'binomial')
   z1 <- mod_marg2(mod1, var_interest = 'treatment',
                   type = 'effects', at = NULL)[[1]]
+  z1 <- z1[2, ]
 
   # Make character outside
   data(margex)
@@ -59,6 +60,7 @@ test_that("effects are calculated correctly despite different input types", {
               data = margex, family = 'binomial')
   z2 <- mod_marg2(mod2, var_interest = 'treatment',
                   type = 'effects', at = NULL)[[1]]
+  z2 <- z2[2, ]
 
   # Make factor inside equation
   data(margex)
@@ -66,28 +68,20 @@ test_that("effects are calculated correctly despite different input types", {
               data = margex, family = 'binomial')
   z3 <- mod_marg2(mod3, var_interest = 'treatment',
                   type = 'effects', at = NULL)[[1]]
+  z3 <- z3[2, ]
 
-  expect_equal(z1$Margin, z2$Margin, z3$Margin, c(.0791146, .2600204),
-               tolerance = 0.0001)
+  expect_equal(z1$Margin, z2$Margin, z3$Margin,
+               c(.1809057), tolerance = 0.0001)
   expect_equal(z1$Standard.Error, z2$Standard.Error, z3$Standard.Error,
-               c(.0069456, .0111772), tolerance = 0.0001)
+               c(.0131684), tolerance = 0.0001)
   expect_equal(z1$Test.Stat, z2$Test.Stat, z3$Test.Stat,
-               c(11.39, 23.26), tolerance = 0.001)
+               c(13.74), tolerance = 0.001)
   expect_equal(z1$P.Value, z2$P.Value, z3$P.Value,
-               c(0, 0), tolerance = 0.001)
+               c(0), tolerance = 0.001)
   expect_equal(z1$`Lower CI (95%)`, z2$`Lower CI (95%)`, z3$`Lower CI (95%)`,
-               c(.0655016, .2381135), tolerance = 0.0001)
+               c(.1550961), tolerance = 0.0001)
   expect_equal(z1$`Upper CI (95%)`, z2$`Upper CI (95%)`, z3$`Upper CI (95%)`,
-               c(.0927277, .2819272), tolerance = 0.0001)
-
-  expect_equal(z1$Margin, c(.1809057), tolerance = 0.0001)
-  expect_equal(z$Standard.Error, c(.0131684), tolerance = 0.0001)
-  expect_equal(z$Test.Stat, c(13.74), tolerance = 0.001)
-  expect_equal(z$P.Value, c(0), tolerance = 0.001)
-  expect_equal(z$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
-  expect_equal(z$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
-
-
+               c(.2067153), tolerance = 0.0001)
 
 })
 
