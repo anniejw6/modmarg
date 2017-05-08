@@ -1,6 +1,8 @@
 # modmarg
 predicted margins and marginals effects
 
+[![Build Status](https://travis-ci.org/anniejw6/modmarg.svg?branch=master)](https://travis-ci.org/anniejw6/modmarg)
+
 added travis
 
 # v1.0

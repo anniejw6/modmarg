@@ -18,18 +18,22 @@
 #' @export
 #' @examples
 #' data(mtcars)
-#' mtcars$gear <- factor(mtcars$gear)
+#' mtcars$gear <- as.character(mtcars$gear)
 #' mod <- glm(vs ~ gear + mpg * disp, data = mtcars, family = 'binomial')
 #' mod_marg2(mod, var_interest = 'gear',
 #'           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
 #'
 #' data(margex)
-#' margex$treatment <- factor(margex$treatment)
-#' mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
+#' mod <- glm(outcome ~ as.factor(treatment) + distance,
+#'        data = margex, family = 'binomial')
 #' mod_marg2(mod, var_interest = 'treatment', type = 'levels', at = NULL)
 #' mod_marg2(mod, var_interest = 'treatment', type = 'effects', at = NULL)
 #' mod_marg2(mod, var_interest = 'distance', type = 'levels',
 #'           at = NULL, at_var_interest = c(10, 20, 30))
+#'
+#' mod <- glm(outcome ~ distance + factor(sex),
+#'            data = margex, family = 'binomial')
+#' mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
 mod_marg2 <- function(mod, var_interest,
                       type = 'levels',
                       vcov_mat = vcov(mod),
@@ -54,14 +58,6 @@ mod_marg2 <- function(mod, var_interest,
       warning(sprintf("Not all values in 'at' are in the range of '%s'", names(at)[i]))
   }
 
-  if( any(grepl('factor', attr(terms(mod$formula), 'term.labels'))) )
-    stop(c('Must create all factors OUTSIDE of the model',
-           'formula (see example in documentation)'))
-
-  if(is.character(df[[var_interest]]))
-    stop(c('var_interest must be factor (if discrete) or numeric (if continuous)',
-           ' prior to creation of the model object'))
-
   # Transform the ats ---
   if(!is.null(at)){
 
@@ -75,14 +71,12 @@ mod_marg2 <- function(mod, var_interest,
 
 
   # Calculate pred and se ---
-  return(
-    lapply(df, function(x){
+  lapply(df, function(x){
       pred_se_wrap(df_trans = x, var_interest = var_interest,
                    model = mod, type = type, base_rn = base_rn,
                    at_var_interest = at_var_interest,
                    vcov_mat = vcov_mat)
-    })
-  )
+  })
 
 }
 
