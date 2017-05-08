@@ -62,7 +62,9 @@ pred_se_wrap <- function(df_trans, var_interest, model,
   }))
 
   if(type == 'effects') {
-    if(is.numeric(df_trans[[var_interest]])){
+    if(is.numeric(df_trans[[var_interest]]) &
+       ! sprintf("as.character(%s)", var_interest) %in% names(model$model) &
+       ! sprintf("as.factor(%s)", var_interest) %in% names(model$model)){
       stop('We do not support effects for continuous variables at this time.')
     } else {
       jacobs <- discrete_effect_jacob(jacobs, base_rn)
