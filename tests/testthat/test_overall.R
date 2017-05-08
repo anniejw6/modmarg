@@ -5,7 +5,7 @@ test_that("levels are calculated correctly despite different input types", {
 
   # http://www.stata.com/support/faqs/statistics/compute-standard-errors-with-margins/
 
-  # Put as.factor in the equation
+  # Put as.character in the equation
   data(margex)
   mod1 <- glm(outcome ~ as.character(treatment) + distance,
               data = margex, family = 'binomial')
@@ -20,7 +20,7 @@ test_that("levels are calculated correctly despite different input types", {
   z2 <- mod_marg2(mod2, var_interest = 'treatment',
                  type = 'levels', at = NULL)[[1]]
 
-  # Make factor inside equation
+  # Put as.factor inside equation
   data(margex)
   mod3 <- glm(outcome ~ as.factor(treatment) + distance,
               data = margex, family = 'binomial')
@@ -45,7 +45,7 @@ test_that("levels are calculated correctly despite different input types", {
 
 test_that("effects are calculated correctly despite different input types", {
 
-  # Put as.factor in the equation
+  # Put as.character in the equation
   data(margex)
   mod1 <- glm(outcome ~ as.character(treatment) + distance,
               data = margex, family = 'binomial')
@@ -62,7 +62,7 @@ test_that("effects are calculated correctly despite different input types", {
                   type = 'effects', at = NULL)[[1]]
   z2 <- z2[2, ]
 
-  # Make factor inside equation
+  # Put as.factor inside equation
   data(margex)
   mod3 <- glm(outcome ~ as.factor(treatment) + distance,
               data = margex, family = 'binomial')
@@ -85,7 +85,7 @@ test_that("effects are calculated correctly despite different input types", {
 
 })
 
-test_that("works correctly even when terms are dropped", {
+test_that("works correctly even when rows are dropped", {
 
   data(margex)
   margex$distance[1:5] <- NA
@@ -101,6 +101,31 @@ test_that("works correctly even when terms are dropped", {
   expect_equal(z$P.Value, c(0, 0), tolerance = 0.001)
   expect_equal(z$`Lower CI (95%)`, c(.0654982, .2369893), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.0927227,.280819), tolerance = 0.0001)
+
+
+  data(mtcars)
+  mtcars$am <- factor(mtcars$am)
+  mtcars$cyl <- factor(mtcars$cyl)
+  mtcars$gear <- factor(mtcars$gear)
+  mtcars$cyl[c(1, 10, 20, 31)] <- NA
+  ols3 <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) +
+                hp + gear, data = mtcars)
+  eff3 <- mod_marg2(
+    mod = ols3, var_interest = 'cyl', type = 'effects',
+    at = list('disp' = seq(80, 470, 5)))
+
+  expect_equal(eff3$`disp = 90`$Margin, c(0, 1.475092, -26.624940),
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 90`$Standard.Error, c(0, 10.06496, 11.51925),
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 90`$P.Value, c(NaN, 0.8853123, 0.0344676),
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 425`$Margin, c(0, -164.3417, -205.5133),
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 425`$Standard.Error, c(0, 168.0473, 154.9123),
+               tolerance = 0.0001)
+  expect_equal(eff3$`disp = 425`$P.Value, c(NaN, 0.3426556, 0.2032512),
+               tolerance = 0.0001)
 
 })
 
@@ -139,30 +164,6 @@ test_that("interaction terms", {
   expect_equal(eff1$`disp = 425`$P.Value, c(NaN, 0.1158436),
                tolerance = 0.0001)
 
-  # Missing values in factor for interaction
-  data(mtcars)
-  mtcars$am <- factor(mtcars$am)
-  mtcars$cyl <- factor(mtcars$cyl)
-  mtcars$gear <- factor(mtcars$gear)
-  mtcars$cyl[c(1, 10, 20, 31)] <- NA
-  ols3 <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) +
-                hp + gear, data = mtcars)
-  eff3 <- mod_marg2(
-    mod = ols3, var_interest = 'cyl', type = 'effects',
-    at = list('disp' = seq(80, 470, 5)))
-
-  expect_equal(eff3$`disp = 90`$Margin, c(0, 1.475092, -26.624940),
-               tolerance = 0.0001)
-  expect_equal(eff3$`disp = 90`$Standard.Error, c(0, 10.06496, 11.51925),
-               tolerance = 0.0001)
-  expect_equal(eff3$`disp = 90`$P.Value, c(NaN, 0.8853123, 0.0344676),
-               tolerance = 0.0001)
-  expect_equal(eff3$`disp = 425`$Margin, c(0, -164.3417, -205.5133),
-               tolerance = 0.0001)
-  expect_equal(eff3$`disp = 425`$Standard.Error, c(0, 168.0473, 154.9123),
-               tolerance = 0.0001)
-  expect_equal(eff3$`disp = 425`$P.Value, c(NaN, 0.3426556, 0.2032512),
-               tolerance = 0.0001)
 
 })
 

@@ -37,17 +37,21 @@ P values are calculated with T tests for OLS, and Z tests otherwise.
 }
 \examples{
 data(mtcars)
-mtcars$gear <- factor(mtcars$gear)
+mtcars$gear <- as.character(mtcars$gear)
 mod <- glm(vs ~ gear + mpg * disp, data = mtcars, family = 'binomial')
 mod_marg2(mod, var_interest = 'gear',
           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
 
 data(margex)
-margex$treatment <- factor(margex$treatment)
-mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
+mod <- glm(outcome ~ as.factor(treatment) + distance,
+       data = margex, family = 'binomial')
 mod_marg2(mod, var_interest = 'treatment', type = 'levels', at = NULL)
 mod_marg2(mod, var_interest = 'treatment', type = 'effects', at = NULL)
 mod_marg2(mod, var_interest = 'distance', type = 'levels',
           at = NULL, at_var_interest = c(10, 20, 30))
+
+mod <- glm(outcome ~ distance + factor(sex),
+           data = margex, family = 'binomial')
+mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
 }
 

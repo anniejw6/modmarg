@@ -24,7 +24,8 @@
 #'           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
 #'
 #' data(margex)
-#' mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
+#' mod <- glm(outcome ~ as.factor(treatment) + distance,
+#'        data = margex, family = 'binomial')
 #' mod_marg2(mod, var_interest = 'treatment', type = 'levels', at = NULL)
 #' mod_marg2(mod, var_interest = 'treatment', type = 'effects', at = NULL)
 #' mod_marg2(mod, var_interest = 'distance', type = 'levels',
