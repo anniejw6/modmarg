@@ -143,6 +143,7 @@ test_that("interaction terms", {
     mod = ols1, var_interest = 'am', type = 'effects',
     at = list('disp' = seq(75, 470, 5)))
 
+
   ols2 <- glm(mpg ~ am * disp + am * I(disp^2) +
                 cyl + hp + gear, data = mtcars)
 
@@ -150,7 +151,15 @@ test_that("interaction terms", {
     mod = ols2, var_interest = 'am', type = 'effects',
     at = list('disp' = seq(75, 470, 5)))
 
+  ols3 <- glm(mpg ~ am * poly(disp, degree = 2, raw = T) +
+                cyl + hp + gear, data = mtcars)
+
+  eff3 <- mod_marg2(
+    mod = ols3, var_interest = 'am', type = 'effects',
+    at = list('disp' = seq(75, 470, 5)))
+
   expect_equal(eff1, eff2)
+  expect_equal(eff2, eff3)
   expect_equal(eff1$`disp = 90`$Margin, c(0, 6.7650630),
                tolerance = 0.0001)
   expect_equal(eff1$`disp = 90`$Standard.Error, c(0, 2.509522),

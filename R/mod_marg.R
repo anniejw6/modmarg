@@ -42,7 +42,7 @@ mod_marg2 <- function(mod, var_interest,
 
   stopifnot('glm' %in% class(mod))
 
-  df <- mod$data[, all.vars(mod$formula)]
+  df <- mod$data[, names(mod$data) %in% all.vars(mod$formula)]
   df <- df[complete.cases(df), ]
 
   stopifnot(
