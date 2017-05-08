@@ -1,37 +1,105 @@
 library(modmarg)
 context("Calculate everything correctly")
 
-test_that("output is calculated correctly", {
+test_that("levels are calculated correctly despite different input types", {
 
   # http://www.stata.com/support/faqs/statistics/compute-standard-errors-with-margins/
+
+  # Put as.factor in the equation
   data(margex)
-  margex$treatment <- factor(margex$treatment)
-  mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
-  z <- mod_marg2(mod, var_interest = 'treatment',
+  mod1 <- glm(outcome ~ as.character(treatment) + distance,
+              data = margex, family = 'binomial')
+  z1 <- mod_marg2(mod1, var_interest = 'treatment',
                  type = 'levels', at = NULL)[[1]]
 
-  expect_equal(z$Margin, c(.0791146, .2600204), tolerance = 0.0001)
-  expect_equal(z$Standard.Error, c(.0069456, .0111772), tolerance = 0.0001)
-  expect_equal(z$Test.Stat, c(11.39, 23.26), tolerance = 0.001)
-  expect_equal(z$P.Value, c(0, 0), tolerance = 0.001)
-  expect_equal(z$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
-  expect_equal(z$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
+  # Make character outside
+  data(margex)
+  margex$treatment <- as.character(margex$treatment)
+  mod2 <- glm(outcome ~ treatment + distance,
+              data = margex, family = 'binomial')
+  z2 <- mod_marg2(mod2, var_interest = 'treatment',
+                 type = 'levels', at = NULL)[[1]]
 
-  z <- mod_marg2(mod, var_interest = 'treatment',
-                 type = 'effects', at = NULL)[[1]]
-  z <- z[2, ]
-  expect_equal(z$Margin, c(.1809057), tolerance = 0.0001)
+  # Make factor inside equation
+  data(margex)
+  mod3 <- glm(outcome ~ as.factor(treatment) + distance,
+              data = margex, family = 'binomial')
+  z3 <- mod_marg2(mod3, var_interest = 'treatment',
+                  type = 'levels', at = NULL)[[1]]
+
+  expect_equal(z1$Margin, z2$Margin, z3$Margin, c(.0791146, .2600204),
+               tolerance = 0.0001)
+  expect_equal(z1$Standard.Error, z2$Standard.Error, z3$Standard.Error,
+               c(.0069456, .0111772), tolerance = 0.0001)
+  expect_equal(z1$Test.Stat, z2$Test.Stat, z3$Test.Stat,
+               c(11.39, 23.26), tolerance = 0.001)
+  expect_equal(z1$P.Value, z2$P.Value, z3$P.Value,
+               c(0, 0), tolerance = 0.001)
+  expect_equal(z1$`Lower CI (95%)`, z2$`Lower CI (95%)`, z3$`Lower CI (95%)`,
+               c(.0655016, .2381135), tolerance = 0.0001)
+  expect_equal(z1$`Upper CI (95%)`, z2$`Upper CI (95%)`, z3$`Upper CI (95%)`,
+               c(.0927277, .2819272), tolerance = 0.0001)
+
+})
+
+
+test_that("effects are calculated correctly despite different input types", {
+
+  # Put as.factor in the equation
+  data(margex)
+  mod1 <- glm(outcome ~ as.character(treatment) + distance,
+              data = margex, family = 'binomial')
+  z1 <- mod_marg2(mod1, var_interest = 'treatment',
+                  type = 'effects', at = NULL)[[1]]
+
+  # Make character outside
+  data(margex)
+  margex$treatment <- as.character(margex$treatment)
+  mod2 <- glm(outcome ~ treatment + distance,
+              data = margex, family = 'binomial')
+  z2 <- mod_marg2(mod2, var_interest = 'treatment',
+                  type = 'effects', at = NULL)[[1]]
+
+  # Make factor inside equation
+  data(margex)
+  mod3 <- glm(outcome ~ as.factor(treatment) + distance,
+              data = margex, family = 'binomial')
+  z3 <- mod_marg2(mod3, var_interest = 'treatment',
+                  type = 'effects', at = NULL)[[1]]
+
+  expect_equal(z1$Margin, z2$Margin, z3$Margin, c(.0791146, .2600204),
+               tolerance = 0.0001)
+  expect_equal(z1$Standard.Error, z2$Standard.Error, z3$Standard.Error,
+               c(.0069456, .0111772), tolerance = 0.0001)
+  expect_equal(z1$Test.Stat, z2$Test.Stat, z3$Test.Stat,
+               c(11.39, 23.26), tolerance = 0.001)
+  expect_equal(z1$P.Value, z2$P.Value, z3$P.Value,
+               c(0, 0), tolerance = 0.001)
+  expect_equal(z1$`Lower CI (95%)`, z2$`Lower CI (95%)`, z3$`Lower CI (95%)`,
+               c(.0655016, .2381135), tolerance = 0.0001)
+  expect_equal(z1$`Upper CI (95%)`, z2$`Upper CI (95%)`, z3$`Upper CI (95%)`,
+               c(.0927277, .2819272), tolerance = 0.0001)
+
+  expect_equal(z1$Margin, c(.1809057), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(.0131684), tolerance = 0.0001)
   expect_equal(z$Test.Stat, c(13.74), tolerance = 0.001)
   expect_equal(z$P.Value, c(0), tolerance = 0.001)
   expect_equal(z$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
 
-  # Check that works correctly with NAs in dataset
+
+
+})
+
+test_that("works correctly even when terms are dropped", {
+
+  data(margex)
   margex$distance[1:5] <- NA
 
-  mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
+  mod <- glm(outcome ~ treatment + distance,
+             data = margex, family = 'binomial')
   z <- mod_marg2(mod, 'treatment', 'levels', at = NULL)[[1]]
+
   expect_equal(z$Margin, c(0.07911049, 0.25890416), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0.006945149, 0.011181260),
                tolerance = 0.0001)
@@ -158,5 +226,23 @@ test_that("Effects and Levels of Continuous Covariates", {
   expect_equal(z$Standard.Error, c(.6200359, .6309828), tolerance = 0.0001)
   expect_equal(z$Test.Stat, c(124.51, 98.37), tolerance = 0.0001)
 
+})
+
+test_that("mod_marg2 input is checked", {
+
+  # var_interest shouldn't be a character
+  data(margex)
+  mm <- glm(y ~ sex + age, margex, family = 'gaussian')
+  expect_error(mod_marg2(mod = mm, var_interest = 'sex'))
+
+  # lm should fail
+  margex$sex <- factor(margex$sex)
+  ml <- lm(y ~ sex + age, margex)
+  expect_error(mod_marg2(mod = lm, var_interest = 'sex'))
+
+  # extrapolated values are troubling
+  mm <- glm(y ~ sex + age, margex, family = 'gaussian')
+  expect_warning(mod_marg2(mod = mm, var_interest = 'sex',
+                           at = list(age = 100)))
 })
 
