@@ -160,3 +160,21 @@ test_that("Effects and Levels of Continuous Covariates", {
 
 })
 
+test_that("mod_marg2 input is checked", {
+
+  # var_interest shouldn't be a character
+  data(margex)
+  mm <- glm(y ~ sex + age, margex, family = 'gaussian')
+  expect_error(mod_marg2(mod = mm, var_interest = 'sex'))
+
+  # lm should fail
+  margex$sex <- factor(margex$sex)
+  ml <- lm(y ~ sex + age, margex)
+  expect_error(mod_marg2(mod = lm, var_interest = 'sex'))
+
+  # extrapolated values are troubling
+  mm <- glm(y ~ sex + age, margex, family = 'gaussian')
+  expect_warning(mod_marg2(mod = mm, var_interest = 'sex',
+                           at = list(age = 100)))
+})
+

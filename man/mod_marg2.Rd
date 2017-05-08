@@ -10,7 +10,7 @@ mod_marg2(mod, var_interest, type = "levels", vcov_mat = vcov(mod),
 \arguments{
 \item{mod}{model object, currently only support those of class glm}
 
-\item{var_interest}{variable of interest}
+\item{var_interest}{name of the variable of interest, must correspond to a factor or numeric covariate in the model}
 
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
 
@@ -23,8 +23,8 @@ This calculates the margins of the variable at these particular variables.}
 the ordered unique values in var_interest). if type == 'levels', this param is ignored.
 Defaults to 1.}
 
-\item{at_var_interest}{vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
-factor variable, defaults to NULL}
+\item{at_var_interest}{vector, if type == 'levels', the values for the variable of interest at which levels should be calculated.
+If NULL, indicates all levels for a factor variable, defaults to NULL}
 }
 \value{
 list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
