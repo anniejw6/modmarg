@@ -237,17 +237,17 @@ test_that("Effects and Levels of Continuous Covariates", {
 })
 
 test_that("Collinear cols treated right", {
-  
+
   # Compare to stata command (load mtcars into stata after transformations)
   # stata
   # reg disp i.am##c.mpg
   # margins, dydx(am) at(mpg = (15(5)30))
   #-------------------------------------------------------------------"
-  #    |            Delta-method"                                        
+  #    |            Delta-method"
   #    |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]"
   # ---+----------------------------------------------------------------"
-  #2.am|"                                                                
-  #_at |"                                                                
+  #2.am|"
+  #_at |"
   # 1  |  -84.86612    36.3742    -2.33   0.027    -159.3753   -10.35695"
   # 2  |  -30.01541    28.0651    -1.07   0.294    -87.50416    27.47335"
   # 3  |    24.8353    37.5892     0.66   0.514    -52.16269    101.8333"
@@ -265,16 +265,53 @@ test_that("Collinear cols treated right", {
   eff1 <- mod_marg2(
     mod = ols1, var_interest = 'am', type = 'effects',
     at = list('mpg' = seq(15, 30, 5)))
-  
+
   expect_equal(eff1$`mpg = 15`$Margin, c(0, -84.86612), tolerance = 0.0001)
-  expect_equal(eff1$`mpg = 15`$Standard.Error, c(0, 36.3742), 
+  expect_equal(eff1$`mpg = 15`$Standard.Error, c(0, 36.3742),
                tolerance = 0.0001)
   expect_equal(eff1$`mpg = 15`$P.Value, c(NaN, 0.027), tolerance = 0.001)
   expect_equal(eff1$`mpg = 25`$Margin, c(0, 24.8353), tolerance = 0.0001)
-  expect_equal(eff1$`mpg = 25`$Standard.Error, c(0, 37.5892), 
+  expect_equal(eff1$`mpg = 25`$Standard.Error, c(0, 37.5892),
                tolerance = 0.0001)
   expect_equal(eff1$`mpg = 25`$P.Value, c(NaN, 0.514), tolerance = 0.001)
 })
+
+test_that("mod_marg2 subsets of data run properly", {
+
+  # Stata Commands
+  # webuse margex
+  # reg y i.treatment##i.agegroup c.distance
+  # margins i.treatment, by(agegroup)
+
+  data(margex)
+  mm <- glm(y ~ treatment * agegroup + distance, margex, family = 'gaussian')
+  z1 <- mod_marg2(mod = mm, var_interest = 'treatment',
+                  type = "levels",
+                  data = subset(margex, agegroup == "20-29"))
+
+  z2 <- mod_marg2(mod = mm, var_interest = 'treatment',
+                  type = "levels",
+                  data = subset(margex, agegroup == "30-39"))
+
+  z3 <- mod_marg2(mod = mm, var_interest = 'treatment',
+                  type = "levels",
+                  data = subset(margex, agegroup == "40+"))
+
+  expect_equal(z1[[1]]$Margin, c(68.67471, 83.40595), tolerance = 0.0001)
+  expect_equal(z1[[1]]$Standard.Error, c(0.8908722, 1.3643423),
+               tolerance = 0.0001)
+
+  expect_equal(z2[[1]]$Margin, c(67.23932, 79.75863), tolerance = 0.0001)
+  expect_equal(z2[[1]]$Standard.Error, c(1.004951, 1.164683),
+               tolerance = 0.0001)
+
+  expect_equal(z3[[1]]$Margin, c(58.87818, 71.36229), tolerance = 0.0001)
+  expect_equal(z3[[1]]$Standard.Error, c(0.8580671, 0.6532233),
+               tolerance = 0.0001)
+
+})
+
+
 
 test_that("mod_marg2 input is checked", {
 
