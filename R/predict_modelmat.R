@@ -24,10 +24,10 @@
 predict_modelmat <- function(model, transformed_df,
                              formula = model$formula){
 
-  m <- model.frame(formula, transformed_df, xlev = model$xlevels)
-
   list(
-    covar =  model.matrix(formula, m, contrasts.arg = model$contrasts),
+    covar =  model.matrix(formula, transformed_df,
+                          contrasts.arg = model$contrasts,
+                          xlev = model$xlevels),
     pred_link = predict(model, newdata = transformed_df),
     pred_resp = predict(model, newdata = transformed_df, type = 'response')
   )
