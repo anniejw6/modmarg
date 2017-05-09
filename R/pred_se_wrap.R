@@ -13,7 +13,7 @@
 #' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
 #' factor variable, defaults to NULL
 #'
-#' @importFrom stats coef
+#' @importFrom stats coef predict model.matrix
 #'
 #' @return dataframe of formatted output
 #' @export
@@ -42,24 +42,23 @@ pred_se_wrap <- function(df_trans, var_interest, model,
   df_levels <- at_transforms(
     df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
 
-  # Get predicted values and covariates
-  cov_preds <- lapply(df_levels, function(x)
-    predict_modelmat(model = model, transformed_df = x))
+  res <- lapply(df_levels, function(x){
+    p <- predict(model, newdata = x)
+    list(
+      jacobs = calc_jacob(
+        pred_values = p,
+        # create a model matrix only using coefficients in the model
+        covar_matrix = model.matrix(
+          object = model$formula, data = x,
+          contrasts.arg = model$contrasts,
+          xlev = model$xlevels)[, !is.na(coef(model))],
+        deriv_func = model$family$mu.eta),
+      preds = mean(model$family$linkinv(p))
+    )
+  })
 
-  # calculate predictions
-  preds <- sapply(cov_preds, function(x){ mean(x$pred_resp) })
-
-  # if covariates are dropped from the model, remove those columns from cov_preds
-  for(i in 1:length(cov_preds)){
-    cov_preds[[i]]$covar <- cov_preds[[i]]$covar[, !is.na(coef(model))]
-  }
-
-  # calculate jacobian using first derivative
-  jacobs <- do.call(rbind, lapply(cov_preds, function(x){
-    calc_jacob(
-      pred_values = x$pred_link, covar_matrix = x$covar,
-      deriv_func = model$family$mu.eta)
-  }))
+  jacobs <- do.call(rbind, lapply(res, function(x){x[['jacobs']]}))
+  preds <- vapply(res, function(x){ x[['preds']]}, numeric(1))
 
   if(type == 'effects') {
     if(is.numeric(df_trans[[var_interest]]) &
@@ -73,7 +72,7 @@ pred_se_wrap <- function(df_trans, var_interest, model,
   }
 
   format_output(
-    margin_labels = names(cov_preds),
+    margin_labels = names(df_levels),
     pred_margins = preds,
     se = calc_pred_se(vcov_mat, jacobs),
     family = model$family$family,
