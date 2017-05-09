@@ -49,21 +49,6 @@ test_that("applying multiple transformations", {
 
 })
 
-test_that("Making sure we generate model matrix and predictions correctly", {
-
-  data(mtcars)
-  mtcars$gear <- factor(mtcars$gear)
-  mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
-
-  df3 <- at_transform(df = mtcars, var_name = 'gear', value = 3)
-  covar3 <- model.matrix(mm$formula, df3)
-
-  z <- predict_modelmat(model = mm, transformed_df = df3)
-  expect_identical(z$covar, covar3)
-  expect_identical(z$pred_link, predict(mm, newdata = df3))
-  expect_identical(z$pred_resp, predict(mm, newdata = df3, type = 'response'))
-
-})
 
 test_that("make sure we format output correctly", {
 
