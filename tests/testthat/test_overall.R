@@ -237,6 +237,22 @@ test_that("Effects and Levels of Continuous Covariates", {
 })
 
 test_that("Collinear cols treated right", {
+  
+  # Compare to stata command (load mtcars into stata after transformations)
+  # stata
+  # reg disp i.am##c.mpg
+  # margins, dydx(am) at(mpg = (15(5)30))
+  #-------------------------------------------------------------------"
+  #    |            Delta-method"                                        
+  #    |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]"
+  # ---+----------------------------------------------------------------"
+  #2.am|"                                                                
+  #_at |"                                                                
+  # 1  |  -84.86612    36.3742    -2.33   0.027    -159.3753   -10.35695"
+  # 2  |  -30.01541    28.0651    -1.07   0.294    -87.50416    27.47335"
+  # 3  |    24.8353    37.5892     0.66   0.514    -52.16269    101.8333"
+  # 4  |   79.68602   56.55951     1.41   0.170    -36.17088    195.5429"
+
 
   data(mtcars)
   mtcars$am <- factor(mtcars$am)
