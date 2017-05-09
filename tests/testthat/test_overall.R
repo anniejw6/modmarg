@@ -288,11 +288,9 @@ test_that("mod_marg2 subsets of data run properly", {
   z1 <- mod_marg2(mod = mm, var_interest = 'treatment',
                   type = "levels",
                   data = subset(margex, agegroup == "20-29"))
-
   z2 <- mod_marg2(mod = mm, var_interest = 'treatment',
                   type = "levels",
                   data = subset(margex, agegroup == "30-39"))
-
   z3 <- mod_marg2(mod = mm, var_interest = 'treatment',
                   type = "levels",
                   data = subset(margex, agegroup == "40+"))
@@ -300,14 +298,16 @@ test_that("mod_marg2 subsets of data run properly", {
   expect_equal(z1[[1]]$Margin, c(68.67471, 83.40595), tolerance = 0.0001)
   expect_equal(z1[[1]]$Standard.Error, c(0.8908722, 1.3643423),
                tolerance = 0.0001)
-
   expect_equal(z2[[1]]$Margin, c(67.23932, 79.75863), tolerance = 0.0001)
   expect_equal(z2[[1]]$Standard.Error, c(1.004951, 1.164683),
                tolerance = 0.0001)
-
   expect_equal(z3[[1]]$Margin, c(58.87818, 71.36229), tolerance = 0.0001)
   expect_equal(z3[[1]]$Standard.Error, c(0.8580671, 0.6532233),
                tolerance = 0.0001)
+
+  expect_error(mod_marg2(mod = mm, var_interest = 'treatment',
+                         type = 'levels',
+                         data = margex[, names(margex) != 'distance']))
 
 })
 
