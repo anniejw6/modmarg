@@ -30,9 +30,9 @@
 #' transformed_df = at_transform(df = mtcars, var_name = 'gear', value = 5)
 #' )
 #'
-#' calc_jacob(x3$pred, x3$covar, ld_fun)
-#' calc_jacob(x4$pred, x4$covar, ld_fun)
-#' calc_jacob(x5$pred, x5$covar, ld_fun)
+#' calc_jacob(x3$pred_link, x3$covar, ld_fun)
+#' calc_jacob(x4$pred_link, x4$covar, ld_fun)
+#' calc_jacob(x5$pred_link, x5$covar, ld_fun)
 #'
 calc_jacob <- function(pred_values, covar_matrix, deriv_func){
 

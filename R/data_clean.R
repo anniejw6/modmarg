@@ -19,9 +19,6 @@
 #' all(df == df3)
 at_transform <- function(df, var_name, value){
 
-  stopifnot( is.factor(df[[var_name]]) | is.numeric(df[[var_name]]),
-             is.data.frame(df) )
-
   # figure out if factor
   if(is.factor(df[[var_name]])){
     # necessary because of factors
@@ -87,6 +84,7 @@ at_transforms <- function(model_df, at_list){
 #' @param at_var_interest at levels for variables of interest, defaults to NULL
 #'
 #' @return named list of all values for variable of interest
+#' @export
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
@@ -94,11 +92,6 @@ at_transforms <- function(model_df, at_list){
 gen_at_list <- function(df, var_interest, at_var_interest = NULL){
 
   stopifnot(var_interest %in% names(df))
-  if(is.null(at_var_interest) & !is.factor(df[[var_interest]]))
-    stop(sprintf(paste('You either need to specify at_var_interest if %s is',
-               'continuous, or you need to transform %s into a',
-               'factor before',
-               'running glm.'), var_interest, var_interest))
 
   if(is.null(at_var_interest)){
     # Get all unique values

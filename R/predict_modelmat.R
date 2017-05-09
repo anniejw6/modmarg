@@ -6,6 +6,7 @@
 #'
 #' @return list of covariates (covar), predictions on the link function scale (pred_link),
 #' and predictions on the response variable scale (pred_response), e.g., probabilities
+#' @importFrom stats model.frame model.matrix predict
 #' @export
 #'
 #' @examples
@@ -17,9 +18,9 @@
 #' covar3 <- model.matrix(mm$formula, df3)
 #'
 #' z <- predict_modelmat(model = mm, transformed_df = df3)
-#' expect_identical(z$covar, covar3)
-#' expect_identical(z$pred_link, predict(mm, newdata = df3))
-#' expect_identical(z$pred_resp, predict(mm, newdata = df3, type = 'response'))
+#' all(z$covar == covar3)
+#' all(z$pred_link == predict(mm, newdata = df3))
+#' all(z$pred_resp == predict(mm, newdata = df3, type = 'response'))
 predict_modelmat <- function(model, transformed_df,
                              formula = model$formula){
 

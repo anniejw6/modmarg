@@ -29,6 +29,6 @@ Format margins output
 \examples{
 format_output(margin_labels = c('hello', 'goodbye', 'whatever'),
 pred_margins = c(1, 0.25, 3.1),
-se = c(0.25, 0.75, 0.5))
+se = c(0.25, 0.75, 0.5), family = 'binomial')
 }
 

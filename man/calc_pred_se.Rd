@@ -9,7 +9,7 @@ calc_pred_se(vcov_model, jac)
 \arguments{
 \item{vcov_model}{variance-covariance matrix of the model}
 
-\item{jacobian}{jacobian matrix of the predictions}
+\item{jac}{jacobian matrix of the predictions}
 }
 \value{
 vector of standard errors
@@ -29,7 +29,7 @@ df3 <- transform(mm$data, gear = factor(3, levels = levels(mtcars$gear)))
 covar3 <- model.matrix(mm$formula, df3)
 p3 <- predict(mm, newdata = df3)
 
-z <-jacob_level(p3, as.matrix(covar3), ld_fun)
+z <- calc_jacob(p3, as.matrix(covar3), ld_fun)
 
 calc_pred_se(vcov(mm), z)
 calc_pred_se(vcov(mm), rbind(z, z))

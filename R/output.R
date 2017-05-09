@@ -7,13 +7,14 @@
 #' @param margin_labels vector, label of what the margins mean
 #' @param pred_margins vector, predictive margins
 #'
+#' @importFrom stats pt qnorm pnorm
 #' @return dataframe of label, margin, se, z-value, p-value, and confidence interval bounds
 #' @export
 #'
 #' @examples
 #' format_output(margin_labels = c('hello', 'goodbye', 'whatever'),
 #' pred_margins = c(1, 0.25, 3.1),
-#' se = c(0.25, 0.75, 0.5))
+#' se = c(0.25, 0.75, 0.5), family = 'binomial')
 format_output <- function(margin_labels, pred_margins, se, family, dof,
                           cofint = c(0.025, 0.975)){
 
