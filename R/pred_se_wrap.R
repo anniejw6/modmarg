@@ -42,21 +42,20 @@ pred_se_wrap <- function(df_trans, var_interest, model,
   df_levels <- at_transforms(
     df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
 
-  jacobs <- lapply(df_levels, function(x){
-    calc_jacob(
-      pred_values = predict(model, newdata = x),
-      covar_matrix =
-        model.matrix(
-          model$formula, x, contrasts.arg = model$contrasts,
-          xlev = model$xlevels)[, !is.na(coef(model))],
-      deriv_func = model$family$mu.eta)
+  res <- lapply(df_levels, function(x){
+    p <- predict(model, newdata = x)
+    list(
+      jacobs = calc_jacob(pred_values = p,
+                     covar_matrix = model.matrix(
+                       model$formula, x, contrasts.arg = model$contrasts,
+                       xlev = model$xlevels)[, !is.na(coef(model))],
+                     deriv_func = model$family$mu.eta),
+      preds = mean(model$family$linkinv(p))
+    )
   })
-  jacobs <- do.call(rbind, jacobs)
 
-  preds <- vapply(
-    df_levels,
-    function(x){ mean(predict(model, newdata = x, type = 'response')) },
-    numeric(1))
+  jacobs <- do.call(rbind, lapply(res, function(x){x[['jacobs']]}))
+  preds <- vapply(res, function(x){ x[['preds']]}, numeric(1))
 
   # # Get predicted values and covariates
   # cov_preds <- lapply(df_levels, function(x)
