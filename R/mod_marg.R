@@ -11,6 +11,7 @@
 #' Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated.
 #' If NULL, indicates all levels for a factor variable, defaults to NULL
+#' @param data data.frame that margins should run over, defaults to mod$data
 #' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 #'
 #' @details P values are calculated with T tests for OLS, and Z tests otherwise.
@@ -38,40 +39,41 @@ mod_marg2 <- function(mod, var_interest,
                       type = 'levels',
                       vcov_mat = vcov(mod),
                       at = NULL, base_rn = 1,
-                      at_var_interest = NULL){
+                      at_var_interest = NULL,
+                      data = mod$data){
 
   stopifnot('glm' %in% class(mod))
 
-  df <- mod$data[, names(mod$data) %in% all.vars(mod$formula)]
-  df <- df[complete.cases(df), ]
+  data <- data[, names(data) %in% all.vars(mod$formula)]
+  data <- data[complete.cases(data), ]
 
   stopifnot(
-    var_interest %in% names(df),
-    all(names(at) %in% names(df))
+    var_interest %in% names(data),
+    all(names(at) %in% names(data))
   )
 
   # Check for extrapolated values
   for(i in seq_along(at)){
-    if(is.numeric(df[[names(at)[i]]]) &
-       ! all(at[[i]] <= max(df[[names(at)[i]]]) &
-             at[[i]] >= min(df[[names(at)[i]]])))
+    if(is.numeric(data[[names(at)[i]]]) &
+       ! all(at[[i]] <= max(data[[names(at)[i]]]) &
+             at[[i]] >= min(data[[names(at)[i]]])))
       warning(sprintf("Not all values in 'at' are in the range of '%s'", names(at)[i]))
   }
 
   # Transform the ats ---
   if(!is.null(at)){
 
-    df <- at_transforms(df, at)
+    data <- at_transforms(data, at)
 
   } else {
 
-    df <- list(df)
+    data <- list(data)
 
   }
 
 
   # Calculate pred and se ---
-  lapply(df, function(x){
+  lapply(data, function(x){
       pred_se_wrap(df_trans = x, var_interest = var_interest,
                    model = mod, type = type, base_rn = base_rn,
                    at_var_interest = at_var_interest,
