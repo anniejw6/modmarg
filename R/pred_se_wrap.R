@@ -43,15 +43,18 @@ pred_se_wrap <- function(df_trans, var_interest, model,
     df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
 
   res <- lapply(df_levels, function(x){
-    p <- predict(model, newdata = x)
+
+    Terms <- delete.response(terms(model))
+    m <- model.frame(Terms, x, na.action = na.fail,
+                     xlev = model$xlevels)
+    if(!is.null(cl <- attr(Terms, "dataClasses"))) .checkMFClasses(cl, m)
+    X <- model.matrix(Terms, m, contrasts.arg = model$contrasts)
+    p <- custom_predict_lm(object = model, newdata = x, model_mat = X)
     list(
       jacobs = calc_jacob(
         pred_values = p,
         # create a model matrix only using coefficients in the model
-        covar_matrix = model.matrix(
-          object = model$formula, data = x,
-          contrasts.arg = model$contrasts,
-          xlev = model$xlevels)[, !is.na(coef(model))],
+        covar_matrix = X[, !is.na(coef(model))],
         deriv_func = model$family$mu.eta),
       preds = mean(model$family$linkinv(p))
     )
