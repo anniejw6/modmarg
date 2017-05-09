@@ -1,8 +1,10 @@
 # modmarg
 [![Build Status](https://travis-ci.org/anniejw6/modmarg.svg?branch=master)](https://travis-ci.org/anniejw6/modmarg)
+[![codecov.io](https://codecov.io/github/jimhester/covr/coverage.svg?branch=master)](https://codecov.io/github/jimhester/covr?branch=master)
 
-predicted margins and marginals effects
-
+Calculate predicted levels and marginal effects from glm objects, 
+using the delta method to calculate standard errors. This is an R-based 
+version of Stata's 'margins' command.
 
 # v1.0
 
