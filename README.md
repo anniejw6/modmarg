@@ -1,6 +1,6 @@
 # modmarg
 [![Build Status](https://travis-ci.org/anniejw6/modmarg.svg?branch=master)](https://travis-ci.org/anniejw6/modmarg)
-[![codecov.io](https://codecov.io/github/jimhester/covr/coverage.svg?branch=master)](https://codecov.io/github/jimhester/covr?branch=master)
+[![codecov](https://codecov.io/gh/anniejw6/modmarg/branch/master/graph/badge.svg)](https://codecov.io/gh/anniejw6/modmarg)
 
 Calculate predicted levels and marginal effects from glm objects, 
 using the delta method to calculate standard errors. This is an R-based 
