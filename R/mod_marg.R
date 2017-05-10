@@ -1,11 +1,19 @@
 #' Estimating predictive margins on a model
-#'
+#' 
+#' The variable for the predictive margin is specified by `var_interest`. If 
+#' margins are only needed at particular values of `var_interest`, 
+#' `at_var_interest` should be used. If margins of `var_interest` are needed at 
+#' across the levels of a *different* variable in the model, `at` should be 
+#' used.
+#' 
+#' 
 #' @param mod model object, currently only support those of class glm
 #' @param var_interest name of the variable of interest, must correspond to a factor or numeric covariate in the model
 #' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
 #' @param vcov_mat the variance-covariance matrix, defaults to vcov(model)
 #' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 #' This calculates the margins of the variable at these particular variables.
+#' If all values are needed, suggested syntax is `at = list(var = unique(df$var))`.
 #' @param base_rn numeric, if type == 'effects', the base level (taken as the index of one of
 #' the ordered unique values in var_interest). if type == 'levels', this param is ignored.
 #' Defaults to 1.
