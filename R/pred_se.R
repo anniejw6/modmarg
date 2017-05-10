@@ -15,19 +15,9 @@
 #'
 #' @importFrom stats coef predict model.matrix
 #'
-#' @return dataframe of formatted output
-#' @export
+#' @return list of labels, predicted margins, and SE
 #'
-#' @examples
-#' data(mtcars)
-#' mtcars$gear <- factor(mtcars$gear)
-#' mm <- glm(vs ~ gear  + mpg * disp, mtcars, family = 'binomial')
-#' df <- transform(mm$model, mpg = 15)
-#' pred_se_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
-#' pred_se_wrap(mm$model, var_interest = 'mpg',
-#'                 at_var_interest = c(15, 21), model = mm,
-#'                 vcov_mat = vcov(mm))
-pred_se_wrap <- function(df_trans, var_interest, model,
+pred_se <- function(df_trans, var_interest, model,
                          type = 'levels', base_rn = 1,
                          at_var_interest = NULL,
                          vcov_mat = NULL){
@@ -72,12 +62,10 @@ pred_se_wrap <- function(df_trans, var_interest, model,
     }
   }
 
-  format_output(
-    margin_labels = names(df_levels),
+  list(
+    labels = names(df_levels),
     pred_margins = preds,
-    se = calc_pred_se(vcov_mat, jacobs),
-    family = model$family$family,
-    dof = model$df.residual
+    se = calc_pred_se(vcov_mat, jacobs)
   )
 
 }
