@@ -43,10 +43,9 @@ at_transforms <- function(model_df, at_list){
   }
 
   # Give names to list
-  named_mat <- vapply(names(at_list), function(name){
-    sprintf("%s = %s", name, all_combos[[name]]) },
-    FUN.VALUE = character(nrow(all_combos)))
-  names(df) <- do.call(paste, data.frame(named_mat))
+  names(df) <- apply(all_combos, 1, FUN = function(x){
+    paste(names(all_combos), "=", x, collapse = ' ')
+  })
 
   # Return
   df
