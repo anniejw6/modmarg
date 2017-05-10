@@ -9,45 +9,50 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Why Margins?
-Let's say that you fit a logistic regression. You are trying to figure out the marginal relationship between a covariate and the outcome of the regression (say, a treatement effect, for example). Or perhaps you want to know the average outcome level given a covariate being set to a particular level. In both cases, you also care about some measure of variation.
+There are a number of possible ways to compute the standard errors for 
+[margins](usage.html) of a regression. If you're a total masochist, it might be possible to derive a 
+probability density function for the margin itself, but that's surely a huge pain
+and might not even exist. It is also possible to use simulation or bootstrapping
+to create standard errors for the margin. 
 
-While predictive levels or effects are pretty easy to estimate given predictions from a regression, estimating the measures of central tendency (variance or standard deviation) are much harder to estimate. Unfortunately, you can't just take the variance of the predictive margin or effect becauase...it's just a single number. We could (maybe) derive a probability density function for the predictive margin and then use method of moments estimation to get the variance, but there’s a good chance that the probability density function doesn’t exist or is monstrously hard to deal with.
-
-The Delta Method is a semi-parametric method that takes advantage of closed form solution to $\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)}$ to improve computational time relative to completely nonparametric methods. There are other completely non-parametric methods for approximation like bootstrap or simulation.
+In this package, we follow 
+[Stata's margins command](https://www.stata.com/help.cgi?margins) and use the
+Delta Method, which is a semi-parametric method that takes advantage of closed form solution to $\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)}$ to improve computational time relative to simulation or bootstrap methods.
 
 # The Delta Method
-There's another way to think of the predictive margin or effect--it's a function of the data for the regression, $X$ and the estimated parameters, $\beta$. The delta method takes advantage of that fact to approximate a local neighborhood of the predictive margin using a [Taylor Series](https://en.wikipedia.org/wiki/Taylor_series) expansion and derive the variation near that point. Assuming we have a closed-form solution for the derivative of the predictive margin, which is true for most common forms of linear regression---but more on this later---we also have a closed-form solution for the variance of the predictive levels or effects.
+The Delta Method is a general method for deriving the variance of a function of random variables with known variance. In this case, the Delta Method takes advantage of the fact that the margin is (usually) an infinitely differentiable function of the data, $X$, and the vector of $\beta$s to derive a closed-form solution for the standard errors of the margin.^[Usually because this statement requires that the canonical link function for the regression has a closed-form derivative. Luckily, this is true for most common forms of linear regression.] 
 
-The Delta Method is a general method for deriving the variance of a function of random variables with known variance. In this case, the random variables are the $\beta$s of the regression and the function is our inverse link function. Therefore, we’ll need to multiply the variance of the $\beta$s, given by the variance-covariance matrix of the regression, by the derivative of their transformation during prediction, given by the Jacobian. 
+In particular, the delta method uses a [Taylor Series](https://en.wikipedia.org/wiki/Taylor_series) expansion of the inverse link function of the regression to approximate the margin in the neighborhood of $X$ and the $\beta$s and derive variation near that point.
 
 ## A reminder about Taylor Series
-The [Taylor Expansion](https://en.wikipedia.org/wiki/Taylor_series) is a useful tool because it allows us to approximate a differentiable function, $G(x)$, in terms of (an infinite sum of) the derivatives of $G(x)$. To be more precise, an infinitely differentiable $G(x)$ evaluated at $a$ can be written as
+The [Taylor Expansion](https://en.wikipedia.org/wiki/Taylor_series) is a useful tool because it allows us to restate a differentiable function, $G(x)$, in terms of (an infinite sum of) the derivatives of $G(x)$. To be more precise, an infinitely differentiable $G(x)$ evaluated at $a$ can be written as
 $$G(x) = G(a) + \frac{G'(a)}{1!}(x - a) + \frac{G''(a)}{2!}(x-a)^2 + 
 \frac{G'''(a)}{3!}(x-a)^3 + \dots$$
 
-In the case of the delta method for predictive margins (levels), with [link function](https://en.wikipedia.org/wiki/Generalized_linear_model#Link_function) $link$, the column vector of predictions $P_m$ at covariates $X_1$ is 
-$$P_m(X_1) = \text{link}^{-1}(X_1 \beta)$$
+If we cut off the expansion after some number of terms (two is commmon), we can get a useful 
+approximation of $G(x)$.
 
-The exact form of the link function and its inverse will depend on the type of regression. For example, the logit function is the canonical link function for logistic regression and allows transformations between probabilities and log-odds.
+## Taylor Series and the Delta Method
+In the case of predictive margins (levels), where the regression model has [link function](https://en.wikipedia.org/wiki/Generalized_linear_model#Link_function) $link$^[The exact form of the link function and its inverse will depend on the type of regression. For example, the logit function is the canonical link function for logistic regression and allows transformations between probabilities and log-odds.], the column vector of *predictive margins* $P_m$ at covariates $X_1$ is 
+$$P_m(X_1 \beta) = \text{link}^{-1}(X_1 \beta)$$
 
-For the predictive effect of a regression run with link function $link$, the column vector of predictions $P_m$ is a function of $X \beta$ such that 
+For the *predicted effects* of that same regression, the column vector of predicted effects $P_e$ is a function of $X \beta$ such that 
 
 $$P_e(X_1 \beta) = \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}$$ 
 
 Depending on whether the effect is over a continuous or categorical variable, this may be an actual derivative (the instantaneous rate of change) or the subtraction of $P(X \beta)$ calculated at one value of $X$ from another (the first difference). 
 
-Using the Taylor expansion, we can express $P$, a function of the random variable $X \beta$ around the point $X_1 \beta$, as
+Using the Taylor expansion, we can express $P$, a function of the random variable $X \beta$ around the point $X_1 \beta$^[Note that we treat the input $X$ as fixed and $\beta$ as a random variable.], as
 
 $$P(X \beta) = P(X_1 \beta) + 
 \frac{d(P(X_1 \beta))}{d(X\beta)}(X\beta - X_1 \beta)$$
 
-For predicted margins (levels), the Taylor expansion is 
+Substituting in for the different margins we'll care about, for **predicted margins** (levels), the Taylor expansion is 
 
 $$P_m(X \beta) = \text{link}^{-1}(X_1 \beta) + 
 \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}(X\beta - X_1 \beta)$$
 
-In the case that we are trying to estimate marginal effects of categorical variables, we are trying to estimate the effects at $P_e(X_1 \beta - X_2 \beta)$, which gives us
+In the case that we are trying to estimate **predicted marginal effects of categorical variables**, we are trying to estimate the effects at $P_e(X_1 \beta - X_2 \beta)$, which gives us
 
 $$ \begin{aligned}
 P_e(X \beta) &= \text{link}^{-1} (X_1 \beta - X_2 \beta) + 
@@ -56,7 +61,7 @@ P_e(X \beta) &= \text{link}^{-1} (X_1 \beta - X_2 \beta) +
 \end{aligned}
 $$
 
-For continuous variables, the marginal effect is a derivative, so 
+For **continuous variables, the marginal effect** is a derivative, so 
 $$\begin{aligned}
 P_e(X_1 \beta) &= \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)} + 
 \frac{d^2(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}(\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)} - \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)})
@@ -64,22 +69,26 @@ P_e(X_1 \beta) &= \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)} +
 $$
 
 # How does the Delta Method Work?
+Broadly speaking, we'll use a bunch of matrix algebra to run the variance/covariance matrix 
+from the original regression through the gradient of the inverse link function to
+get the variance of the margin. 
 
-Now that it's clear why we need the Taylor series, [Wikipedia contains a really nice derivation](https://en.wikipedia.org/wiki/Delta_method#Multivariate_delta_method).
+In particular, we’ll use the “sandwich” method of deriving the variance of a function of a vector of random variables. In this case, we'll multiply the partial derivatives of the inverse link function by the original variance/covariance matrix from the regression.^[Quick reminder on the sandwich method: for scalar $a$ and $r$, where $b$ is the variance of random variable $r$, $Var(a*r)$ is $a^2*b$. The matrix analog of $a^2*Var(b)$ is $ABA^T$.]
 
-To do the multiplication we need in matrix form, we’ll use the “sandwich” method of deriving the variance of a function. The sandwich method is a general method for deriving the variance of a function of random variables. That multiplies the square of the gradient of the function by the original variance/covariance matrix. The matrix form $ABA^T$ is the matrix analog of $Var(a * b)$ where a is a constant, i.e. $a^2*Var(b)$.
+Keeping in mind that the margin is given by $link^{-1}(X \beta)$, all of the first partial derivatives of the margin are given by the the Jacobian matrix.^[Since the Jacobian matrix is just the name of the matrix of all first partial derviatives of a vector-valued function.] For any predicted level indexed by $i$ in a regression, the $i,j$th element of the jacobian will be the derivative of predicted level $i$ with respect to regressor $j$. 
 
-We’ll use the Jacobian matrix of the predicted level to relate the predicted level/effect to the $\beta$s. For any predicted level indexed by $i$ in a regression, the $i,j$th element of the jacobian will be the derivative of predicted level $i$ with respect to regressor $j$. 
+We'll multiply that Jacobian by the variance-covariance matrix of the regression, which captures the variance structure of the coefficients. As a quick reminder about the variance-covariance matrix, if your model contains coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_i}$ and standard deviation $\sigma_{b_i}$), the $i,j$th element of the variance-covariance matrix is $cov(b_i, b_j)$.
 
-The variance-covariance matrix captures the variance structure of the coefficients. If your model contains coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_n}$ and standard deviation $\sigma_{b_n}$), the $i,j$th element of the variance-covariance matrix is $cov(b_i, b_j)$.
+Now that we're all clear on how the pieces fit together, [Wikipedia contains a really nice derivation](https://en.wikipedia.org/wiki/Delta_method#Multivariate_delta_method)
+of the multivariate delta method.
 
 # Step-By-Step
 
-1. Calculate the Jacobian matrix $J$.
+1. Calculate the Jacobian matrix of the inverse link function of $X \beta$, $J$.
 
-2. Calculate the variance-covariance matrix (or get it from the regression output of any standard package) $V$.
+2. Get the variance-covariance matrix, $V$, from the regression output, or calculate it some other way.^[Usually you'll just want the variance-covariance matrix of the regression, but you'll need to modify the vanilla variance-covariance matrix if you want to cluster standard errors or something.]
 
-3. Multiply the matrices: $J^{T} \times V \times J$. You’ll end up with a $k \times 1$ matrix for the $k$ predicted levels/effects.
+3. Sandwich multiply the matrices: $J^{T} \times V \times J$. You’ll end up with a $k \times 1$ matrix for the $k$ predicted levels/effects.
 
 ## Calculating the Jacobian
 
@@ -93,7 +102,7 @@ The variance-covariance matrix captures the variance structure of the coefficien
 
 1. Calculate the derivative of the link function with respect to $X \beta$ (e.g for a simple logit with predicted level $p$, $p*(1-p)$). 
 
-1. Run each vector of predicted levels through the scalar-valued to end up with another 1 x n column vector. Call this $q*_i$
+1. Run each vector of predicted levels through the scalar-valued link function to end up with another 1 x n column vector. Call this $q*_i$
 
 1. Take the cross product of each $q*_i$ and $A_i$ to get a row vector. Divide by the number of observations in $A_i$.
 
