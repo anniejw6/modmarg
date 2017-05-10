@@ -57,5 +57,13 @@ mod_marg2(mod, var_interest = 'distance', type = 'levels',
 mod <- glm(outcome ~ distance + factor(sex),
            data = margex, family = 'binomial')
 mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
+
+data(margex)
+data(ols_cvcov)
+mod <- glm(outcome ~ treatment + distance,
+           data = margex, family = 'binomial')
+mod_marg2(mod, var_interest = 'treatment', type = 'levels',
+          vcov_mat = ols_cvcov$clust,
+          dof = ols_cvcov$stata_dof)
 }
 
