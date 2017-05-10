@@ -24,15 +24,14 @@
 #' mtcars$gear <- factor(mtcars$gear)
 #' mm <- glm(vs ~ gear  + mpg * disp, mtcars, family = 'binomial')
 #' df <- transform(mm$model, mpg = 15)
-#' pred_se_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
+#' pred_se_wrap(df, var_interest = 'gear', model = mm,
+#'              vcov_mat = vcov(mm), dof = mm$df.residual)
 #' pred_se_wrap(mm$model, var_interest = 'mpg',
-#'                 at_var_interest = c(15, 21), model = mm,
-#'                 vcov_mat = vcov(mm))
-pred_se_wrap <- function(df_trans, var_interest, model,
+#'              at_var_interest = c(15, 21), model = mm,
+#'              vcov_mat = vcov(mm), dof = mm$df.residual)
+pred_se_wrap <- function(df_trans, var_interest, model, vcov_mat, dof,
                          type = 'levels', base_rn = 1,
-                         at_var_interest = NULL,
-                         vcov_mat = NULL,
-                         dof = model$df.residual){
+                         at_var_interest = NULL){
 
   stopifnot(is.data.frame(df_trans),
             is.character(var_interest),

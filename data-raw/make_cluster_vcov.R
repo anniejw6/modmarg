@@ -1,10 +1,6 @@
 
 # Create clustered variance-covariance matrix for package tests
 
-library(modmarg)
-library(sandwich)
-library(data.table)
-
 rm(list = ls())
 
 cluster_se <- function(model, cluster, data = model$data){
@@ -16,7 +12,7 @@ cluster_se <- function(model, cluster, data = model$data){
   k <- length(coef(model))
 
   # sum over clusters using data.table
-  u <- data.table(estfun(model))
+  u <- data.table::data.table(sandwich::estfun(model))
   u$cluster <- data[, cluster]
   u_clust <- u[, lapply(.SD, sum), keyby = cluster]
   # Drop cluster variable, go back to matrix
@@ -25,7 +21,7 @@ cluster_se <- function(model, cluster, data = model$data){
   # Sandwich estimator and DFC correction is different for different models
   if(family(model)[['link']] == 'identity'){
     dfc <- (m / (m - 1)) * ((n - 1) / (n - k))
-    clust <- dfc * sandwich(model, meat = crossprod(u_clust) / n)
+    clust <- dfc * sandwich::sandwich(model, meat = crossprod(u_clust) / n)
   } else if(family(model)[['link']] == 'logit'){
     dfc <- m / (m - 1)
     clust <- vcov(model) %*% (dfc * t(u_clust) %*% u_clust) %*% vcov(model)
@@ -34,7 +30,7 @@ cluster_se <- function(model, cluster, data = model$data){
 }
 
 # Create sample vcov matrix + degrees of freedom for vcov test
-# Section D.1 here:
+# Page 29 "Improved Critical Values using a T-distribution"
 # http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf
 data(margex)
 margex$treatment <- factor(margex$treatment)

@@ -3,7 +3,7 @@
 #' @param mod model object, currently only support those of class glm
 #' @param var_interest name of the variable of interest, must correspond to a factor or numeric covariate in the model
 #' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
-#' @param vcov_mat the variance-covariance matrix, defaults to vcov(model)
+#' @param vcov_mat the variance-covariance matrix, defaults to NULL in which case vcov(model) is used.
 #' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 #' This calculates the margins of the variable at these particular variables.
 #' @param base_rn numeric, if type == 'effects', the base level (taken as the index of one of
@@ -11,11 +11,15 @@
 #' Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated.
 #' If NULL, indicates all levels for a factor variable, defaults to NULL
-#' @param dof integer, the degrees of freedom used for the T statistic in an OLS model
+#' @param dof integer, the degrees of freedom used for the T statistic in an OLS model. Defaults to NULL in which case
+#' mod$df.residual is used.
 #' @param data data.frame that margins should run over, defaults to mod$data
 #' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 #'
-#' @details P values are calculated with T tests for OLS, and Z tests otherwise.
+#' @details P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
+#' (e.g. for clustering standard errors), the degrees of freedom for the T test / p-value calculation may need to be specified
+#' using dof. To replicate Stata clustering vce(cluster var_name), dof should be set to g - 1, where g is the number of unique levels
+#' of the clustering variable.
 #' @importFrom stats complete.cases terms vcov
 #' @export
 #' @examples
@@ -68,9 +72,7 @@ mod_marg2 <- function(mod, var_interest,
     warning(paste(
       "You provided a new variance-covariance matrix for an OLS model",
       "but no degrees of freedom for the T test. P-value calculations",
-      "may be incorrect. If you're clustering standard errors,",
-      "use dof = g - 1 (where g is the number of clusters)",
-      "to replicate Stata output."))
+      "may be incorrect - see ?modmarg::mod_marg2 for details."))
 
   if(is.null(vcov_mat))
     vcov_mat <- vcov(mod)
