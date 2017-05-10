@@ -21,10 +21,8 @@
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- factor(mtcars$gear)
-#' mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
-#' # apply at transformations
-#' df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
-#' df <- df[[1]]
+#' mm <- glm(vs ~ gear  + mpg * disp, mtcars, family = 'binomial')
+#' df <- transform(mm$model, mpg = 15)
 #' pred_se_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
 #' pred_se_wrap(mm$model, var_interest = 'mpg',
 #'                 at_var_interest = c(15, 21), model = mm,
@@ -43,8 +41,10 @@ pred_se_wrap <- function(df_trans, var_interest, model,
     df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
 
   res <- lapply(df_levels, function(x){
+    # Predict function is expensive so just calling it once
     p <- predict(model, newdata = x)
     list(
+      # Calculate Jacobian
       jacobs = calc_jacob(
         pred_values = p,
         # create a model matrix only using coefficients in the model
@@ -53,6 +53,7 @@ pred_se_wrap <- function(df_trans, var_interest, model,
           contrasts.arg = model$contrasts,
           xlev = model$xlevels)[, !is.na(coef(model))],
         deriv_func = model$family$mu.eta),
+      # Calculate predicted values
       preds = mean(model$family$linkinv(p))
     )
   })

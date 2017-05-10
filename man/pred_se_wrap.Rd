@@ -34,10 +34,8 @@ calculate the predicted level and se for the variable of interest.
 \examples{
 data(mtcars)
 mtcars$gear <- factor(mtcars$gear)
-mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
-# apply at transformations
-df <- at_transforms(mm$model, list("mpg" = c(15, 21)))
-df <- df[[1]]
+mm <- glm(vs ~ gear  + mpg * disp, mtcars, family = 'binomial')
+df <- transform(mm$model, mpg = 15)
 pred_se_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
 pred_se_wrap(mm$model, var_interest = 'mpg',
                 at_var_interest = c(15, 21), model = mm,
