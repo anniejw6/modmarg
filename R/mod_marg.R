@@ -83,7 +83,8 @@ mod_marg2 <- function(mod, var_interest,
     if(is.numeric(data[[names(at)[i]]]) &
        ! all(at[[i]] <= max(data[[names(at)[i]]]) &
              at[[i]] >= min(data[[names(at)[i]]])))
-      warning(sprintf("Not all values in 'at' are in the range of '%s'", names(at)[i]))
+      warning(sprintf("Not all values in 'at' are in the range of '%s'",
+                      names(at)[i]))
   }
 
   # Transform the ats ---

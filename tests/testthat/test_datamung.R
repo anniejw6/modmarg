@@ -27,11 +27,12 @@ test_that("applying multiple transformations", {
          transform(mtcars, gear = factor(5, levels = levels(mtcars$gear))))
   )
 
-  expect_equivalent(at_transforms(mtcars, list("mpg" = c(15, 21), "disp" = c(140, 180))),
-                    list(transform(mtcars, mpg = 15, disp = 140),
-                         transform(mtcars, mpg = 21, disp = 140),
-                         transform(mtcars, mpg = 15, disp = 180),
-                         transform(mtcars, mpg = 21, disp = 180))
+  expect_equivalent(
+    at_transforms(mtcars, list("mpg" = c(15, 21), "disp" = c(140, 180))),
+    list(transform(mtcars, mpg = 15, disp = 140),
+         transform(mtcars, mpg = 21, disp = 140),
+         transform(mtcars, mpg = 15, disp = 180),
+         transform(mtcars, mpg = 21, disp = 180))
   )
 
   var_interest <- 'gear'
