@@ -74,12 +74,21 @@ mod_marg2 <- function(mod, var_interest,
 
 
   # Calculate pred and se ---
-  lapply(data, function(x){
-      pred_se_wrap(df_trans = x, var_interest = var_interest,
-                   model = mod, type = type, base_rn = base_rn,
-                   at_var_interest = at_var_interest,
-                   vcov_mat = vcov_mat)
+  res <- lapply(data, function(x){
+    pred_se(df_trans = x, var_interest = var_interest,
+            model = mod, type = type, base_rn = base_rn,
+            at_var_interest = at_var_interest,
+            vcov_mat = vcov_mat)
   })
+
+  lapply(res, function(x) {
+    format_output(
+      margin_labels = x$labels,
+      pred_margins = x$pred_margins,
+      se = x$se,
+      family = mod$family$family,
+      dof = mod$df.residual
+    )})
 
 }
 
