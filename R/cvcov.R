@@ -5,7 +5,7 @@
 #' (d.o.f. defined as g - 1, where g is the number of clusters). Generated
 #' with margex data.
 #'
-#' See data/data-raw/make_cluster_vcov.R for details.
+#' See data-raw/make_cluster_vcov.R for details.
 #'
 #' @format A list of two lists, one for OLS and one for logit, each containing
 #' \describe{
