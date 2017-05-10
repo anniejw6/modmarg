@@ -1,31 +1,29 @@
-#' Calculate margins and se
-#'
-#' For one set of transformed covariates (not including the variable of interest),
-#' calculate the predicted level and se for the variable of interest.
-#'
-#' @param df_trans data.frame, should already be transformed for variables not related to
-#' the variable of interest
-#' @param var_interest the variable of interest
-#' @param model model
-#' @param type either effects or levels, defaults to levels
-#' @param base_rn row number of the base level, defaults to 1
-#' @param vcov_mat variance-covariance matrix, defaults to NULL
-#' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
-#' factor variable, defaults to NULL
-#'
 #' @importFrom stats coef predict model.matrix
-#'
-#' @return list of labels, predicted margins, and SE
-#'
-pred_se <- function(df_trans, var_interest, model,
-                         type = 'levels', base_rn = 1,
-                         at_var_interest = NULL,
-                         vcov_mat = NULL){
+# Main wrapper function to calculate margins and se
+pred_se <- function(df_trans, var_interest, at_var_interest,
+                    model, type, base_rn, vcov_mat){
 
   stopifnot(is.data.frame(df_trans),
             is.character(var_interest),
             var_interest %in% names(df_trans),
             type %in% c('effects', 'levels'))
+
+  # For one set of transformed covariates (not including the variable of
+  # interest), calculate the predicted level and se for the
+  # variable of interest.
+  #
+  # @param df_trans: data.frame, already transformed for variables not related
+  #                  to the variable of interest
+  # @param var_interest: character, the variable of interest
+  # @param model: glm object
+  # @param type: either effects or levels
+  # @param base_rn: numeric, row number of the base level
+  # @param vcov_mat: matrix, variance-covariance matrix
+  # @param at_var_interest: vector, if type == 'levels', the values for the
+  #                         variable of interest at which levels should be
+  #                         calculated. ignored otherwise
+  #
+  # @return list of labels, predicted margins, and SE
 
   df_levels <- at_transforms(
     df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
