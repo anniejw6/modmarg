@@ -4,7 +4,7 @@
 \alias{mod_marg2}
 \title{Estimating predictive margins on a model}
 \usage{
-mod_marg2(mod, var_interest, type = "levels", vcov_mat = vcov(mod),
+mod_marg2(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
   at = NULL, base_rn = 1, at_var_interest = NULL)
 }
 \arguments{
@@ -15,6 +15,8 @@ mod_marg2(mod, var_interest, type = "levels", vcov_mat = vcov(mod),
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
 
 \item{vcov_mat}{the variance-covariance matrix, defaults to vcov(model)}
+
+\item{dof}{integer, the degrees of freedom used for the T statistic in an OLS model}
 
 \item{at}{list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 This calculates the margins of the variable at these particular variables.}

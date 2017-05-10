@@ -12,6 +12,7 @@
 #' @param vcov_mat variance-covariance matrix, defaults to NULL
 #' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
 #' factor variable, defaults to NULL
+#' @param dof integer degrees of freedom for T statistics
 #'
 #' @importFrom stats coef predict model.matrix
 #'

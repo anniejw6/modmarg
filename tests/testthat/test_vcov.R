@@ -24,6 +24,9 @@ test_that("clustered standard errors are correct", {
                tolerance = 0.0001)
   expect_equal(z$P.Value, c(0.2373067, 0.0310606), tolerance = 0.0001)
 
+  expect_warning(mod_marg2(mod, var_interest = 'treatment',
+                           type = 'levels', vcov_mat = v))
+
   data(margex)
   mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
   data(logit_cvcov)

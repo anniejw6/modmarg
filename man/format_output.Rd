@@ -16,7 +16,7 @@ format_output(margin_labels, pred_margins, se, family, dof, cofint = c(0.025,
 
 \item{family}{character, type of model (e.g. gaussian, binomial)}
 
-\item{dof}{integer, residual degrees of freedom}
+\item{dof}{integer, degrees of freedom for T statistics}
 
 \item{cofint}{vector, confidence intervals defaults to c(0.025, 0.975)}
 }

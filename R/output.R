@@ -2,7 +2,7 @@
 #'
 #' @param se vector, standard errors
 #' @param family character, type of model (e.g. gaussian, binomial)
-#' @param dof integer, residual degrees of freedom
+#' @param dof integer, degrees of freedom for T statistics
 #' @param cofint vector, confidence intervals defaults to c(0.025, 0.975)
 #' @param margin_labels vector, label of what the margins mean
 #' @param pred_margins vector, predictive margins

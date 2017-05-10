@@ -33,7 +33,7 @@ cluster_se <- function(model, cluster, data = model$data){
   list(clust = clust, stata_dof = m - 1)
 }
 
-# Create sample vcov matrix + degrees of freedom for
+# Create sample vcov matrix + degrees of freedom for vcov test
 # Section D.1 here:
 # http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf
 data(margex)

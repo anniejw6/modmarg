@@ -5,7 +5,7 @@
 \title{Calculate margins and se}
 \usage{
 pred_se_wrap(df_trans, var_interest, model, type = "levels", base_rn = 1,
-  at_var_interest = NULL, vcov_mat = NULL)
+  at_var_interest = NULL, vcov_mat = NULL, dof = model$df.residual)
 }
 \arguments{
 \item{df_trans}{data.frame, should already be transformed for variables not related to
@@ -23,6 +23,8 @@ the variable of interest}
 factor variable, defaults to NULL}
 
 \item{vcov_mat}{variance-covariance matrix, defaults to NULL}
+
+\item{dof}{integer degrees of freedom for T statistics}
 }
 \value{
 dataframe of formatted output
