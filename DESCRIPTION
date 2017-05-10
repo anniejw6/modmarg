@@ -8,7 +8,6 @@ Authors@R: c(
 	)
 Description: Calculate predicted levels and marginal effects from 'glm' objects,
     using the delta method to calculate standard errors. This is an R-based
->>>>>>> a73abe898265c089db41a69a8a234a6a4129a59c
     version of Stata's 'margins' command.
 URL: https://github.com/anniejw6/modmarg
 BugReports: https://github.com/anniejw6/modmarg/issues
