@@ -14,9 +14,10 @@ mod_marg2(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
 
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
 
-\item{vcov_mat}{the variance-covariance matrix, defaults to vcov(model)}
+\item{vcov_mat}{the variance-covariance matrix, defaults to NULL in which case vcov(model) is used.}
 
-\item{dof}{integer, the degrees of freedom used for the T statistic in an OLS model}
+\item{dof}{integer, the degrees of freedom used for the T statistic in an OLS model. Defaults to NULL in which case
+mod$df.residual is used.}
 
 \item{at}{list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 This calculates the margins of the variable at these particular variables.}
@@ -37,7 +38,10 @@ list of dataframes with predicted margins/effects, se, p-values, and confidence 
 Estimating predictive margins on a model
 }
 \details{
-P values are calculated with T tests for OLS, and Z tests otherwise.
+P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
+(e.g. for clustering standard errors), the degrees of freedom for the T test / p-value calculation may need to be specified
+using dof. To replicate Stata clustering vce(cluster var_name), dof should be set to g - 1, where g is the number of unique levels
+of the clustering variable.
 }
 \examples{
 data(mtcars)

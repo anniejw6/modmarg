@@ -4,8 +4,8 @@
 \alias{pred_se_wrap}
 \title{Calculate margins and se}
 \usage{
-pred_se_wrap(df_trans, var_interest, model, type = "levels", base_rn = 1,
-  at_var_interest = NULL, vcov_mat = NULL, dof = model$df.residual)
+pred_se_wrap(df_trans, var_interest, model, vcov_mat, dof, type = "levels",
+  base_rn = 1, at_var_interest = NULL)
 }
 \arguments{
 \item{df_trans}{data.frame, should already be transformed for variables not related to
@@ -15,16 +15,16 @@ the variable of interest}
 
 \item{model}{model}
 
+\item{vcov_mat}{variance-covariance matrix, defaults to NULL}
+
+\item{dof}{integer degrees of freedom for T statistics}
+
 \item{type}{either effects or levels, defaults to levels}
 
 \item{base_rn}{row number of the base level, defaults to 1}
 
 \item{at_var_interest}{vector, if type == 'levels', the values for the variable of interest at which levels should be calculated. if NULL, indicates all levels for a
 factor variable, defaults to NULL}
-
-\item{vcov_mat}{variance-covariance matrix, defaults to NULL}
-
-\item{dof}{integer degrees of freedom for T statistics}
 }
 \value{
 dataframe of formatted output
@@ -38,9 +38,10 @@ data(mtcars)
 mtcars$gear <- factor(mtcars$gear)
 mm <- glm(vs ~ gear  + mpg * disp, mtcars, family = 'binomial')
 df <- transform(mm$model, mpg = 15)
-pred_se_wrap(df, var_interest = 'gear', model = mm, vcov_mat = vcov(mm))
+pred_se_wrap(df, var_interest = 'gear', model = mm,
+             vcov_mat = vcov(mm), dof = mm$df.residual)
 pred_se_wrap(mm$model, var_interest = 'mpg',
-                at_var_interest = c(15, 21), model = mm,
-                vcov_mat = vcov(mm))
+             at_var_interest = c(15, 21), model = mm,
+             vcov_mat = vcov(mm), dof = mm$df.residual)
 }
 

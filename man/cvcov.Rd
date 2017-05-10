@@ -22,7 +22,7 @@ degrees-of-freedom for T statistics, for tests and examples specifying vcov
 with margex data.
 }
 \details{
-See data/data-raw/make_cluster_vcov.R for details.
+See data-raw/make_cluster_vcov.R for details.
 }
 \keyword{datasets}
 
