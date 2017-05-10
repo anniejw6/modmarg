@@ -32,7 +32,8 @@
 pred_se_wrap <- function(df_trans, var_interest, model,
                          type = 'levels', base_rn = 1,
                          at_var_interest = NULL,
-                         vcov_mat = NULL){
+                         vcov_mat = NULL,
+                         dof = model$df.residual){
 
   stopifnot(is.data.frame(df_trans),
             is.character(var_interest),
@@ -76,7 +77,7 @@ pred_se_wrap <- function(df_trans, var_interest, model,
     pred_margins = preds,
     se = calc_pred_se(vcov_mat, jacobs),
     family = model$family$family,
-    dof = model$df.residual
+    dof = dof
   )
 
 }

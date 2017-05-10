@@ -37,6 +37,7 @@
 mod_marg2 <- function(mod, var_interest,
                       type = 'levels',
                       vcov_mat = vcov(mod),
+                      dof = mod$df.residual,
                       at = NULL, base_rn = 1,
                       at_var_interest = NULL){
 
@@ -75,7 +76,8 @@ mod_marg2 <- function(mod, var_interest,
       pred_se_wrap(df_trans = x, var_interest = var_interest,
                    model = mod, type = type, base_rn = base_rn,
                    at_var_interest = at_var_interest,
-                   vcov_mat = vcov_mat)
+                   vcov_mat = vcov_mat,
+                   dof = dof)
   })
 
 }
