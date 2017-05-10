@@ -5,7 +5,7 @@
 \title{Estimating predictive margins on a model}
 \usage{
 mod_marg2(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
-  at = NULL, base_rn = 1, at_var_interest = NULL)
+  at = NULL, base_rn = 1, at_var_interest = NULL, data = mod$data)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class glm}
@@ -27,6 +27,8 @@ Defaults to 1.}
 
 \item{at_var_interest}{vector, if type == 'levels', the values for the variable of interest at which levels should be calculated.
 If NULL, indicates all levels for a factor variable, defaults to NULL}
+
+\item{data}{data.frame that margins should run over, defaults to mod$data}
 }
 \value{
 list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
