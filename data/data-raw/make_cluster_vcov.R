@@ -41,11 +41,10 @@ margex$treatment <- factor(margex$treatment)
 mod <- glm(outcome ~ treatment + distance, data = margex, family = 'gaussian')
 ols_cvcov <- cluster_se(mod, "arm")
 
-devtools::use_data(ols_cvcov, overwrite = TRUE)
-
 data(margex)
 margex$treatment <- factor(margex$treatment)
 mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
 logit_cvcov <- cluster_se(mod, "arm")
 
-devtools::use_data(logit_cvcov, overwrite = TRUE)
+cvcov <- list(ols = ols_cvcov, logit = logit_cvcov)
+devtools::use_data(cvcov, overwrite = TRUE)

@@ -6,18 +6,12 @@ test_that("clustered standard errors are correct", {
   data(margex)
   mod <- glm(outcome ~ treatment + distance, data = margex, family = 'gaussian')
 
-  data(ols_cvcov)
-  v <- ols_cvcov$clust
-  d <- ols_cvcov$stata_dof
+  data(cvcov)
+  v <- cvcov$ols$clust
+  d <- cvcov$ols$stata_dof
 
   z <- mod_marg2(mod, var_interest = 'treatment',
                  type = 'levels', vcov_mat = v, dof = d)[[1]]
-
-  stata <- aiEstimation::mod_marg(
-    model = "reg outcome i.treatment distance, vce(cluster arm)",
-    margs = list(levels = "margins i.treatment"),
-    df = margex
-  )
 
   expect_equal(z$Margin, c(0.0802249, 0.2588702), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0.0481047, 0.0467188),
@@ -29,9 +23,9 @@ test_that("clustered standard errors are correct", {
 
   data(margex)
   mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
-  data(logit_cvcov)
-  v <- logit_cvcov$clust
-  d <- logit_cvcov$stata_dof
+  data(cvcov)
+  v <- cvcov$logit$clust
+  d <- cvcov$logit$stata_dof
   z <- mod_marg2(mod, var_interest = 'treatment',
                  type = 'levels', vcov_mat = v)[[1]]
 
