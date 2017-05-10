@@ -1,22 +1,22 @@
-#' Transform data
-#'
-#' The reason why you want to use this instead of ?transform is that
-#' the syntax for factors is really annoying.
-#'
-#' @param df dataframe
-#' @param var_name variable name
-#' @param value value of variable
-#'
-#' @return dataframe with transformed variable
-#' @export
-#' @examples
-#' data(mtcars)
-#' mtcars$gear <- factor(mtcars$gear)
-#' df3 <- transform(mtcars, gear = factor(3, levels = levels(mtcars$gear)))
-#' df <- at_transform(df = mtcars, var_name = 'gear', value = 3)
-#' str(df3)
-#' str(df)
-#' all(df == df3)
+# Transform data
+#
+# The reason why you want to use this instead of ?transform is that
+# the syntax for factors is really annoying.
+#
+# @param df dataframe
+# @param var_name variable name
+# @param value value of variable
+#
+# @return dataframe with transformed variable
+#
+# @examples
+# data(mtcars)
+# mtcars$gear <- factor(mtcars$gear)
+# df3 <- transform(mtcars, gear = factor(3, levels = levels(mtcars$gear)))
+# df <- at_transform(df = mtcars, var_name = 'gear', value = 3)
+# str(df3)
+# str(df)
+# all(df == df3)
 at_transform <- function(df, var_name, value){
 
   # figure out if factor
@@ -31,18 +31,18 @@ at_transform <- function(df, var_name, value){
 
 }
 
-#' Apply multiple transformations
-#'
-#' @param model_df dataframe used in model (not model.matrix)
-#' @param at_list list of transformations, in the format of list("variable" = c("values"))
-#'
-#' @return list of dataframes, each transformed
-#' @export
-#'
-#' @examples
-#' data(mtcars)
-#' at_list <- list("mpg" = c(15, 21), "disp" = c(140, 180))
-#' at_transforms(mtcars, at_list)
+# Apply multiple transformations
+#
+# @param model_df dataframe used in model (not model.matrix)
+# @param at_list list of transformations, in the format of list("variable" = c("values"))
+#
+# @return list of dataframes, each transformed
+#
+#
+# @examples
+# data(mtcars)
+# at_list <- list("mpg" = c(15, 21), "disp" = c(140, 180))
+# at_transforms(mtcars, at_list)
 at_transforms <- function(model_df, at_list){
 
   # Figure out all transformations
@@ -75,20 +75,20 @@ at_transforms <- function(model_df, at_list){
 }
 
 
-#' Generate "at" transformation list for a single variable
-#'
-#' This function will return all levels of the variable of interest
-#'
-#' @param df dataframe to be transformed
-#' @param var_interest variable of interest
-#' @param at_var_interest at levels for variables of interest, defaults to NULL
-#'
-#' @return named list of all values for variable of interest
-#' @export
-#' @examples
-#' data(mtcars)
-#' mtcars$gear <- factor(mtcars$gear)
-#' gen_at_list(mtcars, 'gear')
+# Generate "at" transformation list for a single variable
+#
+# This function will return all levels of the variable of interest
+#
+# @param df dataframe to be transformed
+# @param var_interest variable of interest
+# @param at_var_interest at levels for variables of interest, defaults to NULL
+#
+# @return named list of all values for variable of interest
+#
+# @examples
+# data(mtcars)
+# mtcars$gear <- factor(mtcars$gear)
+# gen_at_list(mtcars, 'gear')
 gen_at_list <- function(df, var_interest, at_var_interest = NULL){
 
   stopifnot(var_interest %in% names(df))

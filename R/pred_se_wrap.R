@@ -43,8 +43,10 @@ pred_se_wrap <- function(df_trans, var_interest, model,
     df_trans, gen_at_list(df_trans, var_interest, at_var_interest))
 
   res <- lapply(df_levels, function(x){
+    # Predict function is expensive so just calling it once
     p <- predict(model, newdata = x)
     list(
+      # Calculate Jacobian
       jacobs = calc_jacob(
         pred_values = p,
         # create a model matrix only using coefficients in the model
@@ -53,6 +55,7 @@ pred_se_wrap <- function(df_trans, var_interest, model,
           contrasts.arg = model$contrasts,
           xlev = model$xlevels)[, !is.na(coef(model))],
         deriv_func = model$family$mu.eta),
+      # Calculate predicted values
       preds = mean(model$family$linkinv(p))
     )
   })
