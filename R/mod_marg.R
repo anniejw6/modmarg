@@ -41,6 +41,8 @@
 #'            data = margex, family = 'binomial')
 #' mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
 #'
+#' # Using a custom variance-covariance matrix for clustered standard errors
+#' # (also requires custom degrees of freedom for T statistic with OLS model)
 #' data(margex)
 #' data(cvcov)
 #' v <- cvcov$ols$clust
