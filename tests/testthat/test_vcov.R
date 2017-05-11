@@ -25,18 +25,22 @@ test_that("clustered standard errors are correct", {
   # Expression   : Linear prediction, predict()
   #
   # ------------------------------------------------------------------------------
-  #           |            Delta-method
-  #           |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
   # -------------+----------------------------------------------------------------
-  # treatment |
-  #        0  |   .0802249   .0481047     1.67   0.237     -.126753    .2872028
-  #        1  |   .2588702   .0467188     5.54   0.031     .0578554    .4598851
+  #    treatment |
+  #           0  |   .0802249   .0481047  1.66771   0.2373     -.126753    .2872028
+  #           1  |   .2588702   .0467188  5.54103   0.0311     .0578554    .4598851
   # ------------------------------------------------------------------------------
 
   expect_equal(z$Margin, c(0.0802249, 0.2588702), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0.0481047, 0.0467188),
                tolerance = 0.0001)
-  expect_equal(z$P.Value, c(0.2373067, 0.0310606), tolerance = 0.0001)
+  expect_equal(z$P.Value, c(0.2373, 0.0311), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(-.126753, .0578554),
+               tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(.2872028, .4598851),
+               tolerance = 0.0001)
 
   expect_warning(mod_marg2(mod, var_interest = 'treatment',
                            type = 'levels', vcov_mat = v))
