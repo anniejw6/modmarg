@@ -61,18 +61,23 @@ test_that("clustered standard errors are correct", {
   # Expression   : Pr(outcome), predict()
   #
   # ------------------------------------------------------------------------------
-  #             |            Delta-method
-  #             |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
   # -------------+----------------------------------------------------------------
-  #   treatment |
-  #          0  |   .0791146   .0473008     1.67   0.094    -.0135933    .1718226
-  #          1  |   .2600204   .0472214     5.51   0.000      .167468    .3525727
+  #    treatment |
+  #           0  |   .0791146   .0473008  1.67259   0.0944    -.0135933    .1718226
+  #           1  |   .2600204   .0472214  5.50640   0.0000      .167468    .3525727
   # ------------------------------------------------------------------------------
+  #
 
   expect_equal(z$Margin, c(0.0791146, 0.2600204), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0.0473008, 0.0472214),
                tolerance = 0.0001)
-  expect_equal(z$P.Value, c(9.4409e-02, 3.6600e-08), tolerance = 0.0001)
+  expect_equal(z$P.Value, c(0.0944, 0.0000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(-.0135933, .167468),
+               tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(.1718226, .3525727),
+               tolerance = 0.0001)
 
 })
 
