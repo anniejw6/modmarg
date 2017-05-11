@@ -4,14 +4,18 @@ context("Data Munging")
 test_that("applying a single transformation", {
 
   data(mtcars)
-  mtcars$gear <- factor(mtcars$gear)
+  df <- mtcars
+  df$gear <- factor(df$gear)
 
-  expect_identical(
-    at_transform(df = mtcars, var_name = 'gear', value = 3),
-    transform(mtcars, gear = factor(3, levels = levels(mtcars$gear))))
+  d0 <- at_transform(var = df[['gear']], value = 3)
+  d1 <- transform(df, gear = factor(3, levels = levels(df$gear)))
 
-  expect_identical(at_transform(df = mtcars, var_name = 'mpg', value = 20),
-                   transform(mtcars, mpg = 20))
+  expect_identical(d0, d1[['gear']])
+
+  d0 <- at_transform(var = df[['mpg']], value = 20)
+  d1 <- transform(df, mpg = 20)
+
+  expect_identical(d0, d1$mpg)
 
 })
 
