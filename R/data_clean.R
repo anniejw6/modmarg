@@ -1,22 +1,17 @@
 # Transform data (big wrapper)
 # Would use `transform`, but the syntax for factors is annoying
-at_transform <- function(df, var_name, value){
+at_transform <- function(var, value){
 
-  # df: dataframe of values
-  # var_name: character, variable name
+  # var: vector
   # value: character or numeric, value of variable
   #
-  # return: dataframe with transformed variable
+  # return: vector with transformed variable
 
-  # figure out if factor
-  if(is.factor(df[[var_name]])){
-    # necessary because of factors
-    df[[var_name]] <- factor(value, levels = levels(df[[var_name]]))
+  if(is.factor(var)){
+    factor(rep(value, length(var)), levels = levels(var))
   } else {
-    df[[var_name]] <- value
+    rep(value, length(var))
   }
-
-  df
 
 }
 
@@ -36,23 +31,21 @@ at_transforms <- function(model_df, at_list){
   df <- vector(mode = 'list', length  = nrow(all_combos))
 
   # Loop through all combinations
-  for(i in 1:nrow(all_combos)){
+  for(i in seq_len(nrow(all_combos))){
 
     df_tmp <- model_df
 
     for(j in names(all_combos)){
-
-      df_tmp <- at_transform(df = df_tmp,
-                             var_name = j, value = all_combos[i, j])
+      df_tmp[[j]] <- at_transform(var = df_tmp[[j]], value = all_combos[i, j])
     }
 
     df[[i]] <- df_tmp
   }
 
   # Give names to list
-  named_mat <- sapply(names(at_list), function(name){
-    sprintf("%s = %s", name, all_combos[[name]]) })
-  names(df) <- do.call(paste, data.frame(named_mat))
+  names(df) <- apply(all_combos, 1, FUN = function(x){
+    paste(names(all_combos), "=", x, collapse = ' ')
+  })
 
   # Return
   df

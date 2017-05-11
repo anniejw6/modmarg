@@ -20,7 +20,8 @@ mod_marg2(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
 mod$df.residual is used.}
 
 \item{at}{list, should be in the format of list('var_name' = c(values)), defaults to NULL.
-This calculates the margins of the variable at these particular variables.}
+This calculates the margins of the variable at these particular variables.
+If all values are needed, suggested syntax is `at = list(var = unique(df$var))`.}
 
 \item{base_rn}{numeric, if type == 'effects', the base level (taken as the index of one of
 the ordered unique values in var_interest). if type == 'levels', this param is ignored.
@@ -35,7 +36,11 @@ If NULL, indicates all levels for a factor variable, defaults to NULL}
 list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 }
 \description{
-Estimating predictive margins on a model
+The variable for the predictive margin is specified by `var_interest`. If 
+margins are only needed at particular values of `var_interest`, 
+`at_var_interest` should be used. If margins of `var_interest` are needed at 
+across the levels of a *different* variable in the model, `at` should be 
+used.
 }
 \details{
 P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
