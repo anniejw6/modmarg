@@ -36,10 +36,10 @@ If NULL, indicates all levels for a factor variable, defaults to NULL}
 list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 }
 \description{
-The variable for the predictive margin is specified by `var_interest`. If 
-margins are only needed at particular values of `var_interest`, 
-`at_var_interest` should be used. If margins of `var_interest` are needed at 
-across the levels of a *different* variable in the model, `at` should be 
+The variable for the predictive margin is specified by `var_interest`. If
+margins are only needed at particular values of `var_interest`,
+`at_var_interest` should be used. If margins of `var_interest` are needed at
+across the levels of a *different* variable in the model, `at` should be
 used.
 }
 \details{
@@ -67,6 +67,8 @@ mod <- glm(outcome ~ distance + factor(sex),
            data = margex, family = 'binomial')
 mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
 
+# Using a custom variance-covariance matrix for clustered standard errors
+# (also requires custom degrees of freedom for T statistic with OLS model)
 data(margex)
 data(cvcov)
 v <- cvcov$ols$clust
