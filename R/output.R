@@ -28,8 +28,10 @@ format_output <- function(margin_labels, pred_margins, se, family, dof,
   test_stat <- pred_margins/se
   if(family == "gaussian"){
     pval <- 2 * pt(-1 * abs(test_stat), df = dof)
+    ci <- c(qt(min(cofint), df = dof), qt(max(cofint), df = dof))
   } else {
     pval <- 2 * pnorm(-1 * abs(test_stat))
+    ci <- c(qnorm(min(cofint)), qnorm(max(cofint)))
   }
 
   res <- data.frame(
@@ -38,8 +40,8 @@ format_output <- function(margin_labels, pred_margins, se, family, dof,
     `Standard Error` = se,
     `Test Stat` = test_stat,
     `P Value` = pval,
-    lower_ci = pred_margins + (qnorm(min(cofint)) * se ),
-    upper_ci = pred_margins + (qnorm(max(cofint)) * se )
+    lower_ci = pred_margins + min(ci) * se,
+    upper_ci = pred_margins + max(ci) * se
   )
 
   names(res)[names(res) %in% c('lower_ci', 'upper_ci')] <-

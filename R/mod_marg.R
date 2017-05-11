@@ -125,7 +125,7 @@ mod_marg2 <- function(mod, var_interest,
       pred_margins = x$pred_margins,
       se = x$se,
       family = mod$family$family,
-      dof = mod$df.residual
+      dof = dof
     )})
 
 }

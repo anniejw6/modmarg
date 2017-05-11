@@ -4,7 +4,8 @@
 rm(list = ls())
 
 cluster_se <- function(model, cluster, data = model$data){
-  data <- data[complete.cases(data[, names(model$model)]), ]
+  data <- data[, names(data) %in% c(all.vars(model$formula), cluster)]
+  data <- data[complete.cases(data), ]
 
   # get parameters
   n <- nrow(data)
@@ -32,15 +33,28 @@ cluster_se <- function(model, cluster, data = model$data){
 # Create sample vcov matrix + degrees of freedom for vcov test
 # Page 29 "Improved Critical Values using a T-distribution"
 # http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf
+
+# OLS
 data(margex)
 margex$treatment <- factor(margex$treatment)
 mod <- glm(outcome ~ treatment + distance, data = margex, family = 'gaussian')
 ols_cvcov <- cluster_se(mod, "arm")
 
+# Logit
 data(margex)
 margex$treatment <- factor(margex$treatment)
 mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
 logit_cvcov <- cluster_se(mod, "arm")
 
-cvcov <- list(ols = ols_cvcov, logit = logit_cvcov)
+# Polynomial interaction, dropping rows
+data(mtcars)
+mtcars$am <- factor(mtcars$am)
+mtcars$cyl <- factor(mtcars$cyl)
+mtcars$cyl[c(1, 10, 20, 31)] <- NA
+
+mod <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) + hp,
+           data = mtcars)
+weird_cvcov <- cluster_se(mod, "gear")
+
+cvcov <- list(ols = ols_cvcov, logit = logit_cvcov, weird = weird_cvcov)
 devtools::use_data(cvcov, overwrite = TRUE)

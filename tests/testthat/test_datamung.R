@@ -63,8 +63,8 @@ test_that("make sure we format output correctly", {
                      family = "gaussian",
                      dof = 20)
 
-  expect_equal(z$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
-  expect_equal(z$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0.06462633, 0.23670517), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0.09360287, 0.28333563), tolerance = 0.0001)
   expect_equal(z$P.Value, c(0, 0))
   expect_equal(z$Test.Stat, c(11.39, 23.26), tolerance = 0.01)
 

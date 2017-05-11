@@ -76,3 +76,55 @@ test_that("clustered standard errors are correct", {
 
 })
 
+test_that("clustered standard errors work with interaction terms", {
+
+  data(mtcars)
+  data(cvcov)
+  mtcars$am <- factor(mtcars$am)
+  mtcars$cyl <- factor(mtcars$cyl)
+  mtcars$cyl[c(1, 10, 20, 31)] <- NA
+
+  v <- cvcov$weird$clust
+  d <- cvcov$weird$stata_dof
+
+  mod <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) + hp,
+             data = mtcars)
+  z <- mod_marg2(
+    mod = mod, var_interest = 'cyl', type = 'levels',
+    at = list('disp' = 400),
+    vcov_mat = v, dof = d)[[1]]
+
+  # stata
+  # reg mpg cyl##c.disp##c.disp hp, vce(cluster gear)
+  # margins cyl, at(disp = 400)
+  #
+  # Predictive margins                                Number of obs   =         28
+  # Model VCE    : Robust
+  #
+  # Expression   : Linear prediction, predict()
+  # at           : disp            =         400
+  #
+  # ------------------------------------------------------------------------------
+  #       |            Delta-method
+  #       |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #   cyl |
+  #    4  |   139.2514   156.4439     0.89   0.467    -533.8722     812.375
+  #    6  |   67.13311   10.27523     6.53   0.023     22.92237    111.3439
+  #    8  |    16.9802   .6700651    25.34   0.002     14.09715    19.86326
+  # ------------------------------------------------------------------------------
+
+  expect_equal(z$Margin, c(139.25140, 67.13311, 16.9802),
+               tolerance = 0.0001)
+  expect_equal(z$Standard.Error, c(156.4439000, 10.2752300, 0.6700651),
+               tolerance = 0.0001)
+  expect_equal(z$Test.Stat, c(0.890104, 6.5334911, 25.3411205),
+               tolerance = 0.0001)
+  expect_equal(z$P.Value, c(0.4673266, 0.0226343, 0.0015536),
+               tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(-533.8722, 22.92237, 14.09715),
+               tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(812.375, 111.3439, 19.86326),
+               tolerance = 0.0001)
+
+})
