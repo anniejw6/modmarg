@@ -4,7 +4,7 @@
 \alias{mod_marg2}
 \title{Estimating predictive margins on a model}
 \usage{
-mod_marg2(mod, var_interest, type = "levels", vcov_mat = vcov(mod),
+mod_marg2(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
   at = NULL, base_rn = 1, at_var_interest = NULL, data = mod$data)
 }
 \arguments{
@@ -14,7 +14,10 @@ mod_marg2(mod, var_interest, type = "levels", vcov_mat = vcov(mod),
 
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
 
-\item{vcov_mat}{the variance-covariance matrix, defaults to vcov(model)}
+\item{vcov_mat}{the variance-covariance matrix, defaults to NULL in which case vcov(model) is used.}
+
+\item{dof}{integer, the degrees of freedom used for the T statistic in an OLS model. Defaults to NULL in which case
+mod$df.residual is used.}
 
 \item{at}{list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 This calculates the margins of the variable at these particular variables.
@@ -33,14 +36,17 @@ If NULL, indicates all levels for a factor variable, defaults to NULL}
 list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 }
 \description{
-The variable for the predictive margin is specified by `var_interest`. If 
-margins are only needed at particular values of `var_interest`, 
-`at_var_interest` should be used. If margins of `var_interest` are needed at 
-across the levels of a *different* variable in the model, `at` should be 
+The variable for the predictive margin is specified by `var_interest`. If
+margins are only needed at particular values of `var_interest`,
+`at_var_interest` should be used. If margins of `var_interest` are needed at
+across the levels of a *different* variable in the model, `at` should be
 used.
 }
 \details{
-P values are calculated with T tests for OLS, and Z tests otherwise.
+P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
+(e.g. for clustering standard errors), the degrees of freedom for the T test / p-value calculation may need to be specified
+using dof. To replicate Stata clustering vce(cluster var_name), dof should be set to g - 1, where g is the number of unique levels
+of the clustering variable.
 }
 \examples{
 data(mtcars)
@@ -60,5 +66,16 @@ mod_marg2(mod, var_interest = 'distance', type = 'levels',
 mod <- glm(outcome ~ distance + factor(sex),
            data = margex, family = 'binomial')
 mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
+
+# Using a custom variance-covariance matrix for clustered standard errors
+# (also requires custom degrees of freedom for T statistic with OLS model)
+data(margex)
+data(cvcov)
+v <- cvcov$ols$clust
+d <- cvcov$ols$stata_dof
+mod <- glm(outcome ~ treatment + distance,
+           data = margex, family = 'binomial')
+mod_marg2(mod, var_interest = 'treatment', type = 'levels',
+          vcov_mat = v, dof = d)
 }
 

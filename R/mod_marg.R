@@ -1,16 +1,16 @@
 #' Estimating predictive margins on a model
-#' 
-#' The variable for the predictive margin is specified by `var_interest`. If 
-#' margins are only needed at particular values of `var_interest`, 
-#' `at_var_interest` should be used. If margins of `var_interest` are needed at 
-#' across the levels of a *different* variable in the model, `at` should be 
+#'
+#' The variable for the predictive margin is specified by `var_interest`. If
+#' margins are only needed at particular values of `var_interest`,
+#' `at_var_interest` should be used. If margins of `var_interest` are needed at
+#' across the levels of a *different* variable in the model, `at` should be
 #' used.
-#' 
-#' 
+#'
+#'
 #' @param mod model object, currently only support those of class glm
 #' @param var_interest name of the variable of interest, must correspond to a factor or numeric covariate in the model
 #' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
-#' @param vcov_mat the variance-covariance matrix, defaults to vcov(model)
+#' @param vcov_mat the variance-covariance matrix, defaults to NULL in which case vcov(model) is used.
 #' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
 #' This calculates the margins of the variable at these particular variables.
 #' If all values are needed, suggested syntax is `at = list(var = unique(df$var))`.
@@ -19,10 +19,15 @@
 #' Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated.
 #' If NULL, indicates all levels for a factor variable, defaults to NULL
+#' @param dof integer, the degrees of freedom used for the T statistic in an OLS model. Defaults to NULL in which case
+#' mod$df.residual is used.
 #' @param data data.frame that margins should run over, defaults to mod$data
 #' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 #'
-#' @details P values are calculated with T tests for OLS, and Z tests otherwise.
+#' @details P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
+#' (e.g. for clustering standard errors), the degrees of freedom for the T test / p-value calculation may need to be specified
+#' using dof. To replicate Stata clustering vce(cluster var_name), dof should be set to g - 1, where g is the number of unique levels
+#' of the clustering variable.
 #' @importFrom stats complete.cases terms vcov
 #' @export
 #' @examples
@@ -43,9 +48,22 @@
 #' mod <- glm(outcome ~ distance + factor(sex),
 #'            data = margex, family = 'binomial')
 #' mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
+#'
+#' # Using a custom variance-covariance matrix for clustered standard errors
+#' # (also requires custom degrees of freedom for T statistic with OLS model)
+#' data(margex)
+#' data(cvcov)
+#' v <- cvcov$ols$clust
+#' d <- cvcov$ols$stata_dof
+#' mod <- glm(outcome ~ treatment + distance,
+#'            data = margex, family = 'binomial')
+#' mod_marg2(mod, var_interest = 'treatment', type = 'levels',
+#'           vcov_mat = v, dof = d)
+
 mod_marg2 <- function(mod, var_interest,
                       type = 'levels',
-                      vcov_mat = vcov(mod),
+                      vcov_mat = NULL,
+                      dof = NULL,
                       at = NULL, base_rn = 1,
                       at_var_interest = NULL,
                       data = mod$data){
@@ -59,6 +77,18 @@ mod_marg2 <- function(mod, var_interest,
     var_interest %in% names(data),
     all(names(at) %in% names(data))
   )
+
+  if(is.null(dof) & !is.null(vcov_mat) & mod$family$family == 'gaussian')
+    warning(paste(
+      "You provided a new variance-covariance matrix for an OLS model",
+      "but no degrees of freedom for the T test. P-value calculations",
+      "may be incorrect - see ?modmarg::mod_marg2 for details."))
+
+  if(is.null(vcov_mat))
+    vcov_mat <- vcov(mod)
+
+  if(is.null(dof))
+    dof <- mod$df.residual
 
   # Check for extrapolated values
   for(i in seq_along(at)){
@@ -95,7 +125,7 @@ mod_marg2 <- function(mod, var_interest,
       pred_margins = x$pred_margins,
       se = x$se,
       family = mod$family$family,
-      dof = mod$df.residual
+      dof = dof
     )})
 
 }
