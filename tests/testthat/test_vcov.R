@@ -97,6 +97,8 @@ test_that("clustered standard errors work with interaction terms", {
   # stata
   # reg mpg cyl##c.disp##c.disp hp, vce(cluster gear)
   # margins cyl, at(disp = 400)
+  # set sformat %8.5f
+  # set pformat %5.4f"
   #
   # Predictive margins                                Number of obs   =         28
   # Model VCE    : Robust
@@ -105,22 +107,22 @@ test_that("clustered standard errors work with interaction terms", {
   # at           : disp            =         400
   #
   # ------------------------------------------------------------------------------
-  #       |            Delta-method
-  #       |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
   # -------------+----------------------------------------------------------------
-  #   cyl |
-  #    4  |   139.2514   156.4439     0.89   0.467    -533.8722     812.375
-  #    6  |   67.13311   10.27523     6.53   0.023     22.92237    111.3439
-  #    8  |    16.9802   .6700651    25.34   0.002     14.09715    19.86326
+  #          cyl |
+  #           4  |   139.2514   156.4439  0.89010   0.4673    -533.8722     812.375
+  #           6  |   67.13311   10.27523  6.53349   0.0226     22.92237    111.3439
+  #           8  |    16.9802   .6700651 25.34113   0.0016     14.09715    19.86326
   # ------------------------------------------------------------------------------
 
   expect_equal(z$Margin, c(139.25140, 67.13311, 16.9802),
                tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(156.4439000, 10.2752300, 0.6700651),
                tolerance = 0.0001)
-  expect_equal(z$Test.Stat, c(0.890104, 6.5334911, 25.3411205),
+  expect_equal(z$Test.Stat, c(0.89010, 6.53349, 25.34113),
                tolerance = 0.0001)
-  expect_equal(z$P.Value, c(0.4673266, 0.0226343, 0.0015536),
+  expect_equal(z$P.Value, c(0.4673, 0.0226, 0.0016),
                tolerance = 0.0001)
   expect_equal(z$`Lower CI (95%)`, c(-533.8722, 22.92237, 14.09715),
                tolerance = 0.0001)

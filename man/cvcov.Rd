@@ -4,7 +4,8 @@
 \name{cvcov}
 \alias{cvcov}
 \title{Clustered variance-covariance matrices and T statistic d.o.f.}
-\format{A list of two lists, one for OLS and one for logit, each containing
+\format{A list of three lists, from an OLS model, logit model, and OLS with a polynomial
+interaction with missing data, each containing
 \describe{
   \item{clust}{3-by-3 variance-covariance matrix}
   \item{dof}{integer, degrees of freedom for the T statistic}

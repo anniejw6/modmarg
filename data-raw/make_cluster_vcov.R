@@ -54,7 +54,7 @@ mtcars$cyl[c(1, 10, 20, 31)] <- NA
 
 mod <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) + hp,
            data = mtcars)
-weird_cvcov <- cluster_se(mod, "gear")
+poly_cvcov <- cluster_se(mod, "gear")
 
-cvcov <- list(ols = ols_cvcov, logit = logit_cvcov, weird = weird_cvcov)
+cvcov <- list(ols = ols_cvcov, logit = logit_cvcov, poly = poly_cvcov)
 devtools::use_data(cvcov, overwrite = TRUE)
