@@ -73,6 +73,11 @@ mod_marg2 <- function(mod, var_interest,
   data <- data[, names(data) %in% all.vars(mod$formula)]
   data <- data[complete.cases(data), ]
 
+  if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=
+     sum(grepl("raw = T", names(mod$model))))
+    warning(paste("If you're using 'poly()' for higher-order terms,",
+                  "use the raw = T option (see ?poly)"))
+
   stopifnot(
     var_interest %in% names(data),
     all(names(at) %in% names(data))
