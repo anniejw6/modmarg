@@ -326,3 +326,14 @@ test_that("mod_marg2 input is checked", {
                            at = list(age = 100)))
 })
 
+test_that("continuous effects not supported",{
+
+  data(margex)
+  mod <- glm(y ~ sex + age, data = margex, family = 'gaussian')
+  expect_error(mod_marg2(mod, var_interest = 'age', type = 'effects'))
+
+  mod <- glm(y ~ treatment + age, data = margex, family = 'gaussian')
+  expect_error(mod_marg2(mod, var_interest = 'treatment', type = 'effects'))
+
+})
+
