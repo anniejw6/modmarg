@@ -47,13 +47,6 @@ test_that("Poisson models are correct", {
 
   z <- mod_marg2(mod, var_interest = 'tension', type = 'levels')[[1]]
 
-  s <- aiEstimation::mod_marg(
-    "poisson breaks i.wool##i.tension",
-    list(pred = "margins i.tension"),
-    df = warpbreaks
-  )
-  writeLines(s$output)
-
   # stata
   # poisson breaks i.wool##i.tension
   # margins i.tension
