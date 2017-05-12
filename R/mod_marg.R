@@ -99,6 +99,10 @@ mod_marg2 <- function(mod, var_interest,
                       names(at)[i]))
   }
 
+  # Warn if base_rn set but type != 'effects'
+  if(base_rn != 1 & type != 'effects')
+    warning(paste("Setting base_rn when type == 'levels' is ignored."))
+
   # Transform the ats ---
   if(!is.null(at)){
 

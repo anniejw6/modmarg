@@ -326,3 +326,29 @@ test_that("mod_marg2 input is checked", {
                            at = list(age = 100)))
 })
 
+test_that("Setting base level works", {
+
+  # extrapolated values are troubling
+  mm <- glm(y ~ as.factor(treatment) + age, margex, family = 'gaussian')
+
+  # Setting base_rn without type = 'effects' does nothing (warning)
+  expect_warning(mod_marg2(mod = mm, var_interest = 'treatment',
+                           at = list(age = 50), base_rn = 2))
+
+  # Actual check
+  z1 <- mod_marg2(mod = mm, var_interest = 'treatment',
+                  at = list(age = 50), base_rn = 1,
+                  type = 'effects')[[1]]
+  z2 <- mod_marg2(mod = mm, var_interest = 'treatment',
+                  at = list(age = 50), base_rn = 2,
+                  type = 'effects')[[1]]
+
+  # Make sure effects flipped right
+  expect_equal(z1$Margin, rev(-1 * z2$Margin))
+  expect_equal(z1$Standard.Error, rev(z2$Standard.Error))
+  expect_equal(z1$Test.Stat, rev(-1 * z2$Test.Stat))
+  expect_equal(z1$P.Value, rev(z2$P.Value))
+  expect_equal(z1$`Lower CI (95%)`, rev(-1 * z2$`Upper CI (95%)`))
+  expect_equal(z1$`Upper CI (95%)`, rev(-1 * z2$`Lower CI (95%)`))
+
+})
