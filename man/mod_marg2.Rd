@@ -10,7 +10,7 @@ mod_marg2(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
 \arguments{
 \item{mod}{model object, currently only support those of class glm}
 
-\item{var_interest}{name of the variable of interest, must correspond to a factor or numeric covariate in the model}
+\item{var_interest}{name of the variable of interest, must correspond to a covariate in the model}
 
 \item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'}
 
