@@ -4,7 +4,7 @@ context("Calculate margins for other GLM families / links")
 test_that("Probit models are correct", {
 
   data(margex)
-  mod <- glm(outcome ~ treatment * distance, data = margex,
+  mod <- glm(outcome ~ as.factor(treatment) * distance, data = margex,
              family = binomial(link = 'probit'))
 
   z <- mod_marg2(mod, var_interest = 'treatment', type = 'levels')[[1]]
@@ -36,6 +36,32 @@ test_that("Probit models are correct", {
                tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(.0928874, .2814958),
                tolerance = 0.0001)
+
+  # EFFECTS
+
+  z <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')[[1]]
+  # stata
+  # probit outcome i.treatment##distance
+  # margins, dydx(treatment)
+  #
+  # Average marginal effects                          Number of obs   =       3000
+  # Model VCE    : OIM
+  #
+  # Expression   : Pr(outcome), predict()
+  # dy/dx w.r.t. : 1.treatment
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #  1.treatment |   .1803807   .0131534    13.71   0.000     .1546004    .2061609
+  # ------------------------------------------------------------------------------
+
+  expect_equal(z$Margin, c(0, .1803807), tolerance = 0.0001)
+  expect_equal(z$Standard.Error, c(0, .0131534), tolerance = 0.0001)
+  expect_equal(z$Test.Stat, c(NaN, 13.71), tolerance = 0.01)
+  expect_equal(z$`Lower CI (95%)`, c(0, .1546004), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0, .2061609), tolerance = 0.0001)
 
 })
 
@@ -76,6 +102,37 @@ test_that("Poisson models are correct", {
   expect_equal(z$`Lower CI (95%)`, c(33.60215, 24.01575, 19.51632),
                tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(39.17563, 28.76202, 23.81701),
+               tolerance = 0.0001)
+
+  # EFFECTS
+
+  # stata
+  # poisson breaks i.wool##i.tension
+  # margins, dydx(tension)
+  #
+  # Average marginal effects                          Number of obs   =         54
+  # Model VCE    : OIM
+  #
+  # Expression   : Predicted number of events, predict()
+  # dy/dx w.r.t. : 2.tension 3.tension
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #      tension |
+  #           M  |        -10   1.867526    -5.35   0.000    -13.66028   -6.339716
+  #           H  |  -14.72222   1.795914    -8.20   0.000    -18.24215   -11.20229
+  # ------------------------------------------------------------------------------
+
+  z <- mod_marg2(mod, var_interest = 'tension', type = 'effects')[[1]]
+  expect_equal(z$Margin, c(0, -10.000, -14.72222), tolerance = 0.0001)
+  expect_equal(z$Standard.Error, c(0, 1.867526, 1.795914),
+               tolerance = 0.0001)
+  expect_equal(z$Test.Stat, c(NaN, -5.35, -8.20), tolerance = 0.01)
+  expect_equal(z$`Lower CI (95%)`, c(0, -13.66028, -18.24215),
+               tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0, -6.339716, -11.20229),
                tolerance = 0.0001)
 
 })
