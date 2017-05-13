@@ -24,7 +24,15 @@
 #' @param data data.frame that margins should run over, defaults to mod$data
 #' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 #'
-#' @details P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
+#' @details To include higher-order polynomial terms (e.g. y ~ x + x^2), use the R function
+#' poly(), for example, poly(x, 2, raw = TRUE). The raw = TRUE argument is necessary for
+#' including the basic polynomial terms instead of orthogonal polynomial terms. If orthogonal
+#' polynomials are used, mod_marg2 will fail when the user specifies "at" for a small set
+#' of values for the variable in question (e.g. at = list(x = 10)), since poly() needs more
+#' data to calculate orthogonal polynomials (e.g. poly(10, 2) fails, but poly(c(10, 8, 3), 2)
+#' will run).
+#'
+#' P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
 #' (e.g. for clustering standard errors), the degrees of freedom for the T test / p-value calculation may need to be specified
 #' using dof. To replicate Stata clustering vce(cluster var_name), dof should be set to g - 1, where g is the number of unique levels
 #' of the clustering variable.
