@@ -1,33 +1,55 @@
 #' Estimating predictive margins on a model
 #'
-#' The variable for the predictive margin is specified by `var_interest`. If
-#' margins are only needed at particular values of `var_interest`,
-#' `at_var_interest` should be used. If margins of `var_interest` are needed at
-#' across the levels of a *different* variable in the model, `at` should be
-#' used.
 #'
 #'
 #' @param mod model object, currently only support those of class glm
-#' @param var_interest name of the variable of interest, must correspond to a covariate in the model
-#' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
-#' @param vcov_mat the variance-covariance matrix, defaults to NULL in which case vcov(model) is used.
-#' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
-#' This calculates the margins of the variable at these particular variables.
-#' If all values are needed, suggested syntax is `at = list(var = unique(df$var))`.
-#' @param base_rn numeric, if type == 'effects', the base level (taken as the index of one of
-#' the ordered unique values in var_interest). if type == 'levels', this param is ignored.
-#' Defaults to 1.
-#' @param at_var_interest vector, if type == 'levels', the values for the variable of interest at which levels should be calculated.
-#' If NULL, indicates all levels for a factor variable, defaults to NULL
-#' @param dof integer, the degrees of freedom used for the T statistic in an OLS model. Defaults to NULL in which case
-#' mod$df.residual is used.
-#' @param data data.frame that margins should run over, defaults to mod$data
-#' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
+#' @param var_interest name of the variable of interest, must correspond to a
+#' covariate in the model
+#' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} (dydx),
+#' defaults to \code{'levels'}
+#' @param vcov_mat the variance-covariance matrix, defaults to \code{NULL} in which
+#' case \code{vcov(model)} is used.
+#' @param at list, should be in the format of \code{list('var_name' = c(values))},
+#' defaults to \code{NULL}. This calculates the margins of the variable at these
+#' particular variables. If all values are needed, suggested syntax is
+#' \code{at = list('var' = unique(df$var))}.
+#' @param base_rn numeric, if \code{type == 'effects'}, the base level (taken as the
+#' index of one of the ordered unique values in \code{var_interest}). if
+#' \code{type == 'levels'}, this param is ignored.
+#' if type == 'levels', this param is ignored. Defaults to 1.
+#' @param at_var_interest vector, if type == 'levels', the values for the
+#' variable of interest at which levels should be calculated.
+#' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
+#' @param dof integer, the degrees of freedom used for the T statistic in an
+#' OLS model. Defaults to NULL in which case \code{mod$df.residual} is used.
+#' @param data data.frame that margins should run over, defaults to
+#' \code{mod$data}
+#' @return list of dataframes with predicted margins/effects, se, p-values,
+#' and confidence interval bounds
 #'
-#' @details P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
-#' (e.g. for clustering standard errors), the degrees of freedom for the T test / p-value calculation may need to be specified
-#' using dof. To replicate Stata clustering vce(cluster var_name), dof should be set to g - 1, where g is the number of unique levels
-#' of the clustering variable.
+#' @details
+#' The variable for the predictive margin is specified by \code{var_interest}. If
+#' margins are only needed at particular values of \code{var_interest},
+#' \code{at_var_interest} should be used. If margins of \code{var_interest} are
+#' needed at across the levels of a \emph{different} variable in the model,
+#' \code{at} should be used.
+#'
+#' If higher-order polynomial terms (e.g. \eqn{y ~ x + x^2}) are added
+#' using the R function \code{\link[stats]{poly}}, the \code{raw = TRUE}
+#' argument should be used to include the basic polynomial terms
+#' instead of orthogonal polynomial terms. If orthogonal polynomials are used,
+#' \code{mod_marg2} will fail when the user specifies \code{at} for a small set
+#' of values for the variable in question (e.g. \code{at = list(x = 10)}),
+#' since \code{poly} needs more data to calculate orthogonal polynomials
+#' (e.g. \code{poly(10, 2)} fails, but \code{poly(c(10, 8, 3), 2)} will run).
+#'
+#' P values are calculated with T tests for gaussian families, and Z tests
+#' otherwise. If a new variance-covariance matrix is provided (e.g. for
+#' clustering standard errors), the degrees of freedom for the T test / p-value
+#' calculation may need to be specified using dof. To replicate Stata clustering
+#' \code{vce(cluster var_name)}, dof should be set to \eqn{g - 1}, where g is
+#' the number of unique levels of the clustering variable.
+#'
 #' @importFrom stats complete.cases terms vcov
 #' @export
 #' @examples
@@ -72,6 +94,11 @@ mod_marg2 <- function(mod, var_interest,
 
   data <- data[, names(data) %in% all.vars(mod$formula)]
   data <- data[complete.cases(data), ]
+
+  if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=
+     sum(grepl("raw = T", names(mod$model))))
+    warning(paste("If you're using 'poly()' for higher-order terms,",
+                  "use the raw = T option (see ?poly)"))
 
   stopifnot(
     var_interest %in% names(data),
