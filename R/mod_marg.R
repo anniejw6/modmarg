@@ -24,12 +24,12 @@
 #' @param data data.frame that margins should run over, defaults to mod$data
 #' @return list of dataframes with predicted margins/effects, se, p-values, and confidence interval bounds
 #'
-#' @details To include higher-order polynomial terms (e.g. y ~ x + x^2), use the R function
-#' poly(), for example, poly(x, 2, raw = TRUE). The raw = TRUE argument is necessary for
-#' including the basic polynomial terms instead of orthogonal polynomial terms. If orthogonal
+#' @details If higher-order polynomial terms (e.g. y ~ x + x^2) are added using the R function
+#' `poly`, please note that you need to use the `raw = TRUE` argument to include
+#' the basic polynomial terms instead of orthogonal polynomial terms. If orthogonal
 #' polynomials are used, mod_marg2 will fail when the user specifies "at" for a small set
-#' of values for the variable in question (e.g. at = list(x = 10)), since poly() needs more
-#' data to calculate orthogonal polynomials (e.g. poly(10, 2) fails, but poly(c(10, 8, 3), 2)
+#' of values for the variable in question (e.g. `at = list(x = 10)`), since poly() needs more
+#' data to calculate orthogonal polynomials (e.g. `poly(10, 2)` fails, but `poly(c(10, 8, 3), 2)`
 #' will run).
 #'
 #' P values are calculated with T tests for OLS, and Z tests otherwise. If a new variance-covariance matrix is provided
