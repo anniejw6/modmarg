@@ -4,14 +4,18 @@ context("Data Munging")
 test_that("applying a single transformation", {
 
   data(mtcars)
-  mtcars$gear <- factor(mtcars$gear)
+  df <- mtcars
+  df$gear <- factor(df$gear)
 
-  expect_identical(
-    at_transform(df = mtcars, var_name = 'gear', value = 3),
-    transform(mtcars, gear = factor(3, levels = levels(mtcars$gear))))
+  d0 <- at_transform(var = df[['gear']], value = 3)
+  d1 <- transform(df, gear = factor(3, levels = levels(df$gear)))
 
-  expect_identical(at_transform(df = mtcars, var_name = 'mpg', value = 20),
-                   transform(mtcars, mpg = 20))
+  expect_identical(d0, d1[['gear']])
+
+  d0 <- at_transform(var = df[['mpg']], value = 20)
+  d1 <- transform(df, mpg = 20)
+
+  expect_identical(d0, d1$mpg)
 
 })
 
@@ -59,8 +63,8 @@ test_that("make sure we format output correctly", {
                      family = "gaussian",
                      dof = 20)
 
-  expect_equal(z$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
-  expect_equal(z$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0.06462633, 0.23670517), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0.09360287, 0.28333563), tolerance = 0.0001)
   expect_equal(z$P.Value, c(0, 0))
   expect_equal(z$Test.Stat, c(11.39, 23.26), tolerance = 0.01)
 
