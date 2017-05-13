@@ -101,7 +101,42 @@ g <- glm(y ~ poly(distance, 2, raw = T)*as.factor(agegroup) , data = margex)
 summary(g)
 
 unique(margex$agegroup)
-mod_marg2(mod = g, var_interest = "agegroup", type = 'levels' 
+mod_marg2(mod = g, var_interest = "agegroup", type = 'levels',
           at_var_interest = c("20-29"))
+```
+
+# Use Case 4: Getting Margins with Different Variance-Covariance Matrices
+Normally we assume that the amount of variation in our outcome of interest 
+(conditional on covariates) is constant across our sample. Sometimes, this assumption 
+is violated, and we will use a different variance-covariance matrix to represent this 
+heterogeneity in variance (heteroskedasticity). Creating these variance-covariance 
+matrices is beyond the scope of this package. However, they can be used with `mod_marg2`
+to correct standard errors and p values in predicted levels or effects.
+
+Let's say we want to get the predicted levels of an outcome for different treatments,
+but we want to cluster our standard errors by the `arm` variable. We estimate the model,
+and then create the "clustered" variance-covariance matrix separately 
+(see `modmarg/data-raw/make_cluster_vcov.R` for one method to do this). 
+
+We can use the `vcov_mat` option to pass a custom variance-covariance matrix to modmarg.
+Because this is an OLS model, the degrees of freedom for the T test must also be corrected.
+Here we're using Stata's default correction of `ngroups - 1`, where `ngroups` is the number
+of unique values in the clustering variable. Notice the standard errors and p values increase
+substantially.
+```{r}
+data(cvcov)
+g <- glm(outcome ~ treatment + distance, data = margex, family = 'gaussian')
+summary(g)
+v <- cvcov$ols$clust
+print(v)
+d <- cvcov$ols$stata_dof
+print(d)
+
+# Without clustering
+mod_marg2(mod = g, var_interest = "treatment", type = "levels")
+
+# With clustering
+mod_marg2(mod = g, var_interest = "treatment", type = "levels",
+          vcov_mat = v, dof = d)
 ```
 
