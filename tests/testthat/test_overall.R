@@ -326,6 +326,26 @@ test_that("mod_marg2 input is checked", {
                            at = list(age = 100)))
 })
 
+
+test_that("continuous effects not supported unless variable is binary",{
+
+  data(margex)
+  mod <- glm(y ~ sex + age, data = margex, family = 'gaussian')
+  expect_error(mod_marg2(mod, var_interest = 'age', type = 'effects'))
+
+  expect_true(is.numeric(margex$treatment))
+  mod <- glm(y ~ treatment + age,
+             data = margex, family = 'gaussian')
+  z1 <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')
+
+  mod <- glm(y ~ as.factor(treatment) + age,
+             data = margex, family = 'gaussian')
+  z2 <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')
+
+  expect_equal(z1, z2)
+
+})
+
 test_that("Setting base level works", {
 
   data(margex)
@@ -373,3 +393,4 @@ test_that("Setting base level works", {
                c(0, 15.55766), tolerance = 0.0001)
 
 })
+

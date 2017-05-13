@@ -8,7 +8,7 @@
 #'
 #'
 #' @param mod model object, currently only support those of class glm
-#' @param var_interest name of the variable of interest, must correspond to a factor or numeric covariate in the model
+#' @param var_interest name of the variable of interest, must correspond to a covariate in the model
 #' @param type either 'levels' (predicted outcomes) or 'effects' (dydx), defaults to 'levels'
 #' @param vcov_mat the variance-covariance matrix, defaults to NULL in which case vcov(model) is used.
 #' @param at list, should be in the format of list('var_name' = c(values)), defaults to NULL.
