@@ -326,3 +326,71 @@ test_that("mod_marg2 input is checked", {
                            at = list(age = 100)))
 })
 
+
+test_that("continuous effects not supported unless variable is binary",{
+
+  data(margex)
+  mod <- glm(y ~ sex + age, data = margex, family = 'gaussian')
+  expect_error(mod_marg2(mod, var_interest = 'age', type = 'effects'))
+
+  expect_true(is.numeric(margex$treatment))
+  mod <- glm(y ~ treatment + age,
+             data = margex, family = 'gaussian')
+  z1 <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')
+
+  mod <- glm(y ~ as.factor(treatment) + age,
+             data = margex, family = 'gaussian')
+  z2 <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')
+
+  expect_equal(z1, z2)
+
+})
+
+test_that("Setting base level works", {
+
+  data(margex)
+  mm <- glm(y ~ as.factor(treatment) + age, margex, family = 'gaussian')
+
+  # Setting base_rn without type = 'effects' does nothing (warning)
+  expect_warning(mod_marg2(mod = mm, var_interest = 'treatment',
+                           at = list(age = 50), base_rn = 2))
+
+  # Actual check
+  z1 <- mod_marg2(mod = mm, var_interest = 'treatment',
+                  at = list(age = 50), base_rn = 1,
+                  type = 'effects')[[1]]
+  z2 <- mod_marg2(mod = mm, var_interest = 'treatment',
+                  at = list(age = 50), base_rn = 2,
+                  type = 'effects')[[1]]
+
+  # stata
+  # margins, dydx(treatment)
+  #
+  # Average marginal effects                          Number of obs   =       3000
+  # Model VCE    : OLS
+  #
+  # Expression   : Linear prediction, predict()
+  # dy/dx w.r.t. : treatment
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #    treatment |   14.03271   .7777377    18.04   0.000     12.50775    15.55766
+  # ------------------------------------------------------------------------------
+
+  # Make sure effects flipped right
+  expect_equal(z1$Margin, rev(-1 * z2$Margin), c(0, 14.03271),
+               tolerance = 0.0001)
+  expect_equal(z1$Standard.Error, rev(z2$Standard.Error), c(0, .7777377),
+               tolerance = 0.0001)
+  expect_equal(z1$Test.Stat, rev(-1 * z2$Test.Stat), c(NaN, 18.04),
+               tolerance = 0.01)
+  expect_equal(z1$P.Value, rev(z2$P.Value), 0.000, tolerance = 0.001)
+  expect_equal(z1$`Lower CI (95%)`, rev(-1 * z2$`Upper CI (95%)`),
+               c(0, 12.50775), tolerance = 0.0001)
+  expect_equal(z1$`Upper CI (95%)`, rev(-1 * z2$`Lower CI (95%)`),
+               c(0, 15.55766), tolerance = 0.0001)
+
+})
+

@@ -4,21 +4,22 @@
 #'
 #' @param mod model object, currently only support those of class glm
 #' @param var_interest name of the variable of interest, must correspond to a
-#' factor or numeric covariate in the model
-#' @param type either 'levels' (predicted outcomes) or 'effects' (dydx),
-#' defaults to 'levels'
-#' @param vcov_mat the variance-covariance matrix, defaults to NULL in which
+#' covariate in the model
+#' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} (dydx),
+#' defaults to \code{'levels'}
+#' @param vcov_mat the variance-covariance matrix, defaults to \code{NULL} in which
 #' case \code{vcov(model)} is used.
 #' @param at list, should be in the format of \code{list('var_name' = c(values))},
 #' defaults to \code{NULL}. This calculates the margins of the variable at these
 #' particular variables. If all values are needed, suggested syntax is
 #' \code{at = list('var' = unique(df$var))}.
-#' @param base_rn numeric, if type == 'effects', the base level (taken as the
-#' index of one of the ordered unique values in var_interest).
+#' @param base_rn numeric, if \code{type == 'effects'}, the base level (taken as the
+#' index of one of the ordered unique values in \code{var_interest}). if
+#' \code{type == 'levels'}, this param is ignored.
 #' if type == 'levels', this param is ignored. Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the
 #' variable of interest at which levels should be calculated.
-#' If NULL, indicates all levels for a factor variable, defaults to NULL
+#' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
 #' @param dof integer, the degrees of freedom used for the T statistic in an
 #' OLS model. Defaults to NULL in which case \code{mod$df.residual} is used.
 #' @param data data.frame that margins should run over, defaults to
@@ -124,6 +125,10 @@ mod_marg2 <- function(mod, var_interest,
       warning(sprintf("Not all values in 'at' are in the range of '%s'",
                       names(at)[i]))
   }
+
+  # Warn if base_rn set but type != 'effects'
+  if(base_rn != 1 & type != 'effects')
+    warning(paste("Setting base_rn when type == 'levels' is ignored."))
 
   # Transform the ats ---
   if(!is.null(at)){

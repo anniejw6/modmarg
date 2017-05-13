@@ -11,12 +11,12 @@ mod_marg2(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
 \item{mod}{model object, currently only support those of class glm}
 
 \item{var_interest}{name of the variable of interest, must correspond to a
-factor or numeric covariate in the model}
+covariate in the model}
 
-\item{type}{either 'levels' (predicted outcomes) or 'effects' (dydx),
-defaults to 'levels'}
+\item{type}{either \code{'levels'} (predicted outcomes) or \code{'effects'} (dydx),
+defaults to \code{'levels'}}
 
-\item{vcov_mat}{the variance-covariance matrix, defaults to NULL in which
+\item{vcov_mat}{the variance-covariance matrix, defaults to \code{NULL} in which
 case \code{vcov(model)} is used.}
 
 \item{dof}{integer, the degrees of freedom used for the T statistic in an
@@ -27,13 +27,14 @@ defaults to \code{NULL}. This calculates the margins of the variable at these
 particular variables. If all values are needed, suggested syntax is
 \code{at = list('var' = unique(df$var))}.}
 
-\item{base_rn}{numeric, if type == 'effects', the base level (taken as the
-index of one of the ordered unique values in var_interest).
+\item{base_rn}{numeric, if \code{type == 'effects'}, the base level (taken as the
+index of one of the ordered unique values in \code{var_interest}). if
+\code{type == 'levels'}, this param is ignored.
 if type == 'levels', this param is ignored. Defaults to 1.}
 
 \item{at_var_interest}{vector, if type == 'levels', the values for the
 variable of interest at which levels should be calculated.
-If NULL, indicates all levels for a factor variable, defaults to NULL}
+If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}}
 
 \item{data}{data.frame that margins should run over, defaults to
 \code{mod$data}}
