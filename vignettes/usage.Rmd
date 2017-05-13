@@ -12,10 +12,14 @@ vignette: >
 # Why Margins?
 For many types of regression techniques, the coefficients in the
 model may not be sufficient to adequately figure out the marginal relationship
-between a covaraiate and the outcome of a regression (or the error in your estimate). In the simplest case, 
-say you run the following formula in glm `wages ~ age + age^2`. 
+between a covaraiate and the outcome of a regression (or the error in your 
+estimate). In the simplest case, say you run the following formula in glm: 
+`wages ~ age + age^2`. 
 
-Because the output will include coefficients for both age and age squared, it's not immediately apparent what the total marginal relationship is between a change in age and wages. Moreover, computing the error in that estimate is a non-trivial problem.
+Because the output will include coefficients for both age and age squared, 
+it's not immediately apparent what the total marginal relationship is between a 
+change in age and wages. Moreover, computing the error in that estimate is a 
+non-trivial problem.
 
 This non-obviousness of marginal relationships is also a problem for even 
 very simple regressions with functional forms that mean that coefficients are
@@ -35,6 +39,7 @@ actually ran the margins command in Stata for far too long.]
 # Use Case 1: Treatment Effects and Subgroup Effects
 We want to ascertain the marginal effect of `treatment` on `y` while controlling
 for age. In this first example we'll use a binned age variable.
+
 ```{r}
 library(modmarg)
 data(margex)
@@ -47,11 +52,13 @@ It's not at all obvious from these coefficients what the total marginal
 relationship is between `treatment` and `y`.
 
 We can get the predicted margin of `y` at the various levels of `treatment`.
+
 ```{r}
 modmarg::mod_marg2(mod = g, var_interest = "treatment", type = 'levels')
 ```
 
 Or the effect of a unit change in `treatment`.
+
 ```{r}
 modmarg::mod_marg2(mod = g, var_interest = "treatment", type = "effects")
 ```
@@ -63,8 +70,9 @@ at severity of a disease that's most prevalent among the young and the old).
 Note that you have to use `raw = T` when using `poly()`. Otherwise
 `mod_marg2` will try to create multiple orthogonal vectors from a constant, 
 which doesn't work so well.
+
 ```{r}
-g <- glm(y ~ poly(age, 3, raw = T)*as.factor(treatment) , data = margex)
+g <- glm(y ~ poly(age, 3, raw = T) * as.factor(treatment) , data = margex)
 summary(g)
 
 m <- modmarg::mod_marg2(mod = g, var_interest = "treatment", type = "effects",
@@ -75,6 +83,7 @@ print(m)
 # Use Case 2: Logistic Regression
 Let's say we want to figure out how much `treatment` increased the likelihood of
 a binary `outcome`.
+
 ```{r}
 g <- glm(outcome ~ as.factor(treatment), data = margex, family = binomial)
 summary(g)
@@ -82,10 +91,12 @@ summary(g)
 
 Those coefficients are odds ratios. It's really unclear what the marginal
 relationship is.
+
 ```{r}
 mod_marg2(mod = g, var_interest = "treatment", type = 'levels')
 mod_marg2(mod = g, var_interest = "treatment", type = "effects")
 ```
+
 Aha! It's an 18 percentage point increase in the likelihood of a positive outcome 
 from treatment and the effect is highly statistically significant. Much more 
 interpretable.
@@ -96,12 +107,13 @@ age groups while controlling for distance. `mod_marg2` makes that simple.
 
 Note that unlike the `at` option, which takes a named list of values, 
 `at_var_interest` takes just an unnamed vector.
+
 ```{r}
-g <- glm(y ~ poly(distance, 2, raw = T)*as.factor(agegroup) , data = margex)
+g <- glm(y ~ poly(distance, 2, raw = T) * as.factor(agegroup) , data = margex)
 summary(g)
 
 unique(margex$agegroup)
-mod_marg2(mod = g, var_interest = "agegroup", type = 'levels' 
+mod_marg2(mod = g, var_interest = "agegroup", type = 'levels',
           at_var_interest = c("20-29"))
 ```
 
