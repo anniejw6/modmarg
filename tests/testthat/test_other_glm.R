@@ -135,5 +135,70 @@ test_that("Poisson models are correct", {
   expect_equal(z$`Upper CI (95%)`, c(0, -6.339716, -11.20229),
                tolerance = 0.0001)
 
+  # Do offsets work?
+  data(warpbreaks)
+  set.seed(123456)
+  warpbreaks$off <- c(
+    3, 2, 1, 2, 4, 3, 3, 3, 2, 1, 2, 4, 3, 3, 4, 2, 4, 3, 3, 3,
+    4, 2, 2, 3, 2, 4, 3, 2, 2, 1, 3, 4, 2, 1, 2, 4, 4, 2, 2, 3,
+    2, 3, 2, 3, 2, 2, 2, 2, 3, 3, 2, 2, 1, 2)
+
+  # stata
+  # poisson breaks i.wool##i.tension, offset(off)
+  # margins i.tension
+
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #      tension |
+  #           L  |   40.03297   1.596391    25.08   0.000      36.9041    43.16184
+  #           M  |   22.89519   1.050774    21.79   0.000     20.83571    24.95467
+  #           H  |    26.3223   1.369167    19.23   0.000     23.63878    29.00581
+  # ------------------------------------------------------------------------------
+  #
+  # margins, dydx(tension)
+  #
+  # Average marginal effects                          Number of obs   =         54
+  # Model VCE    : OIM
+  #
+  # Expression   : Predicted number of events, predict()
+  # dy/dx w.r.t. : 2.tension 3.tension
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #      tension |
+  #           M  |  -17.13778   1.911175    -8.97   0.000    -20.88361   -13.39194
+  #           H  |  -13.71068   2.103113    -6.52   0.000     -17.8327   -9.588651
+  # ------------------------------------------------------------------------------
+
+  mod <- glm(breaks ~ wool * tension + offset(off), data = warpbreaks,
+             family = "poisson")
+
+  z1 <- mod_marg2(mod, var_interest = 'tension', type = 'levels')[[1]]
+  z2 <- mod_marg2(mod, var_interest = 'tension', type = 'effects')[[1]]
+
+  expect_equal(z1$Margin, c(40.03297, 22.89519, 26.3223),
+               tolerance = 0.0001)
+  expect_equal(z1$Standard.Error, c(1.596391, 1.050774, 1.369167),
+               tolerance = 0.0001)
+  expect_equal(z1$P.Value, c(0, 0, 0), tolerance = 0.0001)
+  expect_equal(z1$`Lower CI (95%)`, c(36.9041, 20.83571, 23.63878),
+               tolerance = 0.0001)
+  expect_equal(z1$`Upper CI (95%)`, c(43.16184, 24.95467, 29.00581),
+               tolerance = 0.0001)
+
+  expect_equal(z2$Margin, c(0, -17.13778, -13.71068),
+               tolerance = 0.0001)
+  expect_equal(z2$Standard.Error, c(0, 1.911175, 2.103113),
+               tolerance = 0.0001)
+  expect_equal(z2$P.Value, c(NaN, 0, 0), tolerance = 0.0001)
+  expect_equal(z2$`Lower CI (95%)`, c(0, -20.88361, -17.8327),
+               tolerance = 0.0001)
+  expect_equal(z2$`Upper CI (95%)`, c(0, -13.39194, -9.588651),
+               tolerance = 0.0001)
+
 })
 
