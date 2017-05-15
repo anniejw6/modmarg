@@ -392,5 +392,58 @@ test_that("Setting base level works", {
   expect_equal(z1$`Upper CI (95%)`, rev(-1 * z2$`Lower CI (95%)`),
                c(0, 15.55766), tolerance = 0.0001)
 
+  # . reg y ib2.group##c.distance
+  #
+  #       Source |       SS       df       MS              Number of obs =    3000
+  # -------------+------------------------------           F(  5,  2994) =    8.20
+  #        Model |  18786.3692     5  3757.27384           Prob > F      =  0.0000
+  #     Residual |  1372646.64  2994  458.465811           R-squared     =  0.0135
+  # -------------+------------------------------           Adj R-squared =  0.0119
+  #        Total |  1391433.01  2999  463.965657           Root MSE      =  21.412
+  #
+  # ----------------------------------------------------------------------------------
+  #                y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -----------------+----------------------------------------------------------------
+  #            group |
+  #               1  |  -.3468524   .9366157    -0.37   0.711    -2.183328    1.489623
+  #               3  |   5.082678   1.090568     4.66   0.000      2.94434    7.221016
+  #                  |
+  #         distance |  -.0056658   .0034517    -1.64   0.101    -.0124338    .0011023
+  #                  |
+  # group#c.distance |
+  #               1  |  -.0013629   .0049395    -0.28   0.783     -.011048    .0083222
+  #               3  |   -.002349   .0056076    -0.42   0.675    -.0133442    .0086462
+  #                  |
+  #            _cons |   69.10901   .6735036   102.61   0.000     67.78844    70.42959
+  # ----------------------------------------------------------------------------------
+  #
+  # . margins, dydx(group) sformat(%7.6f) pformat(%5.4f)
+  #
+  # Average marginal effects                          Number of obs   =       3000
+  # Model VCE    : OLS
+  #
+  # Expression   : Linear prediction, predict()
+  # dy/dx w.r.t. : 1.group 3.group
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #        group |
+  #           1  |  -.4266991   .8902282 -0.479314   0.6318     -2.17222    1.318822
+  #           3  |    4.94506   1.039902 4.755314   0.0000     2.906066    6.984055
+  # ------------------------------------------------------------------------------
+  #   Note: dy/dx for factor levels is the discrete change from the base level.
+
+  data(margex)
+  mm <- glm(y ~ as.factor(group) * distance, margex, family = 'gaussian')
+  z <- mod_marg2(mm, 'group', type = 'effects', base_rn = 2)[[1]]
+  expect_equal(z$Margin, c(-.4266991, 0, 4.94506), tolerance = 0.0001)
+  expect_equal(z$Standard.Error, c(.8902282, 0, 1.039902), tolerance = 0.0001)
+  expect_equal(z$Test.Stat, c(-0.479314, NaN, 4.755314), tolerance = 0.0001)
+  expect_equal(z$P.Value, c(0.6318, NaN, 0), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(-2.17222, 0, 2.906066), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(1.318822, 0, 6.984055), tolerance = 0.0001)
+
 })
 
