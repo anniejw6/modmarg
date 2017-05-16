@@ -38,7 +38,7 @@
 #' using the R function \code{\link[stats]{poly}}, the \code{raw = TRUE}
 #' argument should be used to include the basic polynomial terms
 #' instead of orthogonal polynomial terms. If orthogonal polynomials are used,
-#' \code{mod_marg2} will fail when the user specifies \code{at} for a small set
+#' \code{marg} will fail when the user specifies \code{at} for a small set
 #' of values for the variable in question (e.g. \code{at = list(x = 10)}),
 #' since \code{poly} needs more data to calculate orthogonal polynomials
 #' (e.g. \code{poly(10, 2)} fails, but \code{poly(c(10, 8, 3), 2)} will run).
@@ -56,20 +56,20 @@
 #' data(mtcars)
 #' mtcars$gear <- as.character(mtcars$gear)
 #' mod <- glm(vs ~ gear + mpg * disp, data = mtcars, family = 'binomial')
-#' mod_marg2(mod, var_interest = 'gear',
+#' marg(mod, var_interest = 'gear',
 #'           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
 #'
 #' data(margex)
 #' mod <- glm(outcome ~ as.factor(treatment) + distance,
 #'        data = margex, family = 'binomial')
-#' mod_marg2(mod, var_interest = 'treatment', type = 'levels', at = NULL)
-#' mod_marg2(mod, var_interest = 'treatment', type = 'effects', at = NULL)
-#' mod_marg2(mod, var_interest = 'distance', type = 'levels',
+#' marg(mod, var_interest = 'treatment', type = 'levels', at = NULL)
+#' marg(mod, var_interest = 'treatment', type = 'effects', at = NULL)
+#' marg(mod, var_interest = 'distance', type = 'levels',
 #'           at = NULL, at_var_interest = c(10, 20, 30))
 #'
 #' mod <- glm(outcome ~ distance + factor(sex),
 #'            data = margex, family = 'binomial')
-#' mod_marg2(mod, var_interest = 'sex', type = 'levels', at = NULL)
+#' marg(mod, var_interest = 'sex', type = 'levels', at = NULL)
 #'
 #' # Using a custom variance-covariance matrix for clustered standard errors
 #' # (also requires custom degrees of freedom for T statistic with OLS model)
@@ -79,10 +79,10 @@
 #' d <- cvcov$ols$stata_dof
 #' mod <- glm(outcome ~ treatment + distance,
 #'            data = margex, family = 'binomial')
-#' mod_marg2(mod, var_interest = 'treatment', type = 'levels',
+#' marg(mod, var_interest = 'treatment', type = 'levels',
 #'           vcov_mat = v, dof = d)
 
-mod_marg2 <- function(mod, var_interest,
+marg <- function(mod, var_interest,
                       type = 'levels',
                       vcov_mat = NULL,
                       dof = NULL,
@@ -109,7 +109,7 @@ mod_marg2 <- function(mod, var_interest,
     warning(paste(
       "You provided a new variance-covariance matrix for an OLS model",
       "but no degrees of freedom for the T test. P-value calculations",
-      "may be incorrect - see ?modmarg::mod_marg2 for details."))
+      "may be incorrect - see ?modmarg::marg for details."))
 
   if(is.null(vcov_mat))
     vcov_mat <- vcov(mod)

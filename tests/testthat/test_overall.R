@@ -9,7 +9,7 @@ test_that("levels are calculated correctly despite different input types", {
   data(margex)
   mod1 <- glm(outcome ~ as.character(treatment) + distance,
               data = margex, family = 'binomial')
-  z1 <- mod_marg2(mod1, var_interest = 'treatment',
+  z1 <- marg(mod1, var_interest = 'treatment',
                  type = 'levels', at = NULL)[[1]]
 
   # Make character outside
@@ -17,14 +17,14 @@ test_that("levels are calculated correctly despite different input types", {
   margex$treatment <- as.character(margex$treatment)
   mod2 <- glm(outcome ~ treatment + distance,
               data = margex, family = 'binomial')
-  z2 <- mod_marg2(mod2, var_interest = 'treatment',
+  z2 <- marg(mod2, var_interest = 'treatment',
                  type = 'levels', at = NULL)[[1]]
 
   # Put as.factor inside equation
   data(margex)
   mod3 <- glm(outcome ~ as.factor(treatment) + distance,
               data = margex, family = 'binomial')
-  z3 <- mod_marg2(mod3, var_interest = 'treatment',
+  z3 <- marg(mod3, var_interest = 'treatment',
                   type = 'levels', at = NULL)[[1]]
 
   expect_equal(z1$Margin, z2$Margin, z3$Margin, c(.0791146, .2600204),
@@ -49,7 +49,7 @@ test_that("effects are calculated correctly despite different input types", {
   data(margex)
   mod1 <- glm(outcome ~ as.character(treatment) + distance,
               data = margex, family = 'binomial')
-  z1 <- mod_marg2(mod1, var_interest = 'treatment',
+  z1 <- marg(mod1, var_interest = 'treatment',
                   type = 'effects', at = NULL)[[1]]
   z1 <- z1[2, ]
 
@@ -58,7 +58,7 @@ test_that("effects are calculated correctly despite different input types", {
   margex$treatment <- as.character(margex$treatment)
   mod2 <- glm(outcome ~ treatment + distance,
               data = margex, family = 'binomial')
-  z2 <- mod_marg2(mod2, var_interest = 'treatment',
+  z2 <- marg(mod2, var_interest = 'treatment',
                   type = 'effects', at = NULL)[[1]]
   z2 <- z2[2, ]
 
@@ -66,7 +66,7 @@ test_that("effects are calculated correctly despite different input types", {
   data(margex)
   mod3 <- glm(outcome ~ as.factor(treatment) + distance,
               data = margex, family = 'binomial')
-  z3 <- mod_marg2(mod3, var_interest = 'treatment',
+  z3 <- marg(mod3, var_interest = 'treatment',
                   type = 'effects', at = NULL)[[1]]
   z3 <- z3[2, ]
 
@@ -92,7 +92,7 @@ test_that("works correctly even when rows are dropped", {
 
   mod <- glm(outcome ~ treatment + distance,
              data = margex, family = 'binomial')
-  z <- mod_marg2(mod, 'treatment', 'levels', at = NULL)[[1]]
+  z <- marg(mod, 'treatment', 'levels', at = NULL)[[1]]
 
   expect_equal(z$Margin, c(0.07911049, 0.25890416), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0.006945149, 0.011181260),
@@ -110,7 +110,7 @@ test_that("works correctly even when rows are dropped", {
   mtcars$cyl[c(1, 10, 20, 31)] <- NA
   ols3 <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) +
                 hp + gear, data = mtcars)
-  eff3 <- mod_marg2(
+  eff3 <- marg(
     mod = ols3, var_interest = 'cyl', type = 'effects',
     at = list('disp' = seq(80, 470, 5)))
 
@@ -139,7 +139,7 @@ test_that("interaction terms", {
   ols1 <- glm(mpg ~ am * poly(disp, degree = 2, raw = TRUE) +
                 cyl + hp + gear, data = mtcars)
 
-  eff1 <- mod_marg2(
+  eff1 <- marg(
     mod = ols1, var_interest = 'am', type = 'effects',
     at = list('disp' = seq(75, 470, 5)))
 
@@ -147,14 +147,14 @@ test_that("interaction terms", {
   ols2 <- glm(mpg ~ am * disp + am * I(disp^2) +
                 cyl + hp + gear, data = mtcars)
 
-  eff2 <- mod_marg2(
+  eff2 <- marg(
     mod = ols2, var_interest = 'am', type = 'effects',
     at = list('disp' = seq(75, 470, 5)))
 
   ols3 <- glm(mpg ~ am * poly(disp, degree = 2, raw = T) +
                 cyl + hp + gear, data = mtcars)
 
-  eff3 <- mod_marg2(
+  eff3 <- marg(
     mod = ols3, var_interest = 'am', type = 'effects',
     at = list('disp' = seq(75, 470, 5)))
 
@@ -187,7 +187,7 @@ test_that("Effects and Levels of Continuous Covariates", {
   # margins, at(mpg = (15 21))
 
   mm <- glm(vs ~ gear + mpg * disp, mtcars, family = 'binomial')
-  z <- mod_marg2(mod = mm, var_interest = 'mpg',
+  z <- marg(mod = mm, var_interest = 'mpg',
                  at_var_interest = c(15,21),
                  type = "levels")[[1]]
 
@@ -203,7 +203,7 @@ test_that("Effects and Levels of Continuous Covariates", {
   data(margex)
   margex$sex <- factor(margex$sex)
   mm <- glm(y ~ sex + age * distance, margex, family = 'gaussian')
-  z <- mod_marg2(mod = mm, var_interest = 'age',
+  z <- marg(mod = mm, var_interest = 'age',
                  at_var_interest = c(35, 60),
                  at = list('distance' = c(13, 25)),
                  type = "levels")
@@ -226,7 +226,7 @@ test_that("Effects and Levels of Continuous Covariates", {
   # reg y c.age i.sex
   # margins, at(age = (35 60))
   mm <- glm(y ~ sex + age, margex, family = 'gaussian')
-  z <- mod_marg2(mod = mm, var_interest = 'age',
+  z <- marg(mod = mm, var_interest = 'age',
                  at_var_interest = c(25, 55),
                  type = "levels")[[1]]
 
@@ -262,7 +262,7 @@ test_that("Collinear cols treated right", {
 
   ols1 <- glm(disp ~ am * mpg + mpg_colin, data = mtcars)
 
-  eff1 <- mod_marg2(
+  eff1 <- marg(
     mod = ols1, var_interest = 'am', type = 'effects',
     at = list('mpg' = seq(15, 30, 5)))
 
@@ -276,7 +276,7 @@ test_that("Collinear cols treated right", {
   expect_equal(eff1$`mpg = 25`$P.Value, c(NaN, 0.514), tolerance = 0.001)
 })
 
-test_that("mod_marg2 subsets of data run properly", {
+test_that("marg subsets of data run properly", {
 
   # Stata Commands
   # webuse margex
@@ -285,13 +285,13 @@ test_that("mod_marg2 subsets of data run properly", {
 
   data(margex)
   mm <- glm(y ~ treatment * agegroup + distance, margex, family = 'gaussian')
-  z1 <- mod_marg2(mod = mm, var_interest = 'treatment',
+  z1 <- marg(mod = mm, var_interest = 'treatment',
                   type = "levels",
                   data = subset(margex, agegroup == "20-29"))
-  z2 <- mod_marg2(mod = mm, var_interest = 'treatment',
+  z2 <- marg(mod = mm, var_interest = 'treatment',
                   type = "levels",
                   data = subset(margex, agegroup == "30-39"))
-  z3 <- mod_marg2(mod = mm, var_interest = 'treatment',
+  z3 <- marg(mod = mm, var_interest = 'treatment',
                   type = "levels",
                   data = subset(margex, agegroup == "40+"))
 
@@ -305,7 +305,7 @@ test_that("mod_marg2 subsets of data run properly", {
   expect_equal(z3[[1]]$Standard.Error, c(0.8580671, 0.6532233),
                tolerance = 0.0001)
 
-  expect_error(mod_marg2(mod = mm, var_interest = 'treatment',
+  expect_error(marg(mod = mm, var_interest = 'treatment',
                          type = 'levels',
                          data = margex[, names(margex) != 'distance']))
 
@@ -313,16 +313,16 @@ test_that("mod_marg2 subsets of data run properly", {
 
 
 
-test_that("mod_marg2 input is checked", {
+test_that("marg input is checked", {
 
   # lm should fail
   margex$sex <- factor(margex$sex)
   ml <- lm(y ~ sex + age, margex)
-  expect_error(mod_marg2(mod = lm, var_interest = 'sex'))
+  expect_error(marg(mod = lm, var_interest = 'sex'))
 
   # extrapolated values are troubling
   mm <- glm(y ~ sex + age, margex, family = 'gaussian')
-  expect_warning(mod_marg2(mod = mm, var_interest = 'sex',
+  expect_warning(marg(mod = mm, var_interest = 'sex',
                            at = list(age = 100)))
 })
 
@@ -331,16 +331,16 @@ test_that("continuous effects not supported unless variable is binary",{
 
   data(margex)
   mod <- glm(y ~ sex + age, data = margex, family = 'gaussian')
-  expect_error(mod_marg2(mod, var_interest = 'age', type = 'effects'))
+  expect_error(marg(mod, var_interest = 'age', type = 'effects'))
 
   expect_true(is.numeric(margex$treatment))
   mod <- glm(y ~ treatment + age,
              data = margex, family = 'gaussian')
-  z1 <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')
+  z1 <- marg(mod, var_interest = 'treatment', type = 'effects')
 
   mod <- glm(y ~ as.factor(treatment) + age,
              data = margex, family = 'gaussian')
-  z2 <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')
+  z2 <- marg(mod, var_interest = 'treatment', type = 'effects')
 
   expect_equal(z1, z2)
 
@@ -352,14 +352,14 @@ test_that("Setting base level works", {
   mm <- glm(y ~ as.factor(treatment) + age, margex, family = 'gaussian')
 
   # Setting base_rn without type = 'effects' does nothing (warning)
-  expect_warning(mod_marg2(mod = mm, var_interest = 'treatment',
+  expect_warning(marg(mod = mm, var_interest = 'treatment',
                            at = list(age = 50), base_rn = 2))
 
   # Actual check
-  z1 <- mod_marg2(mod = mm, var_interest = 'treatment',
+  z1 <- marg(mod = mm, var_interest = 'treatment',
                   at = list(age = 50), base_rn = 1,
                   type = 'effects')[[1]]
-  z2 <- mod_marg2(mod = mm, var_interest = 'treatment',
+  z2 <- marg(mod = mm, var_interest = 'treatment',
                   at = list(age = 50), base_rn = 2,
                   type = 'effects')[[1]]
 
