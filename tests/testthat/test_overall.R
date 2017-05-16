@@ -437,7 +437,7 @@ test_that("Setting base level works", {
 
   data(margex)
   mm <- glm(y ~ as.factor(group) * distance, margex, family = 'gaussian')
-  z <- mod_marg2(mm, 'group', type = 'effects', base_rn = 2)[[1]]
+  z <- marg(mm, 'group', type = 'effects', base_rn = 2)[[1]]
   expect_equal(z$Margin, c(-.4266991, 0, 4.94506), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(.8902282, 0, 1.039902), tolerance = 0.0001)
   expect_equal(z$Test.Stat, c(-0.479314, NaN, 4.755314), tolerance = 0.0001)
