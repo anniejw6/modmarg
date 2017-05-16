@@ -22,9 +22,9 @@ data(iris)
 mod <- glm(Sepal.Length ~ Sepal.Width + Species, 
            data = iris, family = 'gaussian')
 # Levels
-modmarg::mod_marg2(mod, var_interest = 'Species', type = 'levels')
+modmarg::marg(mod, var_interest = 'Species', type = 'levels')
 # Effects
-modmarg::mod_marg2(mod, var_interest = 'Species', type = 'effects')
+modmarg::marg(mod, var_interest = 'Species', type = 'effects')
 ```
 
 You can read an overview of the delta method using 
