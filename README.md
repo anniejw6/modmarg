@@ -19,17 +19,21 @@ using the `iris` dataset:
 
 ```
 data(iris)
+
 mod <- glm(Sepal.Length ~ Sepal.Width + Species, 
            data = iris, family = 'gaussian')
-# Levels
+           
+# Predicted Levels
 modmarg::marg(mod, var_interest = 'Species', type = 'levels')
-# Effects
+
+# Predicted Effects
 modmarg::marg(mod, var_interest = 'Species', type = 'effects')
 ```
 
-You can read an overview of the delta method using 
+There are two vignettes included:
 
 ```
+vignette('usage', package = 'modmarg')
 vignette('delta-method', package = 'modmarg')
 ```
 
