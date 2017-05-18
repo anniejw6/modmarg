@@ -122,7 +122,7 @@ Compute the second derivative of the link function and use that in place of the 
 
 # Example
 
-Say we're fitting a logistic regression using the `margex` data, and we're interested in the conditional treatment effect of treatment at various ages.
+Say we're fitting a logistic regression using the `margex` data, and we're interested in the predicted outcome for different treatment groups:
 
 ```{r}
 library(modmarg)
@@ -131,15 +131,15 @@ lg <- glm(outcome ~ treatment * age, data = margex, family = 'binomial')
 summary(lg)
 ```
 
-Where the `treatment` variable $\tau \in {0, 1}$. What is the average outcome when $\tau = 0$ or $\tau = 1$?
+where the `treatment` variable $\tau \in {0, 1}$. What is the average outcome when $\tau = 0$ or $\tau = 1$?
 
 Based on these results alone, we don't really know what the treatment effect is, both because we can't directly interpret the coefficients, because there's an interaction term, and because the effect of each covariate depends on the levels of the other covariates.
 
 ## Point estimates
 
-The `predict` and `plogis` functions will get us partway there. Predict will calculate the linear predictors (in this case, setting $\text{treatment} = t$: 
+To get an estimate of the average levels of the outcome for different values of treatment, we can set treatment to 0 or 1 for the entire dataset, generate predicted outcomes for the dataset, and averaging the results (in other words, what would the outcome have been, if everybody was in the control / treatment group?). We'll use the `predict` and `plogis` functions to do this. Predict will calculate the linear predictors (in this case, setting $\text{treatment} = t$: 
 \[
-\hat{y}_i = \alpha + \beta_1 \cdot t + \beta_2 \text{age}_i + \beta_3 (t \cdot \text{age}_i)
+\hat{y}_i = \alpha + \beta_1 \cdot t + \beta_2 \cdot \text{age}_i + \beta_3 \cdot (t \cdot \text{age}_i)
 \]
 `plogis` is the inverse link function $f(z) = \frac{1}{1 + \exp(-z)}$, which transforms the linear predictors to the scale of the outcome variable (predicted probabilities). Finally, we can find the average predicted level.
 
@@ -149,21 +149,25 @@ Combining these, we have:
 \]
 We'll suppress the $\tau = t$ subscripts from here on.
 
+Now let's do this math in R: set treatment to 0 or 1, generate linear predictors, transform them to predicted outcomes, and take the mean.
+
 ```{r}
 # Extract data from the model
 new <- lg$model
 # Set treatment to 0 for all observations
 new$treatment <- 0
-# Get predicted levels
+# Get linear predictors
 pred_ctl <- predict(lg, newdata = new)
+# Apply the inverse link function and take the mean
 mean_pred_ctl <- mean(plogis(pred_ctl))
 
 # Once again, with treatment
 new <- lg$model
 # Set treatment to 1 for all observations
 new$treatment <- 1
-# 
+# Get linear predictors
 pred_treat <- predict(lg, newdata = new)
+# Apply the inverse link function and take the mean
 mean_pred_treat <- mean(plogis(pred_treat))
 
 print(mean_pred_ctl)
@@ -172,11 +176,11 @@ print(mean_pred_treat)
 
 ## Variance
 
-So far this is pretty straightforward, but we want to know the standard error of these estimates. Fortunately, our estimators $\hat{y}_{\tau = t}$ is a function of variables that obey the central limit theory - which means we can approximate their variance. Specifically, if the gradient $\nabla {\hat{y}_{\tau = t}}$ is defined as $\mathbf{J}$, then
+So far this is pretty straightforward, but we want to know the standard error of these estimates. As explained above, we can approximate their variance: if the gradient $\nabla {\hat{y}_{\tau = t}}$ is defined as $\mathbf{J}$, then
 
 \[\text{Var}(\hat{y}_{\tau = t}) =  \mathbf{J} \times \mathbf{V} \times \mathbf{J}^\prime\]
 
-What is $\nabla {\hat{y}_{\tau = t}}$? It's the derivative of $\hat{y}_{\tau = t}$ with respect to each of the $\beta$ parameters. Going back to our function from before, let's start with the coefficient on treatment, $\beta_1$.
+\ldots and $\nabla {\hat{y}_{\tau = t}}$ is the derivative of $\hat{y}_{\tau = t}$ with respect to each of the $\beta$ parameters. Going back to our function from before, let's start with the coefficient on treatment, $\beta_1$.
 
 \begin{align*}
 \hat{y} &= \frac{1}{n} \sum_{i = 1}^n (1 + \exp(-X_i\beta))^{-1}\\
