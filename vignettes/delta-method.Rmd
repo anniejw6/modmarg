@@ -75,7 +75,7 @@ get the variance of the margin.
 
 In particular, we’ll use the “sandwich” method of deriving the variance of a function of a vector of random variables. In this case, we'll multiply the partial derivatives of the inverse link function by the original variance/covariance matrix from the regression.^[Quick reminder on the sandwich method: for scalar $a$ and $r$, where $b$ is the variance of random variable $r$, $Var(a*r)$ is $a^2*b$. The matrix analog of $a^2*Var(b)$ is $ABA^T$.]
 
-Keeping in mind that the margin is given by $link^{-1}(X \beta)$, all of the first partial derivatives of the margin are given by the the Jacobian matrix.^[Since the Jacobian matrix is just the name of the matrix of all first partial derviatives of a vector-valued function.] For any predicted level indexed by $i$ in a regression, the $i,j$th element of the jacobian will be the derivative of predicted level $i$ with respect to regressor $j$. 
+Keeping in mind that the margin is given by $\text{link}^{-1}(X \beta)$, all of the first partial derivatives of the margin are given by the the Jacobian matrix.^[Since the Jacobian matrix is just the name of the matrix of all first partial derviatives of a vector-valued function.] For any predicted level indexed by $i$ in a regression, the $i,j$th element of the jacobian will be the derivative of predicted level $i$ with respect to regressor $j$. 
 
 We'll multiply that Jacobian by the variance-covariance matrix of the regression, which captures the variance structure of the coefficients. As a quick reminder about the variance-covariance matrix, if your model contains coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_i}$ and standard deviation $\sigma_{b_i}$), the $i,j$th element of the variance-covariance matrix is $cov(b_i, b_j)$.
 
@@ -100,11 +100,11 @@ of the multivariate delta method.
 
 1. Calculate predicted levels for each of these matrices, call each of the resulting 1 x n column vectors $q_1, q_2, ..., q_k$.
 
-1. Calculate the derivative of the link function with respect to $X \beta$ (e.g for a simple logit with predicted level $p$, $p*(1-p)$). 
+1. Calculate the derivative of the link function with respect to $X \beta$ (e.g for a simple logit with predicted level $p$, $p \cdot (1-p)$). 
 
-1. Run each vector of predicted levels through the scalar-valued link function to end up with another 1 x n column vector. Call this $q*_i$
+1. Run each vector of predicted levels through the scalar-valued link function to end up with another 1 x n column vector. Call this $q^*_i$
 
-1. Take the cross product of each $q*_i$ and $A_i$ to get a row vector. Divide by the number of observations in $A_i$.
+1. Take the cross product of each $q^*_i$ and $A_i$ to get a row vector. Divide by the number of observations in $A_i$.
 
 1. Row bind your vectors together. This is your Jacobian.
 
@@ -137,7 +137,7 @@ Based on these results alone, we don't really know what the treatment effect is,
 
 ## Point estimates
 
-To get an estimate of the average levels of the outcome for different values of treatment, we can set treatment to 0 or 1 for the entire dataset, generate predicted outcomes for the dataset, and averaging the results (in other words, what would the outcome have been, if everybody was in the control / treatment group?). We'll use the `predict` and `plogis` functions to do this. Predict will calculate the linear predictors (in this case, setting $\text{treatment} = t$: 
+To get an estimate of the average levels of the outcome for different values of treatment, we can set treatment to 0 or 1 for the entire dataset, generate predicted outcomes for the dataset, and averaging the results (in other words, what would the outcome have been, if everybody was in the control / treatment group?). We'll use the `predict` and `plogis` functions to do this. Predict will calculate the linear predictors (in this case, setting $\tau = t$: 
 \[
 \hat{y}_i = \alpha + \beta_1 \cdot t + \beta_2 \cdot \text{age}_i + \beta_3 \cdot (t \cdot \text{age}_i)
 \]
@@ -145,7 +145,7 @@ To get an estimate of the average levels of the outcome for different values of 
 
 Combining these, we have:
 \[
-\hat{y}_{\tau = t} = \frac{1}{n} \sum_{i = 1}^n (1 + \exp(-\beta x_{i, \tau = t}))^{-1}
+g(\hat{y}_{\tau = t}) = \frac{1}{n} \sum_{i = 1}^n (1 + \exp(-\beta x_{i, \tau = t}))^{-1}
 \]
 We'll suppress the $\tau = t$ subscripts from here on.
 
@@ -176,15 +176,15 @@ print(mean_pred_treat)
 
 ## Variance
 
-So far this is pretty straightforward, but we want to know the standard error of these estimates. As explained above, we can approximate their variance: if the gradient $\nabla {\hat{y}_{\tau = t}}$ is defined as $\mathbf{J}$, then
+So far this is pretty straightforward, but we want to know the standard error of these estimates. As explained above, we can approximate their variance: if the gradient $\nabla g(\hat{y})$, the derivative with respect to each $\beta$ parameter, is defined as $J$, then
 
-\[\text{Var}(\hat{y}_{\tau = t}) =  \mathbf{J} \times \mathbf{V} \times \mathbf{J}^\prime\]
+\[\text{Var}(g(\hat{y})) =  J \times V \times J^\prime\]
 
-\ldots and $\nabla {\hat{y}_{\tau = t}}$ is the derivative of $\hat{y}_{\tau = t}$ with respect to each of the $\beta$ parameters. Going back to our function from before, let's start with the coefficient on treatment, $\beta_1$.
+\ldots Going back to our function from before, let's start with the coefficient on treatment, $\beta_1$.
 
 \begin{align*}
-\hat{y} &= \frac{1}{n} \sum_{i = 1}^n (1 + \exp(-X_i\beta))^{-1}\\
-\frac{\partial}{\partial \beta_1} \hat{y} &= \frac{\partial}{\partial \beta_1} \left[\frac{1}{n} \sum_{i = 1}^n (1 + \exp(-X_i\beta ))^{-1}\right]\\
+g(\hat{y}) &= \frac{1}{n} \sum_{i = 1}^n (1 + \exp(-X_i\beta))^{-1}\\
+\frac{\partial}{\partial \beta_1} g(\hat{y}) &= \frac{\partial}{\partial \beta_1} \left[\frac{1}{n} \sum_{i = 1}^n (1 + \exp(-X_i\beta ))^{-1}\right]\\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{\partial}{\partial \beta_1} (1 + \exp(-X_i\beta))^{-1}\\
 &= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \frac{\partial}{\partial \beta_1} (1 + \exp(-X_i\beta))\\
 &= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \exp(-X_i\beta) \cdot \frac{\partial}{\partial \beta_1} (-X_i\beta)
@@ -193,15 +193,15 @@ So far this is pretty straightforward, but we want to know the standard error of
 Coming up for air for a second: what's the last term in that final expression? $X_i\beta = \alpha + \beta_1 \tau_i + \beta_2 \text{age}_i + \beta_3 (\tau_i \times \text{age}_i)$, so the derivative of that with respect to $\beta_1$ is just $\tau_i$. Therefore, 
 
 \begin{align*}
-\frac{\partial}{\partial \beta_1} \hat{y} &= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \exp(-X_i\beta) \cdot \frac{\partial}{\partial \beta_1} (-X_i\beta)\\
+\frac{\partial}{\partial \beta_1} g(\hat{y}) &= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \exp(-X_i\beta) \cdot \frac{\partial}{\partial \beta_1} (-X_i\beta)\\
 &= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \exp(-X_i\beta) \cdot (-\tau_i) \\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot \tau_i
 \end{align*}
-\ldots which is the first term of our Jacobian.^[Note that the first term is sometimes written $\frac{1}{1 + \exp(-X_i\beta)} \cdot \frac{1}{1 + \exp(X_i\beta)}$ since that implies $\frac{\partial}{\partial \beta} \text{logit}^{-1}(X\beta) = \text{logit}^{-1}(X\beta) \cdot \text{logit}^{-1}(-X\beta)$]
+\ldots which is the first term of our Jacobian. Basically the chain rule means that inside the sum, we have the derivative of the inverse link function, multiplied by the derviative of the linear predictor (which is just one of the covariates for the model).^[Note that the first term is sometimes written $\frac{1}{1 + \exp(-X_i\beta)} \cdot \frac{1}{1 + \exp(X_i\beta)}$ since that implies $\frac{\partial}{\partial \beta} \text{logit}^{-1}(X\beta) = \text{logit}^{-1}(X\beta) \cdot \text{logit}^{-1}(-X\beta)$]
 
 What about the other terms? Well, because the $X_i\beta$ term is additively separable, they're pretty much the same but with a different term at the end - for example, the derivative with respect to $\beta_2$ is going to be $\frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta))}{(1 + \exp(-X_i\beta))^2} \cdot \text{age}_i$. So the full gradient is
 \[
-\mathbf{J} = 
+J = 
 \left[
   \begin{array}{l} \\
     \frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot 1\\
@@ -212,10 +212,10 @@ What about the other terms? Well, because the $X_i\beta$ term is additively sepa
 \right]
 \]
 
-In other words, each value is the sum of the predicted effects for each observation, multiplied by the sum of one of the covariates, divided by $n$. This can be written much more succinctly as
+In other words, apply the derivative of the inverse link function to the linear predictors, multiply them by one of the covariates, sum that up, and, divide by $n$. This can be written much more succinctly as
 
 \[
-\mathbf{J} = 
+J = 
 \frac{1}{n}
 \left[
   \begin{array} \\
@@ -228,17 +228,17 @@ In other words, each value is the sum of the predicted effects for each observat
 \times
 \left[
   \begin{array}{cccc}\\
-    1 & \tau_1 & \text{age}_1 & \tau_1 \cdot & \text{age}_1 \\
-    1 & \tau_2 & \text{age}_2 & \tau_2 \cdot & \text{age}_2 \\
+    1 & \tau_1 & \text{age}_1 & \tau_1 \cdot \text{age}_1 \\
+    1 & \tau_2 & \text{age}_2 & \tau_2 \cdot \text{age}_2 \\
     \vdots  & \vdots & \vdots & \vdots\\
     1 & \tau_n & \text{age}_n & \tau_n \cdot \text{age}_n \\
   \end{array}
 \right]
 \]
 
-The second term is the covariate matrix from our model! How convenient! That's going to be true for all general linear models. So we can rewrite this as
-\[\mathbf{J} = \frac{\left[\begin{array}\\ \frac{\exp(-X_1\beta))}{(1 + \exp(-X_1\beta))^2} & \frac{\exp(-X_2\beta))}{(1 + \exp(-X_2\beta))^2} & \cdots & \frac{\exp(-X_n\beta))}{(1 + \exp(-X_n\beta))^2}\end{array}\right] \cdot X}{n}\]
-Recalling that our variance is $\mathbf{J} \cdot \mathbf{V} \cdot \mathbf{J}^\prime$, and that we've already calculated $X_i\beta$ for all $i$, this is relatively simple to do in R:
+The first term applies the derivative of the inverse link function to every linear predictor in the model, and the second term is the covariate matrix from our data! How convenient! That's going to be true for all general linear models. So we can rewrite this as
+\[J = \frac{\left[\begin{array}\\ \frac{\exp(-X_1\beta)}{(1 + \exp(-X_1\beta))^2} & \frac{\exp(-X_2\beta)}{(1 + \exp(-X_2\beta))^2} & \cdots & \frac{\exp(-X_n\beta)}{(1 + \exp(-X_n\beta))^2}\end{array}\right] \cdot X}{n}\]
+Recalling that our variance is $J \cdot V \cdot J^\prime$, and that we've already calculated $X_i\beta$ for all $i$, this is relatively simple to do in R:
 
 ```{r}
 # Control error
