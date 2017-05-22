@@ -88,7 +88,7 @@ of the multivariate delta method.
 
 2. Get the variance-covariance matrix, $V$, from the regression output, or calculate it some other way.^[Usually you'll just want the variance-covariance matrix of the regression, but you'll need to modify the vanilla variance-covariance matrix if you want to cluster standard errors or something.]
 
-3. Sandwich multiply the matrices: $J^{T} \times V \times J$. You’ll end up with a $k \times 1$ matrix for the $k$ predicted levels/effects.
+3. Sandwich multiply the matrices: $J^{T} V J$. You’ll end up with a $k \times 1$ matrix for the $k$ predicted levels/effects.
 
 ## Calculating the Jacobian
 
@@ -133,73 +133,92 @@ summary(lg)
 
 where the `treatment` variable $\tau \in {0, 1}$. What is the average outcome when $\tau = 0$ or $\tau = 1$?
 
-Based on these results alone, we don't really know what the treatment effect is, both because we can't directly interpret the coefficients, because there's an interaction term, and because the effect of each covariate depends on the levels of the other covariates.
+Based on these results alone, we don't really know what the predicted outcome is for different treatment groups, because we can't directly interpret the coefficients, because there's an interaction term, and because the effect of each covariate depends on the levels of the other covariates.
 
 ## Point estimates
 
-To get an estimate of the average levels of the outcome for different values of treatment, we can set treatment to 0 or 1 for the entire dataset, generate predicted outcomes for the dataset, and averaging the results (in other words, what would the outcome have been, if everybody was in the control / treatment group?). We'll use the `predict` and `plogis` functions to do this. Predict will calculate the linear predictors (in this case, setting $\tau = t$: 
+To get an estimate of the average levels of the outcome for different values of treatment, we can set treatment to 0 or 1 for the entire dataset, generate predicted outcomes for the dataset, and average the results (in other words, what would the outcome have been, if everybody was in the control / treatment group?). The linear predictors of our model (in this case, setting $\tau = t$), are given by: 
 \[
 \hat{y}_i = \alpha + \beta_1 \cdot t + \beta_2 \cdot \text{age}_i + \beta_3 \cdot (t \cdot \text{age}_i)
 \]
-`plogis` is the inverse link function $f(z) = \frac{1}{1 + \exp(-z)}$, which transforms the linear predictors to the scale of the outcome variable (predicted probabilities). Finally, we can find the average predicted level.
-
-Combining these, we have:
+\ldots also known as $\hat{y}_i = X_i\beta$. We can then transform the linear predictors to the scale of the outcome variable (predicted probabilities) with the inverse link function: \[f(z) = \frac{1}{1 + \exp(-z)}\] Finally, we can find the average predicted level, by taking the average of these predicted probabilities. Combining these, we have:
 \[
-g(\hat{y}_{\tau = t}) = \frac{1}{n} \sum_{i = 1}^n (1 + \exp(-\beta x_{i, \tau = t}))^{-1}
+g(\hat{y}_i) = \frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta)}
 \]
-We'll suppress the $\tau = t$ subscripts from here on.
-
 Now let's do this math in R: set treatment to 0 or 1, generate linear predictors, transform them to predicted outcomes, and take the mean.
 
 ```{r}
-# Extract data from the model
-new <- lg$model
-# Set treatment to 0 for all observations
-new$treatment <- 0
-# Get linear predictors
-pred_ctl <- predict(lg, newdata = new)
-# Apply the inverse link function and take the mean
-mean_pred_ctl <- mean(plogis(pred_ctl))
+# Extract the n x k matrix of data
+x <- model.matrix(lg)
 
-# Once again, with treatment
-new <- lg$model
-# Set treatment to 1 for all observations
-new$treatment <- 1
-# Get linear predictors
-pred_treat <- predict(lg, newdata = new)
-# Apply the inverse link function and take the mean
-mean_pred_treat <- mean(plogis(pred_treat))
+# Extract the coefficients from the model (a column vector with k entries)
+beta <- matrix(lg$coefficients)
 
-print(mean_pred_ctl)
-print(mean_pred_treat)
+# CONTROL:
+
+# Set treatment and treatment:age to 0 for all observations
+x[, "treatment"] <- 0
+x[, 'treatment:age'] <- x[, 'treatment'] * x[, 'age']
+
+# Get linear predictors
+pred_ctl <- x %*% beta
+
+# Apply the inverse link function to get predicted probabilities
+pp_ctl <- 1 / (1 + exp(-pred_ctl))
+
+# Get the average predicted probability
+mean_pp_ctl <- mean(pp_ctl)
+
+# TREATMENT:
+
+# Set treatment to 1 and treatment:age to age for all observations
+x[, "treatment"] <- 1
+x[, 'treatment:age'] <- x[, 'treatment'] * x[, 'age']
+
+# Get linear predictors
+pred_treat <- x %*% beta
+
+# Apply the inverse link function to get predicted probabilities
+pp_treat <- 1 / (1 + exp(-pred_treat))
+
+# Get the average predicted probability
+mean_pp_treat <- mean(pp_treat)
+
+# RESULTS:
+
+print(mean_pp_ctl)
+print(mean_pp_treat)
 ```
 
 ## Variance
 
-So far this is pretty straightforward, but we want to know the standard error of these estimates. As explained above, we can approximate their variance: if the gradient $\nabla g(\hat{y})$, the derivative with respect to each $\beta$ parameter, is defined as $J$, then
+So far this is pretty straightforward, but we want to know the standard error of these estimates. 
 
-\[\text{Var}(g(\hat{y})) =  J \times V \times J^\prime\]
+You might be tempted to just use the R command, `predict(model, newdata, se.fit = TRUE)`, fix treatment to 0 or 1, and find the average of the resulting standard errors. Don't do that! You'll average the standard errors of the predicted outcome of each observation in your dataset - which is _not_ the same thing as finding the standard error for a specific estimate, which is what we're looking for.
 
-\ldots Going back to our function from before, let's start with the coefficient on treatment, $\beta_1$.
+As explained above, we can approximate their variance: using $J$ to represent the Jacobian (the derivative of our transformation with respect to each $\beta$ parameter), then
+
+\[\text{Var}(g(\hat{y})) =  J V J^T\]
+
+\ldots Going back to our function from before, let's start with the coefficient on treatment, $\beta_1$. First we just apply the quotient rule (and the chain rule in the last step):
 
 \begin{align*}
-g(\hat{y}) &= \frac{1}{n} \sum_{i = 1}^n (1 + \exp(-X_i\beta))^{-1}\\
-\frac{\partial}{\partial \beta_1} g(\hat{y}) &= \frac{\partial}{\partial \beta_1} \left[\frac{1}{n} \sum_{i = 1}^n (1 + \exp(-X_i\beta ))^{-1}\right]\\
-&= \frac{1}{n} \sum_{i = 1}^n \frac{\partial}{\partial \beta_1} (1 + \exp(-X_i\beta))^{-1}\\
-&= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \frac{\partial}{\partial \beta_1} (1 + \exp(-X_i\beta))\\
-&= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \exp(-X_i\beta) \cdot \frac{\partial}{\partial \beta_1} (-X_i\beta)
+g(\hat{y}) &= \frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta)}\\
+\frac{\partial}{\partial \beta_1} g(\hat{y}) &= \frac{\partial}{\partial \beta_1} \left[\frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta )}\right]\\
+&= \frac{1}{n} \sum_{i = 1}^n \frac{\partial}{\partial \beta_1} \left[\frac{1}{1 + \exp(-X_i\beta)}\right]\\
+&= \frac{1}{n} \sum_{i = 1}^n \frac{-\frac{\partial}{\partial \beta_1}[1 + \exp(-X_i\beta)]}{(1 + \exp(-X_i\beta))^2} \\
+&= \frac{1}{n} \sum_{i = 1}^n \frac{-\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot \frac{\partial}{\partial \beta_1} [-X_i\beta]
 \end{align*}
 
-Coming up for air for a second: what's the last term in that final expression? $X_i\beta = \alpha + \beta_1 \tau_i + \beta_2 \text{age}_i + \beta_3 (\tau_i \times \text{age}_i)$, so the derivative of that with respect to $\beta_1$ is just $\tau_i$. Therefore, 
-
+Coming up for air for a second: what's the last term in that final expression? $X_i\beta = \alpha + \beta_1 \tau_i + \beta_2 \text{age}_i + \beta_3 (\tau_i \cdot \text{age}_i)$, so the derivative of that with respect to $\beta_1$ is just $\tau_i$. Therefore, 
 \begin{align*}
-\frac{\partial}{\partial \beta_1} g(\hat{y}) &= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \exp(-X_i\beta) \cdot \frac{\partial}{\partial \beta_1} (-X_i\beta)\\
-&= \frac{1}{n} \sum_{i = 1}^n -(1 + \exp(-X_i\beta))^{-2} \cdot \exp(-X_i\beta) \cdot (-\tau_i) \\
+\frac{\partial}{\partial \beta_1} g(\hat{y}) 
+&= \frac{1}{n} \sum_{i = 1}^n \frac{-\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot (-\tau_i)\\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot \tau_i
 \end{align*}
-\ldots which is the first term of our Jacobian. Basically the chain rule means that inside the sum, we have the derivative of the inverse link function, multiplied by the derviative of the linear predictor (which is just one of the covariates for the model).^[Note that the first term is sometimes written $\frac{1}{1 + \exp(-X_i\beta)} \cdot \frac{1}{1 + \exp(X_i\beta)}$ since that implies $\frac{\partial}{\partial \beta} \text{logit}^{-1}(X\beta) = \text{logit}^{-1}(X\beta) \cdot \text{logit}^{-1}(-X\beta)$]
+\ldots which is the first term of our Jacobian.^[Note that the first part of the expression is sometimes written $\frac{1}{1 + \exp(-X_i\beta)} \cdot \frac{1}{1 + \exp(X_i\beta)}$ since that implies $\frac{\partial}{\partial \beta} \text{logit}^{-1}(X\beta) = \text{logit}^{-1}(X\beta) \cdot \text{logit}^{-1}(-X\beta)$]
 
-What about the other terms? Well, because the $X_i\beta$ term is additively separable, they're pretty much the same but with a different term at the end - for example, the derivative with respect to $\beta_2$ is going to be $\frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta))}{(1 + \exp(-X_i\beta))^2} \cdot \text{age}_i$. So the full gradient is
+What about the other terms? Well, because the $X_i\beta$ term is additively separable, each term is the same, except for having a different term at the end - for example, the derivative with respect to $\beta_2$ is going to be $\frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta))}{(1 + \exp(-X_i\beta))^2} \cdot \text{age}_i$. So the full Jacobian is
 \[
 J = 
 \left[
@@ -212,7 +231,7 @@ J =
 \right]
 \]
 
-In other words, apply the derivative of the inverse link function to the linear predictors, multiply them by one of the covariates, sum that up, and, divide by $n$. This can be written much more succinctly as
+This can be rewritten as
 
 \[
 J = 
@@ -225,7 +244,6 @@ J =
      \frac{\exp(-X_n\beta)}{(1 + \exp(-X_n\beta))^2}
   \end{array}
 \right]
-\times
 \left[
   \begin{array}{cccc}\\
     1 & \tau_1 & \text{age}_1 & \tau_1 \cdot \text{age}_1 \\
@@ -237,26 +255,45 @@ J =
 \]
 
 The first term applies the derivative of the inverse link function to every linear predictor in the model, and the second term is the covariate matrix from our data! How convenient! That's going to be true for all general linear models. So we can rewrite this as
-\[J = \frac{\left[\begin{array}\\ \frac{\exp(-X_1\beta)}{(1 + \exp(-X_1\beta))^2} & \frac{\exp(-X_2\beta)}{(1 + \exp(-X_2\beta))^2} & \cdots & \frac{\exp(-X_n\beta)}{(1 + \exp(-X_n\beta))^2}\end{array}\right] \cdot X}{n}\]
-Recalling that our variance is $J \cdot V \cdot J^\prime$, and that we've already calculated $X_i\beta$ for all $i$, this is relatively simple to do in R:
+\[J = \frac{\left[\begin{array}\\ \frac{\exp(-X_1\beta)}{(1 + \exp(-X_1\beta))^2} & \frac{\exp(-X_2\beta)}{(1 + \exp(-X_2\beta))^2} & \cdots & \frac{\exp(-X_n\beta)}{(1 + \exp(-X_n\beta))^2}\end{array}\right] X}{n}\]
+Recalling that our variance is $J V J^T$, and that we've already calculated $X_i\beta$ for all $i$, this is relatively simple to do in R:
 
 ```{r}
-# Control error
-deriv <- exp(-pred_ctl) / (1 + exp(-pred_ctl))^2
+# Get the data
 x <- model.matrix(lg)
+
+# CONTROL ERROR
+
+# Apply the derivative of the inverse link function to the linear predictors
+deriv <- as.vector(exp(-pred_ctl) / (1 + exp(-pred_ctl))^2)
+
+# Set treatment to 0
 x[, 'treatment'] <- 0
 x[, 'treatment:age'] <- x[, 'treatment'] * x[, 'age']
-grad <- deriv %*% x / nrow(x)
-variance <- grad %*% vcov(lg) %*% t(grad)
+
+# Complete the chain rule by matrix-multiplying the derivatives by the data,
+# now we have the jacobian
+j <- deriv %*% x / nrow(x)
+
+# The variance of our estimate is the cross product of the jacobian and the model's
+# variance-covariance matrix
+variance <- j %*% vcov(lg) %*% t(j)
+
+# The error is the square root of that
 se_ctl <- sqrt(diag(variance))
 
-# Treat error
-deriv <- exp(-pred_treat) / (1 + exp(-pred_treat))^2
+# TREATMENT ERROR: same logic
+
+deriv <- as.vector(exp(-pred_treat) / (1 + exp(-pred_treat))^2)
+
 x <- model.matrix(lg)
+
 x[, 'treatment'] <- 1
 x[, 'treatment:age'] <- x[, 'treatment'] * x[, 'age']
-grad <- deriv %*% x / nrow(x)
-variance <- grad %*% vcov(lg) %*% t(grad)
+
+j <- deriv %*% x / nrow(x)
+
+variance <- j %*% vcov(lg) %*% t(j)
 se_treat <- sqrt(diag(variance))
 
 print(se_ctl)
@@ -270,7 +307,7 @@ OK, we've got our estimates and variance:
 ```{r}
 result <- data.frame(
   Label = c("treatment = 0", "treatment = 1"),
-  Margin = c(mean_pred_ctl, mean_pred_treat),
+  Margin = c(mean_pp_ctl, mean_pp_treat),
   Standard.Error = c(se_ctl, se_treat)
 )
 
@@ -280,7 +317,7 @@ print(result)
 What do we get from modmarg?
 
 ```{r}
-marg <- modmarg::mod_marg2(mod = lg, var_interest = 'treatment')
+marg <- modmarg::marg(mod = lg, var_interest = 'treatment')
 marg[[1]][, c("Label", "Margin", "Standard.Error")]
 ```
 
