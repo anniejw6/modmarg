@@ -15,8 +15,7 @@
 #' \code{at = list('var' = unique(df$var))}.
 #' @param base_rn numeric, if \code{type == 'effects'}, the base level (taken as the
 #' index of one of the ordered unique values in \code{var_interest}). if
-#' \code{type == 'levels'}, this param is ignored.
-#' if type == 'levels', this param is ignored. Defaults to 1.
+#' \code{type == 'levels'}, this param is ignored. Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the
 #' variable of interest at which levels should be calculated.
 #' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
@@ -55,7 +54,7 @@
 #' @examples
 #' data(mtcars)
 #' mtcars$gear <- as.character(mtcars$gear)
-#' mod <- glm(vs ~ gear + mpg * disp, data = mtcars, family = 'binomial')
+#' mod <- glm(vs ~ gear + mpg, data = mtcars, family = 'binomial')
 #' marg(mod, var_interest = 'gear',
 #'           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
 #'
