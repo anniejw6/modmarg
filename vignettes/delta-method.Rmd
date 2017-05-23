@@ -136,6 +136,19 @@ contains coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_i}$ and
 standard deviation $\sigma_{b_i}$), the $i,j$th element of the 
 variance-covariance matrix is $cov(b_i, b_j)$.
 
+In short, 
+
+1. Calculate the jacobian matrix of the inverse link function of $X \beta$, $J$.
+
+2. Get the variance-covariance matrix, $V$, from the regression output, 
+or calculate it some other way.^[Usually you'll just want the 
+variance-covariance matrix of the regression, but you'll need to modify 
+the standard variance-covariance matrix if you want to cluster standard 
+errors or something.]
+
+3. Sandwich multiply the matrices: $J^{T} V J$. You’ll end up with a 
+$k \times 1$ matrix for the $k$ predicted levels/effects.
+
 # Example
 
 Say we're fitting a logistic regression using the `margex` data, and we're 
@@ -384,24 +397,11 @@ marg[[1]][, c("Label", "Margin", "Standard.Error")]
 
 Hooray!
 
-# Step by Step to Calcuating the Variance of Predicted Margins
+# Miscellaneous Notes on Calculating the Jacobian
 
-1. Calculate the jacobian matrix of the inverse link function of $X \beta$, $J$.
+## Predictive Levels 
 
-2. Get the variance-covariance matrix, $V$, from the regression output, 
-or calculate it some other way.^[Usually you'll just want the 
-variance-covariance matrix of the regression, but you'll need to modify 
-the standard variance-covariance matrix if you want to cluster standard 
-errors or something.]
-
-3. Sandwich multiply the matrices: $J^{T} V J$. You’ll end up with a 
-$k \times 1$ matrix for the $k$ predicted levels/effects.
-
-## Miscellaneous Notes on Calculating the Jacobian
-
-### Predictive Levels 
-
-#### Categorical or Continuous Variables
+### Categorical or Continuous Variables
 
 1. Create the covariates at which you would like predicted levels. 
 Call these matrices $A_1, A_2, ..., A_k$. 
@@ -420,18 +420,18 @@ Divide by the number of observations in $A_i$.
 
 1. Row bind your vectors together. This is your jacobian.
 
-### Predictive Effects
+## Predictive Effects
 
 The big change from the section above is that you are now calculating the 
 variance on predicted effects, so you need to take the second derivative of 
 the link function. (Because the first derivative is the effect.)
 
-#### Categorical Variables
+### Categorical Variables
 
 Take the second derivative by subtracting each of the levels from the base 
 level and return that as the jacobian. 
 
-#### Continuous Variables
+### Continuous Variables
 
 Compute the second derivative of the link function and use that in place of 
 the first derivative above. You need to explicitly compute the second derivative
