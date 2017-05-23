@@ -397,7 +397,7 @@ errors or something.]
 3. Sandwich multiply the matrices: $J^{T} V J$. You’ll end up with a 
 $k \times 1$ matrix for the $k$ predicted levels/effects.
 
-## Calculating the Jacobian
+## Miscellaneous Notes on Calculating the Jacobian
 
 ### Predictive Levels 
 
