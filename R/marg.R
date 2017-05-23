@@ -56,7 +56,7 @@
 #' mtcars$gear <- as.character(mtcars$gear)
 #' mod <- glm(vs ~ gear + mpg, data = mtcars, family = 'binomial')
 #' marg(mod, var_interest = 'gear',
-#'           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
+#'           type = 'levels', at = list(mpg = c(15, 21)))
 #'
 #' data(margex)
 #' mod <- glm(outcome ~ as.factor(treatment) + distance,
