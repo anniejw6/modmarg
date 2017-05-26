@@ -24,7 +24,7 @@ improve computational time relative to simulation or bootstrap methods.
 # The Delta Method
 
 The delta method is a general method for deriving the variance of a function 
-of random variables with known variance. In this case, the delta method takes 
+of asymptotically normal random variables with known variance. In this case, the delta method takes 
 advantage of the fact that the margin is (usually) an infinitely differentiable 
 function of the data, $X$, and the vector of $\beta$s to derive a closed-form 
 solution for the standard errors of the margin.^["Usually" because this 
@@ -72,7 +72,7 @@ this may be an actual derivative (the instantaneous rate of change) or the
 subtraction of $P(X \beta)$ calculated at one value of $X$ from another 
 (the first difference). 
 
-Using the Taylor expansion, we can express $P$, an arbitrary function of the
+Using the Taylor expansion, we can approximate $P$, an arbitrary function of the
 random variable $X \beta$ around the point $X_1 \beta$, as^[Note that we treat the 
 input $X$ as fixed and $\beta$ as a random variable.]
 
@@ -104,37 +104,44 @@ P_e(X_1 \beta) &= \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)} +
 
 # How does the Delta Method Work?
 
-The equations above describe how to calculate predicted levels or effects, but 
-we want to calculate errors on that estimate. To do that, broadly speaking, 
-we'll use a bunch of matrix algebra to run the variance/covariance matrix from 
-the original regression through the gradient of the inverse link function. 
+The equations above describe how to apprxoimate predicted levels or effects, but
+why not just calculate our estimate $P(X\beta)$ directly?
 
-Why do we do that? 
-[Wikipedia contains a really nice derivation](https://en.wikipedia.org/wiki/Delta_method#Multivariate_delta_method)
-of the multivariate delta method.
+Well, we can do that for the point estimate, but also want to calculate errors
+on that estimate, and the variance of $P(X\beta)$ isn't known. Fortunately, we
+_can_ calculate the variance of the approximations above. [Wikipedia contains a
+really nice 
+derivation](https://en.wikipedia.org/wiki/Delta_method#Multivariate_delta_method)
+of the multivariate delta method:
 
-Practically speaking, we’ll use the “sandwich” method of deriving the variance of a 
-function of a vector of random variables. In this case, we'll multiply the
+\[\text{Var}[P(X \beta)] = \text{Var}\left[P(X_1 \beta) + \frac{d(P(X_1 \beta))}{d(X\beta)}(X\beta - X_1 \beta)\right]\]
+
+Because $X_1\beta$ is a known point, it has variance of zero, so this simplifies to
+
+\[\text{Var}[P(X \beta)] = \text{Var}\left[\frac{d(P(X_1 \beta))}{d(X\beta)} \cdot X\beta\right]\]
+
+The first term in the variance is the vector of partial derivatives of our
+estimator, also known as our jacobian matrix.^[The Jacobian matrix is just the
+name of the matrix of all first partial derviatives of a vector-valued
+function.] For any predicted level indexed by $i$ in a regression, the $i,j$th
+element of the jacobian will be the derivative of predicted level $i$ with 
+respect to regressor $j$. Those are fixed quantities. We also know
+the variance of $X\beta$, since that's our variance-covariance matrix $V$. As a
+quick reminder about the variance-covariance matrix, if your model contains
+coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_i}$ and standard deviation
+$\sigma_{b_i}$), the $i,j$th element of the variance-covariance matrix is
+$cov(b_i, b_j)$. 
+
+So we want the variance of a random variable multiplied by a fixed matrix, which
+we can find.^[Quick reminder: for scalar $a$ and $r$, where $b$ is the variance
+of random variable $r$, $\text{Var}(a \cdot r)$ is $a^2 \cdot b$. The matrix analog of $a^2 \cdot \text{Var}(b)$
+is $ABA^T$.]
+
+\[\text{Var}[P(X \beta)] = \left(\frac{d(P(X_1 \beta))}{d(X\beta)}\right)^T \ V \left(\frac{d(P(X_1 \beta))}{d(X\beta)}\right)\]
+
+So practically speaking, to get our variance, we'll pre- and post-multiply the
 partial derivatives of the inverse link function by the original 
-variance/covariance matrix from the regression.^[Quick reminder on the 
-sandwich method: for scalar $a$ and $r$, where $b$ is the variance of random 
-variable $r$, $Var(a*r)$ is $a^2*b$. 
-The matrix analog of $a^2*Var(b)$ is $ABA^T$.]
-
-Keeping in mind that the margin is given by $\text{link}^{-1}(X \beta)$, 
-all of the first partial derivatives of the margin are given by the the 
-jacobian matrix.^[Since the jacobian matrix is just the name of the matrix 
-of all first partial derviatives of a vector-valued function.] For any 
-predicted level indexed by $i$ in a regression, the $i,j$th element of the 
-jacobian will be the derivative of predicted level $i$ with 
-respect to regressor $j$. 
-
-We'll multiply that jacobian by the variance-covariance matrix of the 
-regression, which captures the variance structure of the coefficients. 
-As a quick reminder about the variance-covariance matrix, if your model 
-contains coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_i}$ and 
-standard deviation $\sigma_{b_i}$), the $i,j$th element of the 
-variance-covariance matrix is $cov(b_i, b_j)$.
+variance/covariance matrix from the regression.
 
 In short, 
 
@@ -186,7 +193,7 @@ the inverse link function: \[f(z) = \frac{1}{1 + \exp(-z)}\] Finally, we can
 find the average predicted level, by taking the average of these predicted 
 probabilities. Combining these, we have:
 \[
-g(\hat{y}_i) = \frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta)}
+P(X\beta) = \frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta)}
 \]
 Now let's do this in R: set treatment to 0 or 1, generate linear 
 predictors, transform them to predicted outcomes, and take the mean.
@@ -250,15 +257,15 @@ As explained above, we can approximate the variance of the predicted margins:
 using $J$ to represent the jacobian (the derivative of our transformation 
 with respect to each $\beta$ parameter), then
 
-\[\text{Var}(g(\hat{y})) =  J V J^T\]
+\[\text{Var}(P(X\beta)) =  J V J^T\]
 
 \ldots Going back to our function from before, let's start with the 
 coefficient on treatment, $\beta_1$. First we just apply the quotient rule 
 (and the chain rule in the last step):
 
 \begin{align*}
-g(\hat{y}) &= \frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta)}\\
-\frac{\partial}{\partial \beta_1} g(\hat{y}) &= \frac{\partial}{\partial \beta_1} \left[\frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta )}\right]\\
+P(X\beta) &= \frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta)}\\
+\frac{\partial}{\partial \beta_1} P(X\beta) &= \frac{\partial}{\partial \beta_1} \left[\frac{1}{n} \sum_{i = 1}^n \frac{1}{1 + \exp(-X_i\beta )}\right]\\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{\partial}{\partial \beta_1} \left[\frac{1}{1 + \exp(-X_i\beta)}\right]\\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{-\frac{\partial}{\partial \beta_1}[1 + \exp(-X_i\beta)]}{(1 + \exp(-X_i\beta))^2} \\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{-\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot \frac{\partial}{\partial \beta_1} [-X_i\beta]
@@ -271,7 +278,7 @@ $X_i\beta = \alpha + \beta_1 \tau_i + \beta_2 \text{age}_i + \beta_3 (\tau_i \cd
 so the derivative of that with respect to $\beta_1$ is just $\tau_i$. Therefore, 
 
 \begin{align*}
-\frac{\partial}{\partial \beta_1} g(\hat{y}) 
+\frac{\partial}{\partial \beta_1} g(P(X\beta)) 
 &= \frac{1}{n} \sum_{i = 1}^n \frac{-\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot (-\tau_i)\\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot \tau_i
 \end{align*}
