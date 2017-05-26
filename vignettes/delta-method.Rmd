@@ -23,14 +23,14 @@ improve computational time relative to simulation or bootstrap methods.
 
 # The Delta Method
 
-The delta method is a general method for deriving the variance of a function 
-of asymptotically normal random variables with known variance. In this case, the delta method takes 
-advantage of the fact that the margin is (usually) an infinitely differentiable 
-function of the data, $X$, and the vector of $\beta$s to derive a closed-form 
-solution for the standard errors of the margin.^["Usually" because this 
-statement requires that the canonical link function for the regression has a 
-closed-form derivative. Luckily, this is true for most common forms of 
-linear regression.] 
+The delta method is a general method for deriving the variance of a function of
+asymptotically normal random variables with known variance. In this case, the
+delta method takes advantage of the fact that the margin is (usually) an
+infinitely differentiable function of the data, $X$, and the vector of $\beta$s
+to derive a closed-form solution for the standard errors of the
+margin.^["Usually" because this statement requires that the canonical link
+function for the regression has a closed-form derivative. Luckily, this is true
+for most common forms of linear regression.]
 
 In particular, the delta method uses a 
 [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of the 
@@ -126,22 +126,22 @@ name of the matrix of all first partial derviatives of a vector-valued
 function.] For any predicted level indexed by $i$ in a regression, the $i,j$th
 element of the jacobian will be the derivative of predicted level $i$ with 
 respect to regressor $j$. Those are fixed quantities. We also know
-the variance of $X\beta$, since that's our variance-covariance matrix $V$. As a
+the variance of $X\beta$, since that's our variance-covariance matrix $V$.^[As a
 quick reminder about the variance-covariance matrix, if your model contains
 coefficients $b_0$ to $b_n$ (each with mean $\mu_{b_i}$ and standard deviation
 $\sigma_{b_i}$), the $i,j$th element of the variance-covariance matrix is
-$cov(b_i, b_j)$. 
+$cov(b_i, b_j)$.] 
 
 So we want the variance of a random variable multiplied by a fixed matrix, which
-we can find.^[Quick reminder: for scalar $a$ and $r$, where $b$ is the variance
-of random variable $r$, $\text{Var}(a \cdot r)$ is $a^2 \cdot b$. The matrix analog of $a^2 \cdot \text{Var}(b)$
-is $ABA^T$.]
+we can find.^[Quick reminder: for scalar $a$ and $r$, where $b$ is the variance 
+of random variable $r$, $\text{Var}(a \cdot r)$ is $a^2 \cdot b$. The matrix
+analog of $a^2 \cdot \text{Var}(b)$ is $ABA^T$.]
 
 \[\text{Var}[P(X \beta)] = \left(\frac{d(P(X_1 \beta))}{d(X\beta)}\right)^T \ V \left(\frac{d(P(X_1 \beta))}{d(X\beta)}\right)\]
 
-So practically speaking, to get our variance, we'll pre- and post-multiply the
+So practically speaking, to get our variance, we'll pre- and post-multiply the 
 partial derivatives of the inverse link function by the original 
-variance/covariance matrix from the regression.
+variance-covariance matrix from the regression.
 
 In short, 
 
