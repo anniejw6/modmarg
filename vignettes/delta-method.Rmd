@@ -278,7 +278,7 @@ $X_i\beta = \alpha + \beta_1 \tau_i + \beta_2 \text{age}_i + \beta_3 (\tau_i \cd
 so the derivative of that with respect to $\beta_1$ is just $\tau_i$. Therefore, 
 
 \begin{align*}
-\frac{\partial}{\partial \beta_1} g(P(X\beta)) 
+\frac{\partial}{\partial \beta_1} P(X\beta) 
 &= \frac{1}{n} \sum_{i = 1}^n \frac{-\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot (-\tau_i)\\
 &= \frac{1}{n} \sum_{i = 1}^n \frac{\exp(-X_i\beta)}{(1 + \exp(-X_i\beta))^2} \cdot \tau_i
 \end{align*}
