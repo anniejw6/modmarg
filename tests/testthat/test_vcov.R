@@ -12,7 +12,7 @@ test_that("clustered standard errors are correct", {
   v <- cvcov$ols$clust
   d <- cvcov$ols$stata_dof
 
-  z <- mod_marg2(mod, var_interest = 'treatment',
+  z <- marg(mod, var_interest = 'treatment',
                  type = 'levels', vcov_mat = v, dof = d)[[1]]
 
   # stata
@@ -42,7 +42,7 @@ test_that("clustered standard errors are correct", {
   expect_equal(z$`Upper CI (95%)`, c(.2872028, .4598851),
                tolerance = 0.0001)
 
-  expect_warning(mod_marg2(mod, var_interest = 'treatment',
+  expect_warning(marg(mod, var_interest = 'treatment',
                            type = 'levels', vcov_mat = v))
 
   # Binary model
@@ -52,7 +52,7 @@ test_that("clustered standard errors are correct", {
   data(cvcov)
   v <- cvcov$logit$clust
   d <- cvcov$logit$stata_dof
-  z <- mod_marg2(mod, var_interest = 'treatment',
+  z <- marg(mod, var_interest = 'treatment',
                  type = 'levels', vcov_mat = v)[[1]]
 
   # stata
@@ -98,7 +98,7 @@ test_that("clustered standard errors work with interaction terms", {
 
   mod <- glm(mpg ~ cyl * poly(disp, degree = 2, raw = TRUE) + hp,
              data = mtcars)
-  z <- mod_marg2(
+  z <- marg(
     mod = mod, var_interest = 'cyl', type = 'levels',
     at = list('disp' = 400),
     vcov_mat = v, dof = d)[[1]]

@@ -51,6 +51,7 @@ pred_se <- function(df_trans, var_interest, at_var_interest,
 
   if(type == 'effects') {
     if(is.numeric(df_trans[[var_interest]]) &
+       ! all(unique(df_trans[[var_interest]]) %in% c(0, 1)) &
        ! sprintf("as.character(%s)", var_interest) %in% names(model$model) &
        ! sprintf("as.factor(%s)", var_interest) %in% names(model$model)){
       stop('We do not support effects for continuous variables at this time.')
