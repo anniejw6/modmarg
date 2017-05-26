@@ -98,7 +98,7 @@ For the predicted effects of continuous variables, the marginal effect is a deri
 
 \[\begin{aligned}
 P_e(X_1 \beta) &= \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)} + 
-\frac{d^2(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}(\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)} - \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)})
+\frac{d^2(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}\left(\frac{d(\text{link}^{-1}(X \beta))}{d(X \beta)} - \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)}\right)
 \end{aligned}
 \]
 
