@@ -4,10 +4,13 @@
 
 Calculate predicted levels and marginal effects from 'glm' objects, 
 using the delta method to calculate standard errors. This is an R-based 
-version of Stata's 'margins' command. It differs from existing packages such
-as [margins](https://github.com/leeper/margins) by using the closed-form 
+version of Stata's 'margins' command. 
+
+It differs from existing packages such as 
+[margins](https://github.com/leeper/margins) by using the closed-form 
 derviatives stored in `glm` objects, rather than calculating the derivative
-numerically.
+numerically. As a result, it is substantially faster than existing 
+packages.
 
 # Usage
 
