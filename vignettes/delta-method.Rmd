@@ -145,7 +145,8 @@ variance-covariance matrix from the regression.
 
 In short, 
 
-1. Calculate the jacobian matrix of the inverse link function of $X \beta$, $J$.
+1. Calculate the jacobian matrix of the inverse link function 
+of $X \beta$, $J$.[^1]
 
 2. Get the variance-covariance matrix, $V$, from the regression output, 
 or calculate it some other way.^[Usually you'll just want the 
@@ -404,43 +405,14 @@ marg[[1]][, c("Label", "Margin", "Standard.Error")]
 
 Hooray!
 
-# Miscellaneous Notes on Calculating the Jacobian
-
-## Predictive Levels 
-
-### Categorical or Continuous Variables
-
-1. Create the covariates at which you would like predicted levels. 
-Call these matrices $A_1, A_2, ..., A_k$. 
-
-1. Calculate predicted levels for each of these matrices, call each of the 
-resulting 1 x n column vectors $q_1, q_2, ..., q_k$.
-
-1. Calculate the derivative of the link function with respect to $X \beta$ 
-(e.g, for a simple logit with predicted level $p$, $p \cdot (1-p)$). 
-
-1. Run each vector of predicted levels through the scalar-valued link 
-function to end up with another 1 x n column vector. Call this $q^*_i$
-
-1. Take the cross product of each $q^*_i$ and $A_i$ to get a row vector. 
-Divide by the number of observations in $A_i$.
-
-1. Row bind your vectors together. This is your jacobian.
-
-## Predictive Effects
-
-The big change from the section above is that you are now calculating the 
-variance on predicted effects, so you need to take the second derivative of 
-the link function. (Because the first derivative is the effect.)
-
-### Categorical Variables
-
-Take the second derivative by subtracting each of the levels from the base 
-level and return that as the jacobian. 
-
-### Continuous Variables
-
-Compute the second derivative of the link function and use that in place of 
-the first derivative above. You need to explicitly compute the second derivative
-because you want an instantaneous rate of change as opposed to the rate of 
-change over a range as with categorical variables above.
+[^1]: Some practical notes on calculating the jacobian: the example at the bottom
+of the vignette captures how to calculate the jacobian for predicted levels pretty
+thoroughly. For predictive effects, the big change is that you are now calculating 
+the variance on predicted effects, so you need to take the second derivative of 
+the link function (instead of the first derivative). For categorical
+variables, you can take the second derivative by subtracting each of the levels 
+from the base level and returning that as the jacobian. For continuous variables, 
+you need to actually compute the second derivative of the link function and use 
+that in place of the first derivative above. You need to explicitly compute the 
+second derivative because you want an instantaneous rate of change as opposed to 
+the rate of change over a range as with categorical variables above.
