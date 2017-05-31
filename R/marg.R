@@ -24,6 +24,7 @@
 #' OLS model. Defaults to NULL in which case \code{mod$df.residual} is used.
 #' @param data data.frame that margins should run over, defaults to
 #' \code{mod$data}
+#' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
 #' @return list of dataframes with predicted margins/effects, se, p-values,
 #' and confidence interval bounds
 #'
@@ -88,7 +89,8 @@ marg <- function(mod, var_interest,
                       dof = NULL,
                       at = NULL, base_rn = 1,
                       at_var_interest = NULL,
-                      data = mod$data){
+                      data = mod$data,
+                 cofint = 0.95){
 
   stopifnot('glm' %in% class(mod))
 
@@ -102,7 +104,9 @@ marg <- function(mod, var_interest,
 
   stopifnot(
     var_interest %in% names(data),
-    all(names(at) %in% names(data))
+    all(names(at) %in% names(data)),
+    is.numeric(cofint),
+    cofint < 1, cofint > 0
   )
 
   if(is.null(dof) & !is.null(vcov_mat) & mod$family$family == 'gaussian')
@@ -156,7 +160,8 @@ marg <- function(mod, var_interest,
       pred_margins = x$pred_margins,
       se = x$se,
       family = mod$family$family,
-      dof = dof
+      dof = dof,
+      cofint = c( (1 - cofint)/2, 1 - (1 - cofint)/2 )
     )})
 
 }
