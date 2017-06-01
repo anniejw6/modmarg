@@ -1,6 +1,5 @@
 ---
-title: "Package Usage"
-author: "Alex Gold"
+title: "Modmarg Usage"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -10,9 +9,10 @@ vignette: >
 ---
 
 # Why Margins?
+
 For many types of regression techniques, the coefficients in the
 model may not be sufficient to adequately figure out the marginal relationship
-between a covaraiate and the outcome of a regression (or the error in your 
+between a covariate and the outcome of a regression (or the error in your 
 estimate). In the simplest case, say you run the following formula in glm: 
 `wages ~ age + age^2`. 
 
@@ -35,6 +35,7 @@ in a separate [vignette](delta-method.html).
 In this vignette, we detail a few possible use cases of the `modmarg` package.^[Modmarg is short for *model margins*.]
 
 # Use Case 1: Treatment Effects and Subgroup Effects
+
 We want to ascertain the marginal effect of `treatment` on `y` while controlling
 for age. In this first example we'll use a binned age variable.
 
@@ -73,12 +74,12 @@ which doesn't work so well.
 g <- glm(y ~ poly(age, 3, raw = T) * as.factor(treatment) , data = margex)
 summary(g)
 
-m <- modmarg::marg(mod = g, var_interest = "treatment", type = "effects",
-                        at = list("age" = c(20, 40, 60)))
-print(m)
+modmarg::marg(mod = g, var_interest = "treatment", type = "effects",
+              at = list("age" = c(20, 40, 60)))
 ```
 
 # Use Case 2: Logistic Regression
+
 Let's say we want to figure out how much `treatment` increased the likelihood of
 a binary `outcome`.
 
@@ -100,6 +101,7 @@ from treatment and the effect is highly statistically significant. Much more
 interpretable.
 
 # Use Case 3: Getting Margins At Specific Values of Variable of Interest
+
 Let's say we want to know the marginal predicted level at only a couple of 
 age groups while controlling for distance. `marg` makes that simple.
 
@@ -116,6 +118,7 @@ marg(mod = g, var_interest = "agegroup", type = 'levels',
 ```
 
 # Use Case 4: Getting Margins with Different Variance-Covariance Matrices
+
 Normally we assume that the amount of variation in our outcome of interest 
 (conditional on covariates) is constant across our sample. Sometimes, this assumption 
 is violated, and we will use a different variance-covariance matrix to represent this 

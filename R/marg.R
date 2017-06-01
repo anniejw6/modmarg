@@ -15,8 +15,7 @@
 #' \code{at = list('var' = unique(df$var))}.
 #' @param base_rn numeric, if \code{type == 'effects'}, the base level (taken as the
 #' index of one of the ordered unique values in \code{var_interest}). if
-#' \code{type == 'levels'}, this param is ignored.
-#' if type == 'levels', this param is ignored. Defaults to 1.
+#' \code{type == 'levels'}, this param is ignored. Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the
 #' variable of interest at which levels should be calculated.
 #' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
@@ -54,35 +53,44 @@
 #' @importFrom stats complete.cases terms vcov
 #' @export
 #' @examples
+#'
 #' data(mtcars)
-#' mtcars$gear <- as.character(mtcars$gear)
-#' mod <- glm(vs ~ gear + mpg * disp, data = mtcars, family = 'binomial')
-#' marg(mod, var_interest = 'gear',
-#'           type = 'levels', at = list(mpg = c(15, 21), disp = c(140, 180)))
+#' mod <- glm(vs ~ as.factor(gear) + mpg, data = mtcars, family = 'binomial')
+#'
+#' # Get the level of the outcome variable at different values of `gear`
+#' marg(mod, var_interest = 'gear', type = 'levels')
+#'
+#' # Get the effect of `gear` on the outcome value, holding values of `mpg`
+#' # constant
+#' marg(mod, var_interest = 'gear', type = 'effects',
+#'      at = list(mpg = c(15, 21)))
+#'
 #'
 #' data(margex)
 #' mod <- glm(outcome ~ as.factor(treatment) + distance,
 #'        data = margex, family = 'binomial')
+#' # Get the level of the outcome variable at different values of `treatment`
 #' marg(mod, var_interest = 'treatment', type = 'levels', at = NULL)
+#' # Get the effect of `treatment` on the outcome variable
 #' marg(mod, var_interest = 'treatment', type = 'effects', at = NULL)
+#' # Get the level of the outcome variable at different values of `distance`
 #' marg(mod, var_interest = 'distance', type = 'levels',
 #'           at = NULL, at_var_interest = c(10, 20, 30))
 #'
-#' mod <- glm(outcome ~ distance + factor(sex),
-#'            data = margex, family = 'binomial')
-#' marg(mod, var_interest = 'sex', type = 'levels', at = NULL)
-#'
 #' # Using a custom variance-covariance matrix for clustered standard errors
-#' # (also requires custom degrees of freedom for T statistic with OLS model)
+#' # (also requires custom degrees of freedom for T statistic with OLS model),
+#' # clustering on the "arm" variable
+#'
 #' data(margex)
 #' data(cvcov)
+#' ?cvcov
 #' v <- cvcov$ols$clust
 #' d <- cvcov$ols$stata_dof
 #' mod <- glm(outcome ~ treatment + distance,
 #'            data = margex, family = 'binomial')
 #' marg(mod, var_interest = 'treatment', type = 'levels',
 #'           vcov_mat = v, dof = d)
-
+#'
 marg <- function(mod, var_interest,
                       type = 'levels',
                       vcov_mat = NULL,
