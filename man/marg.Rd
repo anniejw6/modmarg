@@ -70,6 +70,10 @@ clustering standard errors), the degrees of freedom for the T test / p-value
 calculation may need to be specified using dof. To replicate Stata clustering
 \code{vce(cluster var_name)}, dof should be set to \eqn{g - 1}, where g is
 the number of unique levels of the clustering variable.
+
+This function currently only supports \code{glm} objects. If you would like to
+use \code{lm} objects, consider running a \code{glm} with family
+\code{gaussian}.
 }
 \examples{
 

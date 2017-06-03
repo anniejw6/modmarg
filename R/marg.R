@@ -50,6 +50,10 @@
 #' \code{vce(cluster var_name)}, dof should be set to \eqn{g - 1}, where g is
 #' the number of unique levels of the clustering variable.
 #'
+#' This function currently only supports \code{glm} objects. If you would like to
+#' use \code{lm} objects, consider running a \code{glm} with family
+#' \code{gaussian}.
+#'
 #' @importFrom stats complete.cases terms vcov
 #' @export
 #' @examples
