@@ -1,11 +1,12 @@
 #' Estimating predictive margins on a model
 #'
+#' This function estimates the predictive effects and levels for variables within
+#' a model using the delta method.
 #'
-#'
-#' @param mod model object, currently only support those of class glm
+#' @param mod model object, currently only support those of class \code{\link[stats]{glm}}
 #' @param var_interest name of the variable of interest, must correspond to a
 #' covariate in the model
-#' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} (dydx),
+#' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
 #' defaults to \code{'levels'}
 #' @param vcov_mat the variance-covariance matrix, defaults to \code{NULL} in which
 #' case \code{vcov(model)} is used.
@@ -15,7 +16,7 @@
 #' \code{at = list('var' = unique(df$var))}.
 #' @param base_rn numeric, if \code{type == 'effects'}, the base level (taken as the
 #' index of one of the ordered unique values in \code{var_interest}). if
-#' \code{type == 'levels'}, this param is ignored. Defaults to 1.
+#' \code{type == 'levels'}, this parameter is ignored. Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the
 #' variable of interest at which levels should be calculated.
 #' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
@@ -24,7 +25,7 @@
 #' @param data data.frame that margins should run over, defaults to
 #' \code{mod$data}
 #' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
-#' @return list of dataframes with predicted margins/effects, se, p-values,
+#' @return list of dataframes with predicted margins/effects, standard errors, p-values,
 #' and confidence interval bounds
 #'
 #' @details
@@ -46,11 +47,11 @@
 #' P values are calculated with T tests for gaussian families, and Z tests
 #' otherwise. If a new variance-covariance matrix is provided (e.g. for
 #' clustering standard errors), the degrees of freedom for the T test / p-value
-#' calculation may need to be specified using dof. To replicate Stata clustering
-#' \code{vce(cluster var_name)}, dof should be set to \eqn{g - 1}, where g is
+#' calculation may need to be specified using \code{dof}. To replicate Stata clustering
+#' \code{vce(cluster var_name)}, \code{dof} should be set to \eqn{g - 1}, where g is
 #' the number of unique levels of the clustering variable.
 #'
-#' This function currently only supports \code{glm} objects. If you would like to
+#' This function currently only supports \code{\link[stats]{glm}} objects. If you would like to
 #' use \code{lm} objects, consider running a \code{glm} with family
 #' \code{gaussian}.
 #'
