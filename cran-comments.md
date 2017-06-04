@@ -14,5 +14,11 @@ There was 1 NOTE:
 
 * Maintainer: 'Annie Wang <anniejw6@gmail.com>'
   New submission
+  
+  Possibly mis-spelled words in DESCRIPTION:
+  Stata (11:43)
 
-  This is my first submission to CRAN.
+This is my first submission to CRAN.
+'Stata' is not mis-spelled. See 'http://www.stata.com/'.
+  
+  
