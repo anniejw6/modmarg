@@ -40,7 +40,10 @@ If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NU
 \code{mod$data}}
 
 \item{weights}{numeric, vector of weights used to generate predicted levels,
-defaults to \code{mod$prior.weights}.}
+defaults to \code{mod$prior.weights}. Must be equal to the number of rows
+in \code{data}, which means that if there are missing values, in \code{data},
+then the default will not work because \code{prior.weights} are the weights
+after subsetting.}
 
 \item{cofint}{numeric, confidence interval (must be less than 1), defaults to 0.95}
 }
@@ -121,6 +124,14 @@ mod <- glm(outcome ~ treatment + distance,
            data = margex, family = 'binomial')
 marg(mod, var_interest = 'treatment', type = 'levels',
           vcov_mat = v, dof = d)
+
+Using weights
+
+data(margex)
+mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
+          weights = distance)
+z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
+z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
 
 }
 
