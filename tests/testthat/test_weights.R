@@ -59,8 +59,10 @@ test_that("Using weights on a subset of data works", {
             family = 'gaussian', weights = distance)
 
   # Actual check
-  z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
-  z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
+  z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels',
+             weights = margex$distance)[[1]]
+  z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects',
+             weights = margex$distance)[[1]]
 
   # . reg y i.treatment age [pweight = distance]
   # (sum of wgt is   1.7571e+05)
