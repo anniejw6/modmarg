@@ -106,7 +106,7 @@
 #' marg(mod, var_interest = 'treatment', type = 'levels',
 #'           vcov_mat = v, dof = d)
 #'
-#' Using weights
+#' # Using weights
 #'
 #' data(margex)
 #' mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
