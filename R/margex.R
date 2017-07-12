@@ -1,6 +1,6 @@
 #' Artificial data for margins
 #'
-#' A fictious dataset outcome, treatment, and demographic variables for 3000
+#' A fictitious dataset outcome, treatment, and demographic variables for 3000
 #' observations.
 #'
 #' @format A data frame with 3000 rows and 11 variables:
