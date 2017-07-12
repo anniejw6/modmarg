@@ -27,6 +27,7 @@
 #' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
 #' @param weights numeric, vector of weights used to generate predicted levels,
 #' defaults to \code{mod$prior.weights}.
+#'
 #' @return list of dataframes with predicted margins/effects, standard errors, p-values,
 #' and confidence interval bounds
 #'

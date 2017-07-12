@@ -50,13 +50,15 @@ test_that("jacobian works correctly", {
     c(0, 0, 0.090535558, 1.316670875, 24.040145060, 0.004931502)[c(6, 1:5)],
     tolerance = .0001)
 
-  expect_equal(calc_jacob(p4, as.matrix(covar4), ld_fun),
-               c(0.02704185, 0, 0.56997483, 4.31214, 90.5598, 0.02704185)[c(6, 1:5)],
-               tolerance = .0001)
+  expect_equal(
+    calc_jacob(p4, as.matrix(covar4), ld_fun),
+    c(0.02704185, 0, 0.56997483, 4.31214, 90.5598, 0.02704185)[c(6, 1:5)],
+    tolerance = .0001)
 
-  expect_equal(calc_jacob(p5, as.matrix(covar5), ld_fun),
-               c(0, 0.00469992, 0.12826647, 0.52297052, 13.961691, 0.00469992)[c(6, 1:5)],
-               tolerance = .0001)
+  expect_equal(
+    calc_jacob(p5, as.matrix(covar5), ld_fun),
+    c(0, 0.00469992, 0.12826647, 0.52297052, 13.961691, 0.00469992)[c(6, 1:5)],
+    tolerance = .0001)
 
 })
 

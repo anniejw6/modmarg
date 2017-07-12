@@ -1,6 +1,6 @@
 Package: modmarg
 Title: Calculating Marginal Effects and Levels with Errors
-Version: 0.5.0
+Version: 0.6.0
 Authors@R: c(
 	person("Alex", "Gold", email = "alex.k.gold@gmail.com", role = "aut"),
 	person("Nat", "Olin", email = "nathaniel.olin@gmail.com", role = c("ctb")),
@@ -8,7 +8,7 @@ Authors@R: c(
 	)
 Description: Calculate predicted levels and marginal effects from 'glm' objects,
     using the delta method to calculate standard errors. This is an R-based
-    version of Stata's 'margins' command.
+    version of the 'margins' command from Stata.
 URL: https://github.com/anniejw6/modmarg
 BugReports: https://github.com/anniejw6/modmarg/issues
 Depends:

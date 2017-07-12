@@ -8,7 +8,7 @@ version of Stata's 'margins' command.
 
 It differs from existing packages such as 
 [margins](https://github.com/leeper/margins) by using the closed-form 
-derviatives stored in `glm` objects, rather than calculating the derivative
+derivatives stored in `glm` objects, rather than calculating the derivative
 numerically. As a result, it is substantially faster than existing 
 packages.
 
