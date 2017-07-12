@@ -1,11 +1,12 @@
 #' Estimating predictive margins on a model
 #'
+#' This function estimates the predictive effects and levels for variables within
+#' a model using the delta method.
 #'
-#'
-#' @param mod model object, currently only support those of class glm
+#' @param mod model object, currently only support those of class \code{\link[stats]{glm}}
 #' @param var_interest name of the variable of interest, must correspond to a
 #' covariate in the model
-#' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} (dydx),
+#' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
 #' defaults to \code{'levels'}
 #' @param vcov_mat the variance-covariance matrix, defaults to \code{NULL} in which
 #' case \code{vcov(model)} is used.
@@ -15,7 +16,7 @@
 #' \code{at = list('var' = unique(df$var))}.
 #' @param base_rn numeric, if \code{type == 'effects'}, the base level (taken as the
 #' index of one of the ordered unique values in \code{var_interest}). if
-#' \code{type == 'levels'}, this param is ignored. Defaults to 1.
+#' \code{type == 'levels'}, this parameter is ignored. Defaults to 1.
 #' @param at_var_interest vector, if type == 'levels', the values for the
 #' variable of interest at which levels should be calculated.
 #' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
@@ -24,7 +25,9 @@
 #' @param data data.frame that margins should run over, defaults to
 #' \code{mod$data}
 #' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
-#' @return list of dataframes with predicted margins/effects, se, p-values,
+#' @param weights numeric, vector of weights used to generate predicted levels,
+#' defaults to \code{mod$prior.weights}.
+#' @return list of dataframes with predicted margins/effects, standard errors, p-values,
 #' and confidence interval bounds
 #'
 #' @details
@@ -46,9 +49,17 @@
 #' P values are calculated with T tests for gaussian families, and Z tests
 #' otherwise. If a new variance-covariance matrix is provided (e.g. for
 #' clustering standard errors), the degrees of freedom for the T test / p-value
-#' calculation may need to be specified using dof. To replicate Stata clustering
-#' \code{vce(cluster var_name)}, dof should be set to \eqn{g - 1}, where g is
+#' calculation may need to be specified using \code{dof}. To replicate Stata clustering
+#' \code{vce(cluster var_name)}, \code{dof} should be set to \eqn{g - 1}, where g is
 #' the number of unique levels of the clustering variable.
+#'
+#' This function currently only supports \code{\link[stats]{glm}} objects.
+#' If you would like to use \code{lm} objects, consider running a \code{glm}
+#' with family \code{gaussian}.
+#'
+#' When calculating predicted levels and effects for models built using weights,
+#' \code{marg} returns weighted averages for levels and effects by default.
+#' Users can remove this option by setting \code{weights = NULL}.
 #'
 #' @importFrom stats complete.cases terms vcov
 #' @export
@@ -92,19 +103,37 @@
 #'           vcov_mat = v, dof = d)
 #'
 marg <- function(mod, var_interest,
-                      type = 'levels',
-                      vcov_mat = NULL,
-                      dof = NULL,
-                      at = NULL, base_rn = 1,
-                      at_var_interest = NULL,
-                      data = mod$data,
+                 type = 'levels',
+                 vcov_mat = NULL,
+                 dof = NULL,
+                 at = NULL, base_rn = 1,
+                 at_var_interest = NULL,
+                 data = mod$data,
+                 weights = mod$prior.weights,
                  cofint = 0.95){
 
   stopifnot('glm' %in% class(mod))
 
-  data <- data[, names(data) %in% all.vars(mod$formula)]
-  data <- data[complete.cases(data), ]
+  # Remove weights if no weights
+  if(all(weights == 1)) weights <- NULL
 
+  # Check if no weights when model was built was weights
+  if(is.null(weights) & !all(mod$prior.weights == 1))
+    warning(paste('The model was built with weights, but you have not',
+                  'provided weights. Your calculated margins may be odd.',
+                  'See Details.'))
+
+  # Weights should be same length as data
+  if(!is.null(weights) & length(weights) != nrow(data))
+    stop('`weights` and `data` must be the same length.')
+
+  # Subset to completes
+  data <- data[, names(data) %in% all.vars(mod$formula)]
+  complete_cases <- complete.cases(data)
+  data <- data[complete_cases, ]
+  weights <- weights[complete_cases]
+
+  # Check for polynomials
   if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=
      sum(grepl("raw = T", names(mod$model))))
     warning(paste("If you're using 'poly()' for higher-order terms,",
@@ -159,7 +188,7 @@ marg <- function(mod, var_interest,
     pred_se(df_trans = x, var_interest = var_interest,
             model = mod, type = type, base_rn = base_rn,
             at_var_interest = at_var_interest,
-            vcov_mat = vcov_mat)
+            vcov_mat = vcov_mat, weights = weights)
   })
 
   lapply(res, function(x) {

@@ -6,15 +6,15 @@
 \usage{
 marg(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
   at = NULL, base_rn = 1, at_var_interest = NULL, data = mod$data,
-  cofint = 0.95)
+  weights = mod$prior.weights, cofint = 0.95)
 }
 \arguments{
-\item{mod}{model object, currently only support those of class glm}
+\item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}}
 
 \item{var_interest}{name of the variable of interest, must correspond to a
 covariate in the model}
 
-\item{type}{either \code{'levels'} (predicted outcomes) or \code{'effects'} (dydx),
+\item{type}{either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
 defaults to \code{'levels'}}
 
 \item{vcov_mat}{the variance-covariance matrix, defaults to \code{NULL} in which
@@ -30,7 +30,7 @@ particular variables. If all values are needed, suggested syntax is
 
 \item{base_rn}{numeric, if \code{type == 'effects'}, the base level (taken as the
 index of one of the ordered unique values in \code{var_interest}). if
-\code{type == 'levels'}, this param is ignored. Defaults to 1.}
+\code{type == 'levels'}, this parameter is ignored. Defaults to 1.}
 
 \item{at_var_interest}{vector, if type == 'levels', the values for the
 variable of interest at which levels should be calculated.
@@ -39,14 +39,18 @@ If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NU
 \item{data}{data.frame that margins should run over, defaults to
 \code{mod$data}}
 
+\item{weights}{numeric, vector of weights used to generate predicted levels,
+defaults to \code{mod$prior.weights}.}
+
 \item{cofint}{numeric, confidence interval (must be less than 1), defaults to 0.95}
 }
 \value{
-list of dataframes with predicted margins/effects, se, p-values,
+list of dataframes with predicted margins/effects, standard errors, p-values,
 and confidence interval bounds
 }
 \description{
-Estimating predictive margins on a model
+This function estimates the predictive effects and levels for variables within
+a model using the delta method.
 }
 \details{
 The variable for the predictive margin is specified by \code{var_interest}. If
@@ -67,9 +71,17 @@ since \code{poly} needs more data to calculate orthogonal polynomials
 P values are calculated with T tests for gaussian families, and Z tests
 otherwise. If a new variance-covariance matrix is provided (e.g. for
 clustering standard errors), the degrees of freedom for the T test / p-value
-calculation may need to be specified using dof. To replicate Stata clustering
-\code{vce(cluster var_name)}, dof should be set to \eqn{g - 1}, where g is
+calculation may need to be specified using \code{dof}. To replicate Stata clustering
+\code{vce(cluster var_name)}, \code{dof} should be set to \eqn{g - 1}, where g is
 the number of unique levels of the clustering variable.
+
+This function currently only supports \code{\link[stats]{glm}} objects.
+If you would like to use \code{lm} objects, consider running a \code{glm}
+with family \code{gaussian}.
+
+When calculating predicted levels and effects for models built using weights,
+\code{marg} returns weighted averages for levels and effects by default.
+Users can remove this option by setting \code{weights = NULL}.
 }
 \examples{
 
