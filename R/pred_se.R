@@ -49,7 +49,8 @@ pred_se <- function(df_trans, var_interest, at_var_interest,
           object = model$formula, data = x,
           contrasts.arg = model$contrasts,
           xlev = model$xlevels)[, !is.na(coef(model))],
-        deriv_func = model$family$mu.eta),
+        deriv_func = model$family$mu.eta,
+        weights = weights),
       # Calculate predicted values
       preds = preds
     )

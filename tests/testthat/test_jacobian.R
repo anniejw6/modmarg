@@ -19,7 +19,8 @@ test_that("jacobian works correctly", {
   binom_family <- make.link('logit')
   ld_fun <- binom_family$mu.eta
 
-  expect_equal(calc_jacob(p0, as.matrix(covar0), ld_fun),
+  expect_equal(calc_jacob(pred_values = p0, covar_matrix = as.matrix(covar0),
+                          deriv_func = ld_fun),
                c(0, 0.74390659, 0.07240388)[c(3, 1, 2)],
                tolerance = .0001)
 

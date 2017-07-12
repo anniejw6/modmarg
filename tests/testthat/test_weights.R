@@ -8,8 +8,10 @@ test_that("Using weights with full dataset works", {
             weights = distance)
 
   # Actual check
-  z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
-  z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
+  z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels',
+             vcov_mat = sandwich::vcovHC(mm, 'HC1'))[[1]]
+  z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects',
+             vcov_mat = sandwich::vcovHC(mm, 'HC1'))[[1]]
 
   # stata
   # . margins i.treatment
@@ -30,6 +32,7 @@ test_that("Using weights with full dataset works", {
 
   # Make sure levels calculated correctly
   expect_equal(z1$Margin, c(58.75757, 73.97362), tolerance = 0.0001)
+  expect_equal(z1$Standard.Error, c(1.618851, 1.752939), tolerance = 0.0001)
 
   #
   # Average marginal effects                          Number of obs   =       3000
@@ -46,6 +49,7 @@ test_that("Using weights with full dataset works", {
   # ------------------------------------------------------------------------------
 
   expect_equal(z2$Margin[2], 15.21605, tolerance = 0.0001)
+  expect_equal(z2$Standard.Error[2], 2.43451, tolerance = 0.0001)
 
 })
 
@@ -60,9 +64,11 @@ test_that("Using weights on a subset of data works", {
 
   # Actual check
   z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels',
-             weights = margex$distance)[[1]]
+             weights = margex$distance,
+             vcov_mat = sandwich::vcovHC(mm, 'HC1'))[[1]]
   z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects',
-             weights = margex$distance)[[1]]
+             weights = margex$distance,
+             vcov_mat = sandwich::vcovHC(mm, 'HC1'))[[1]]
 
   # . reg y i.treatment age [pweight = distance]
   # (sum of wgt is   1.7571e+05)
@@ -130,7 +136,9 @@ test_that("Using weights on a subset of data works", {
   # Note: dy/dx for factor levels is the discrete change from the base level.
 
   expect_equal(z1$Margin, c(58.76027, 73.97407), tolerance = 0.0001)
+  expect_equal(z1$Standard.Error, c(1.619279, 1.753296), tolerance = 0.0001)
   expect_equal(z2$Margin[2], 15.21381, tolerance = 0.0001)
+  expect_equal(z2$Standard.Error[2], 2.434979, tolerance = 0.0001)
 
   data(margex)
   set.seed(12345)
@@ -214,13 +222,17 @@ test_that("Using weights on a subset of data works", {
 
   z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels',
              data = subset(margex, outcome == 1),
-             weights = margex$distance[margex$outcome == 1])[[1]]
+             weights = margex$distance[margex$outcome == 1],
+             vcov_mat = sandwich::vcovHC(mm, 'HC1'))[[1]]
   z2 <- marg(mod = mm, var_interest = 'treatment', type = 'levels',
              data = subset(margex, outcome == 0),
-             weights = margex$distance[margex$outcome == 0])[[1]]
+             weights = margex$distance[margex$outcome == 0],
+             vcov_mat = sandwich::vcovHC(mm, 'HC1'))[[1]]
 
   expect_equal(z1$Margin, c(53.0616, 68.35033), tolerance = 0.0001)
+  expect_equal(z1$Standard.Error, c(2.417434, 1.121245), tolerance = 0.0001)
   expect_equal(z2$Margin, c(58.9547, 74.24343), tolerance = 0.0001)
+  expect_equal(z2$Standard.Error, c(1.634249, 1.905337), tolerance = 0.0001)
 
 
 
