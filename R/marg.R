@@ -142,8 +142,12 @@ marg <- function(mod, var_interest,
   # Subset to completes
   data <- data[, names(data) %in% all.vars(mod$formula)]
   complete_cases <- complete.cases(data)
-  data <- data[complete_cases, ]
-  weights <- weights[complete_cases]
+  if(sum(complete_cases) != nrow(data)){
+    warning(sprintf('Dropping %s rows due to missing data',
+                    nrow(data) - sum(complete_cases)))
+    data <- data[complete_cases, ]
+    weights <- weights[complete_cases]
+  }
 
   # Check for polynomials
   if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=

@@ -1,6 +1,6 @@
 Package: modmarg
 Title: Calculating Marginal Effects and Levels with Errors
-Version: 0.6.0
+Version: 0.6.1
 Authors@R: c(
 	person("Alex", "Gold", email = "alex.k.gold@gmail.com", role = "aut"),
 	person("Nat", "Olin", email = "nathaniel.olin@gmail.com", role = c("ctb")),
@@ -19,6 +19,7 @@ LazyData: true
 Suggests:
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    sandwich
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
