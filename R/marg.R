@@ -25,6 +25,12 @@
 #' @param data data.frame that margins should run over, defaults to
 #' \code{mod$data}
 #' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
+#' @param weights numeric, vector of weights used to generate predicted levels,
+#' defaults to \code{mod$prior.weights}. Must be equal to the number of rows
+#' in \code{data}, which means that if there are missing values, in \code{data},
+#' then the default will not work because \code{prior.weights} are the weights
+#' after subsetting.
+#'
 #' @return list of dataframes with predicted margins/effects, standard errors, p-values,
 #' and confidence interval bounds
 #'
@@ -51,9 +57,13 @@
 #' \code{vce(cluster var_name)}, \code{dof} should be set to \eqn{g - 1}, where g is
 #' the number of unique levels of the clustering variable.
 #'
-#' This function currently only supports \code{\link[stats]{glm}} objects. If you would like to
-#' use \code{lm} objects, consider running a \code{glm} with family
-#' \code{gaussian}.
+#' This function currently only supports \code{\link[stats]{glm}} objects.
+#' If you would like to use \code{lm} objects, consider running a \code{glm}
+#' with family \code{gaussian}.
+#'
+#' When calculating predicted levels and effects for models built using weights,
+#' \code{marg} returns weighted averages for levels and effects by default.
+#' Users can remove this option by setting \code{weights = NULL}.
 #'
 #' @importFrom stats complete.cases terms vcov
 #' @export
@@ -96,20 +106,54 @@
 #' marg(mod, var_interest = 'treatment', type = 'levels',
 #'           vcov_mat = v, dof = d)
 #'
+#' # Using weights
+#'
+#' data(margex)
+#' mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
+#'           weights = distance)
+#' z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
+#' z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
+#'
 marg <- function(mod, var_interest,
-                      type = 'levels',
-                      vcov_mat = NULL,
-                      dof = NULL,
-                      at = NULL, base_rn = 1,
-                      at_var_interest = NULL,
-                      data = mod$data,
+                 type = 'levels',
+                 vcov_mat = NULL,
+                 dof = NULL,
+                 at = NULL, base_rn = 1,
+                 at_var_interest = NULL,
+                 data = mod$data,
+                 weights = mod$prior.weights,
                  cofint = 0.95){
 
   stopifnot('glm' %in% class(mod))
 
-  data <- data[, names(data) %in% all.vars(mod$formula)]
-  data <- data[complete.cases(data), ]
+  # Remove weights if no weights
+  if(all(weights == 1)) weights <- NULL
 
+  # Check if no weights when model was built was weights
+  if(is.null(weights) & !all(mod$prior.weights == 1))
+    warning(paste('The model was built with weights, but you have not',
+                  'provided weights. Your calculated margins may be odd.',
+                  'See Details.'))
+
+  # Weights should be same length as data
+  if(!is.null(weights) & length(weights) != nrow(data))
+    stop('`weights` and `data` must be the same length.')
+
+  # Subset to covariate completes
+  data <- data[, names(data) %in% all.vars(mod$formula)]
+  complete_cases <- complete.cases(data)
+
+  # Subset based on weights too
+  if(!is.null(weights)) complete_cases <- complete_cases & !is.na(weights)
+
+  if(sum(complete_cases) != nrow(data)){
+    warning(sprintf('Dropping %s rows due to missing data',
+                    nrow(data) - sum(complete_cases)))
+    data <- data[complete_cases, ]
+    weights <- weights[complete_cases]
+  }
+
+  # Check for polynomials
   if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=
      sum(grepl("raw = T", names(mod$model))))
     warning(paste("If you're using 'poly()' for higher-order terms,",
@@ -164,7 +208,7 @@ marg <- function(mod, var_interest,
     pred_se(df_trans = x, var_interest = var_interest,
             model = mod, type = type, base_rn = base_rn,
             at_var_interest = at_var_interest,
-            vcov_mat = vcov_mat)
+            vcov_mat = vcov_mat, weights = weights)
   })
 
   lapply(res, function(x) {

@@ -6,7 +6,7 @@
 \usage{
 marg(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
   at = NULL, base_rn = 1, at_var_interest = NULL, data = mod$data,
-  cofint = 0.95)
+  weights = mod$prior.weights, cofint = 0.95)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}}
@@ -38,6 +38,12 @@ If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NU
 
 \item{data}{data.frame that margins should run over, defaults to
 \code{mod$data}}
+
+\item{weights}{numeric, vector of weights used to generate predicted levels,
+defaults to \code{mod$prior.weights}. Must be equal to the number of rows
+in \code{data}, which means that if there are missing values, in \code{data},
+then the default will not work because \code{prior.weights} are the weights
+after subsetting.}
 
 \item{cofint}{numeric, confidence interval (must be less than 1), defaults to 0.95}
 }
@@ -72,9 +78,13 @@ calculation may need to be specified using \code{dof}. To replicate Stata cluste
 \code{vce(cluster var_name)}, \code{dof} should be set to \eqn{g - 1}, where g is
 the number of unique levels of the clustering variable.
 
-This function currently only supports \code{\link[stats]{glm}} objects. If you would like to
-use \code{lm} objects, consider running a \code{glm} with family
-\code{gaussian}.
+This function currently only supports \code{\link[stats]{glm}} objects.
+If you would like to use \code{lm} objects, consider running a \code{glm}
+with family \code{gaussian}.
+
+When calculating predicted levels and effects for models built using weights,
+\code{marg} returns weighted averages for levels and effects by default.
+Users can remove this option by setting \code{weights = NULL}.
 }
 \examples{
 
@@ -114,6 +124,14 @@ mod <- glm(outcome ~ treatment + distance,
            data = margex, family = 'binomial')
 marg(mod, var_interest = 'treatment', type = 'levels',
           vcov_mat = v, dof = d)
+
+# Using weights
+
+data(margex)
+mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
+          weights = distance)
+z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
+z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
 
 }
 

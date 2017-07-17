@@ -1,7 +1,7 @@
 #' @importFrom stats coef predict model.matrix
 # Main wrapper function to calculate margins and se
 pred_se <- function(df_trans, var_interest, at_var_interest,
-                    model, type, base_rn, vcov_mat){
+                    model, type, base_rn, vcov_mat, weights){
 
   stopifnot(is.data.frame(df_trans),
             is.character(var_interest),
@@ -22,6 +22,7 @@ pred_se <- function(df_trans, var_interest, at_var_interest,
   # @param at_var_interest: vector, if type == 'levels', the values for the
   #                         variable of interest at which levels should be
   #                         calculated. ignored otherwise
+  # @param weights: vector of weights, or NULL
   #
   # @return list of labels, predicted margins, and SE
 
@@ -31,6 +32,14 @@ pred_se <- function(df_trans, var_interest, at_var_interest,
   res <- lapply(df_levels, function(x){
     # Predict function is expensive so just calling it once
     p <- predict(model, newdata = x)
+
+    # Calculate mean values
+    if(is.null(weights)){
+      preds <- mean(model$family$linkinv(p))
+    } else {
+      preds <- sum(model$family$linkinv(p) * weights)/sum(weights)
+    }
+
     list(
       # Calculate Jacobian
       jacobs = calc_jacob(
@@ -40,9 +49,10 @@ pred_se <- function(df_trans, var_interest, at_var_interest,
           object = model$formula, data = x,
           contrasts.arg = model$contrasts,
           xlev = model$xlevels)[, !is.na(coef(model))],
-        deriv_func = model$family$mu.eta),
+        deriv_func = model$family$mu.eta,
+        weights = weights),
       # Calculate predicted values
-      preds = mean(model$family$linkinv(p))
+      preds = preds
     )
   })
 
