@@ -139,9 +139,13 @@ marg <- function(mod, var_interest,
   if(!is.null(weights) & length(weights) != nrow(data))
     stop('`weights` and `data` must be the same length.')
 
-  # Subset to completes
+  # Subset to covariate completes
   data <- data[, names(data) %in% all.vars(mod$formula)]
   complete_cases <- complete.cases(data)
+
+  # Subset based on weights too
+  if(!is.null(weights)) complete_cases <- complete_cases & !is.na(weights)
+
   if(sum(complete_cases) != nrow(data)){
     warning(sprintf('Dropping %s rows due to missing data',
                     nrow(data) - sum(complete_cases)))
