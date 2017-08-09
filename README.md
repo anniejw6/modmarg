@@ -15,7 +15,13 @@ packages.
 
 # Usage
 
-To install this package, please run
+To install this package from CRAN, please run
+
+```
+install.packages('modmarg')
+```
+
+To install the development version of this package, please run
 
 ```
 devtools::install_github('anniejw6/modmarg', build_vignettes = TRUE)
