@@ -1,4 +1,5 @@
 # modmarg
+[![CRAN Version](http://www.r-pkg.org/badges/version/modmarg)](http://www.r-pkg.org/badges/version/modmarg)
 [![Build Status](https://travis-ci.org/anniejw6/modmarg.svg?branch=master)](https://travis-ci.org/anniejw6/modmarg)
 [![codecov](https://codecov.io/gh/anniejw6/modmarg/branch/master/graph/badge.svg)](https://codecov.io/gh/anniejw6/modmarg)
 
