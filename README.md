@@ -3,15 +3,20 @@
 [![Build Status](https://travis-ci.org/anniejw6/modmarg.svg?branch=master)](https://travis-ci.org/anniejw6/modmarg)
 [![codecov](https://codecov.io/gh/anniejw6/modmarg/branch/master/graph/badge.svg)](https://codecov.io/gh/anniejw6/modmarg)
 
-Calculate predicted levels and marginal effects from 'glm' objects, 
+Calculate predicted levels and marginal effects 
 using the delta method to calculate standard errors. This is an R-based 
-version of Stata's 'margins' command. 
+version of Stata's 'margins' command.
 
-It differs from existing packages such as 
-[margins](https://github.com/leeper/margins) by using the closed-form 
-derivatives stored in `glm` objects, rather than calculating the derivative
-numerically. As a result, it is substantially faster than existing 
-packages.
+Features:
+
+* Calculate predictive levels and margins for `glm` objects
+(more models to be added - PRs welcome) using closed-form derivatives
+
+* Add custom variance-covariance matrices to all calculations to add, e.g.,
+clustered or robust standard errors (for more information on replicating
+Stata analyses, see [here](https://github.com/anniejw6/modmarg/issues/107))
+
+* Frequency weights are incorporated into margins and effects
 
 # Usage
 
@@ -27,7 +32,7 @@ To install the development version of this package, please run
 devtools::install_github('anniejw6/modmarg', build_vignettes = TRUE)
 ```
 
-Here is an example of estimating predicted levels and effects (with standard errors)
+Here is an example of estimating predicted levels and effects
 using the `iris` dataset:
 
 ```

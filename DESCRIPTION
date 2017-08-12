@@ -13,7 +13,7 @@ URL: https://github.com/anniejw6/modmarg
 BugReports: https://github.com/anniejw6/modmarg/issues
 Depends:
     R (>= 2.10.0)
-License: GPL-2
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Suggests:
