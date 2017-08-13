@@ -1,4 +1,4 @@
-# Version 0.5.0
+# Version 0.6.0
 
 ## Test environments
 
@@ -8,17 +8,8 @@
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs. 
+There were no ERRORs, WARNINGs, or NOTEs. 
 
-There was 1 NOTE:
+## Downstream Dependencies
 
-* Maintainer: 'Annie Wang <anniejw6@gmail.com>'
-  New submission
-  
-  Possibly mis-spelled words in DESCRIPTION:
-  Stata (11:43)
-
-This is my first submission to CRAN.
-'Stata' is not mis-spelled. See 'http://www.stata.com/'.
-  
-  
+There are currently no downstream dependencies for this package.

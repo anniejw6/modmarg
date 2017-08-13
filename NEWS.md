@@ -1,6 +1,5 @@
 # Version 0.6.0
 
-* This is the second CRAN release of `modmarg`
 * Incorporates frequency weights into predictive margins and levels
 
 # Version 0.5.0
