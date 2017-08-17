@@ -1,12 +1,13 @@
 library(modmarg)
-context("Use different variance-covariance matrices")
 
-test_that("clustered standard errors are correct", {
+# -------------------------------------------
+context("Test clustered standard errors")
 
-  # Gaussian model
+test_that("clustered SEs work in OLS", {
 
   data(margex)
-  mod <- glm(outcome ~ treatment + distance, data = margex, family = 'gaussian')
+  mod <- glm(outcome ~ treatment + distance,
+             data = margex, family = 'gaussian')
 
   data(cvcov)
   v <- cvcov$ols$clust
@@ -44,14 +45,14 @@ test_that("clustered standard errors are correct", {
 
   expect_warning(marg(mod, var_interest = 'treatment',
                            type = 'levels', vcov_mat = v))
+})
 
-  # Binary model
+test_that("clustered SEs work with logit", {
 
   data(margex)
   mod <- glm(outcome ~ treatment + distance, data = margex, family = 'binomial')
   data(cvcov)
   v <- cvcov$logit$clust
-  d <- cvcov$logit$stata_dof
   z <- marg(mod, var_interest = 'treatment',
                  type = 'levels', vcov_mat = v)[[1]]
 
@@ -85,7 +86,7 @@ test_that("clustered standard errors are correct", {
 
 })
 
-test_that("clustered standard errors work with interaction terms", {
+test_that("clustered SEs work with interactions", {
 
   data(mtcars)
   data(cvcov)
@@ -138,4 +139,29 @@ test_that("clustered standard errors work with interaction terms", {
   expect_equal(z$`Upper CI (95%)`, c(812.375, 111.3439, 19.86326),
                tolerance = 0.0001)
 
+})
+
+# -------------------------------------------
+context("Test robust standard errors")
+
+test_that("robust SEs work with OLS", {
+  data(margex)
+  mod <- glm(outcome ~ treatment + distance,
+             data = margex, family = 'gaussian')
+  v <- robust_se(mod)
+
+  data(rvcov)
+  v <- rvcov$ols$clust
+  d <- rvcov$ols$stata_dof
+
+  z <- marg(
+    mod = mod, var_interest = 'cyl', type = 'levels',
+    at = list('disp' = 400),
+    vcov_mat = v, dof = d)[[1]]
+
+  # stata
+  # reg mpg cyl##c.disp##c.disp hp, robust
+  # margins cyl, at(disp = 400)
+  # set sformat %8.5f
+  # set pformat %5.4f"
 })
