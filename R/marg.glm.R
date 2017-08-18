@@ -67,12 +67,6 @@ marg.glm <- function(mod, var_interest,
     warning("If you're using 'poly()' for higher-order terms, ",
             "use the raw = T option (see ?poly)")
 
-  if(is.null(dof) & !is.null(vcov_mat) & mod$family$family == 'gaussian')
-    warning(
-      "You provided a new variance-covariance matrix for an OLS model ",
-      "but no degrees of freedom for the T test. P-value calculations ",
-      "may be incorrect - see ?modmarg::marg for details.")
-
   # Check if no weights when model was built was weights
   if(is.null(weights) & !all(mod$prior.weights == 1))
     warning('The model was built with weights, but you have not ',

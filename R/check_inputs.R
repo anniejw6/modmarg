@@ -13,6 +13,14 @@ check_inputs <- function(weights, data, var_interest,
   if(!is.null(weights) & length(weights) != nrow(data))
     stop('`weights` and `data` must be the same length.')
 
+  # DOF Check
+  if(is.null(dof) & !is.null(vcov_mat))
+    warning(
+      "You provided a new variance-covariance matrix ",
+      "but no degrees of freedom for the T test. P-value calculations ",
+      "may be incorrect if the model is gaussian - ",
+      "see ?modmarg::marg for details.")
+
   stopifnot(
     var_interest %in% names(data),
     all(names(at) %in% names(data)),
