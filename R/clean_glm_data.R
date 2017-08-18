@@ -14,6 +14,7 @@ clean_glm_data <- function(mod, data, weights){
   data <- na.omit(data)
 
   # Remove weights
+  weights <- data[[wgt_col]]
   data[[wgt_col]] <- NULL
 
   # Remove any booleans
@@ -22,6 +23,6 @@ clean_glm_data <- function(mod, data, weights){
   if(all(data$`F` == FALSE))
     data$`F` <- NULL
 
-  data
+  list(data = data, weights = weights)
 
 }
