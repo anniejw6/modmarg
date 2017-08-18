@@ -1,5 +1,8 @@
 clean_glm_data <- function(mod, data, weights){
 
+  # Store original number of rows
+  nrow_orig <- nrow(data)
+
   # Grab only necessary variables
   data <- get_all_vars(mod, data)
 
@@ -20,6 +23,11 @@ clean_glm_data <- function(mod, data, weights){
     data$`T` <- NULL
   if(all(data$`F` == FALSE))
     data$`F` <- NULL
+
+  # Throw warning if rows were dropped
+  if(nrow(data) != nrow_orig)
+    warning(sprintf('Dropping %s rows due to missing data',
+                    nrow_orig - nrow(data)))
 
   data
 
