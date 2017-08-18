@@ -127,6 +127,7 @@ marg.glm <- function(mod, var_interest,
             vcov_mat = vcov_mat, weights = weights)
   })
 
+  # Format Output ----
   lapply(res, function(x) {
     format_output(
       margin_labels = x$labels,
