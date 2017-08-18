@@ -6,9 +6,6 @@ check_inputs <- function(weights, data, var_interest,
   if(base_rn != 1 & type != 'effects')
     warning("Setting base_rn when type == 'levels' is ignored.")
 
-  # Check for polynomials
-  # Should be a general thing, but may have to be specific
-
   # Weights should be same length as data
   if(!is.null(weights) & length(weights) != nrow(data))
     stop('`weights` and `data` must be the same length.')

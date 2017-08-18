@@ -77,6 +77,30 @@ marg <- function(mod, var_interest,
                  weights = mod$prior.weights,
                  cofint = 0.95){
 
-  UseMethod("marg")
+  stopifnot(type %in% c('levels', 'effects'))
+
+  UseMethod("marg", mod)
 
 }
+
+
+#' Main wrapper function to calculate margins and standard errors
+#'
+#' For one set of transformed covariates (not including the variable of
+#' interest), calculate the predicted level and standard error for the
+#' variable of interest.
+#'
+#' @param df_levels data.frame, already transformed for variables not related
+#'                  to the variable of interest
+#' @param model model object
+#' @param type either effects or levels
+#' @param base_rn numeric, row number of the base level
+#' @param vcov_mat matrix, variance-covariance matrix
+#' @param weights vector of weights, or NULL
+#' @importFrom stats coef predict model.matrix
+pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights){
+
+  UseMethod("pred_se", model)
+
+}
+
