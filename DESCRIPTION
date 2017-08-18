@@ -1,6 +1,10 @@
 Package: modmarg
 Title: Calculating Marginal Effects and Levels with Errors
+<<<<<<< HEAD
 Version: 0.7.0
+=======
+Version: 0.6.1
+>>>>>>> refac_complete
 Authors@R: c(
 	person("Alex", "Gold", email = "alex.k.gold@gmail.com", role = "aut"),
 	person("Nat", "Olin", email = "nathaniel.olin@gmail.com", role = c("ctb")),

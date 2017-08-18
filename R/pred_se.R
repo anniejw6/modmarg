@@ -34,21 +34,24 @@ pred_se <- function(df_trans, var_interest, at_var_interest,
     p <- predict(model, newdata = x)
 
     # Calculate mean values
+    preds <- model$family$linkinv(p)
     if(is.null(weights)){
-      preds <- mean(model$family$linkinv(p))
+      preds <- mean(preds)
     } else {
-      preds <- sum(model$family$linkinv(p) * weights)/sum(weights)
+      preds <- sum(preds * weights)/sum(weights)
     }
+
+    # Get covariate matrix
+    covar_matrix <- model.matrix(
+      object = model$formula, data = x,
+      contrasts.arg = model$contrasts,
+      xlev = model$xlevels)[, !is.na(coef(model))]
 
     list(
       # Calculate Jacobian
       jacobs = calc_jacob(
         pred_values = p,
-        # create a model matrix only using coefficients in the model
-        covar_matrix = model.matrix(
-          object = model$formula, data = x,
-          contrasts.arg = model$contrasts,
-          xlev = model$xlevels)[, !is.na(coef(model))],
+        covar_matrix = covar_matrix,
         deriv_func = model$family$mu.eta,
         weights = weights),
       # Calculate predicted values
