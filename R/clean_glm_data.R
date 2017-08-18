@@ -7,10 +7,14 @@ clean_glm_data <- function(mod, data, weights){
     stop('`weights` and `data` must be the same length.')
 
   # Add weights
-  data$weights <- weights
+  wgt_col <- paste(sample(c(letters, 1:9), 10), collapse = '')
+  data[[wgt_col]] <- weights
 
   # Keep completes only
   data <- na.omit(data)
+
+  # Remove weights
+  data[[wgt_col]] <- NULL
 
   # Remove any booleans
   if(all(data$`T` == TRUE))
