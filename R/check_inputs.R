@@ -1,6 +1,6 @@
 # Wrapper function to check inputs
 check_inputs <- function(weights, data, var_interest,
-                         at, cofint, base_rn, type){
+                         at, cofint, base_rn, type, dof, vcov_mat){
 
   # Warn if base_rn set but type != 'effects'
   if(base_rn != 1 & type != 'effects')

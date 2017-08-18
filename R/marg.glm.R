@@ -56,17 +56,15 @@ marg.glm <- function(mod, var_interest,
                      weights = mod$prior.weights,
                      cofint = 0.95){
 
-  # Run checks ----
+  # Set params and Run checks ----
+  # Remove weights if no weights
+  if(all(weights == 1)) weights <- NULL
+
   check_inputs(weights = weights, data = data, var_interest = var_interest,
-               at = at, cofint = cofint, base_rn = base_rn, type = type)
+               at = at, cofint = cofint, base_rn = base_rn, type = type,
+               dof = dof, vcov_mat = vcov_mat)
 
   # Chekcs specific to glm-----
-  # Check for polynomials
-  if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=
-     sum(grepl("raw = T", names(mod$model))))
-    warning("If you're using 'poly()' for higher-order terms, ",
-            "use the raw = T option (see ?poly)")
-
   # Check if no weights when model was built was weights
   if(is.null(weights) & !all(mod$prior.weights == 1))
     warning('The model was built with weights, but you have not ',
@@ -75,22 +73,12 @@ marg.glm <- function(mod, var_interest,
 
   # Set Params ----
 
-  # Remove weights if no weights
-  if(all(weights == 1)) weights <- NULL
 
-  # Subset to covariate completes
-  data <- data[, names(data) %in% all.vars(mod$formula)]
-  complete_cases <- complete.cases(data)
 
-  # Subset based on weights too
-  if(!is.null(weights)) complete_cases <- complete_cases & !is.na(weights)
-
-  if(sum(complete_cases) != nrow(data)){
-    warning(sprintf('Dropping %s rows due to missing data',
-                    nrow(data) - sum(complete_cases)))
-    data <- data[complete_cases, ]
-    weights <- weights[complete_cases]
-  }
+  # Keep only complete variables ---
+  data <- clean_glm_data(mod, data, weights)
+  # Add weights back
+  if(!is.null(data$`_weights`)) weights <- data$`_weights`
 
   if(is.null(vcov_mat))
     vcov_mat <- vcov(mod)
