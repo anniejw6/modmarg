@@ -92,8 +92,6 @@ test_that("works correctly even when rows are dropped", {
 
   mod <- glm(outcome ~ treatment + distance,
              data = margex, family = 'binomial')
-  expect_warning(marg(mod, 'treatment', 'levels', at = NULL),
-                 'Dropping 5 rows due to missing data')
 
   z <- marg(mod, 'treatment', 'levels', at = NULL)[[1]]
 

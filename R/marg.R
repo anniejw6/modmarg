@@ -135,29 +135,21 @@ marg <- function(mod, var_interest,
                   'provided weights. Your calculated margins may be odd.',
                   'See Details.'))
 
-  # Weights should be same length as data
-  if(!is.null(weights) & length(weights) != nrow(data))
-    stop('`weights` and `data` must be the same length.')
-
-  # Subset to covariate completes
-  data <- data[, names(data) %in% all.vars(mod$formula)]
-  complete_cases <- complete.cases(data)
-
-  # Subset based on weights too
-  if(!is.null(weights)) complete_cases <- complete_cases & !is.na(weights)
-
-  if(sum(complete_cases) != nrow(data)){
-    warning(sprintf('Dropping %s rows due to missing data',
-                    nrow(data) - sum(complete_cases)))
-    data <- data[complete_cases, ]
-    weights <- weights[complete_cases]
-  }
-
   # Check for polynomials
   if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=
      sum(grepl("raw = T", names(mod$model))))
     warning(paste("If you're using 'poly()' for higher-order terms,",
                   "use the raw = T option (see ?poly)"))
+
+  # Keep only complete variables ---
+  nrow_orig <- nrow(data)
+  data <- clean_glm_data(mod, data, weights)
+  # Add weights back
+  if(!is.null(data$weights)) weights <- data$weights
+  # Throw warning if rows were dropped
+  if(nrow(data) != nrow_orig)
+    warning(sprintf('Dropping %s rows due to missing data',
+                    nrow(data) - nrow_orig))
 
   stopifnot(
     var_interest %in% names(data),

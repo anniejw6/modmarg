@@ -11,7 +11,7 @@ calc_jacob <- function(pred_values, covar_matrix, deriv_func, weights = NULL,
   stopifnot(is.numeric(pred_values), is.matrix(covar_matrix),
             is.numeric(covar_matrix), is.function(deriv_func))
 
-  # caluclate derivative of the predicted values
+  # Calculate derivative of the predicted values
   x1 <- do.call(deriv_func, list(pred_values))
 
   if(is.null(weights)){
