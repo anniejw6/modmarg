@@ -143,10 +143,9 @@ marg <- function(mod, var_interest,
 
   # Keep only complete variables ---
   nrow_orig <- nrow(data)
-  dwgt <- clean_glm_data(mod, data, weights)
-  data <- dwgt$data
+  data <- clean_glm_data(mod, data, weights)
   # Add weights back
-  if(!is.null(dwgt$weights)) weights <- dwgt$weights
+  if(!is.null(data$`_weights`)) weights <- data$`_weights`
   # Throw warning if rows were dropped
   if(nrow(data) != nrow_orig)
     warning(sprintf('Dropping %s rows due to missing data',
