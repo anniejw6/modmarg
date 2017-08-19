@@ -502,7 +502,7 @@ test_that("Missing covariate, outcome, and weight data", {
 
   # . reg y i.treatment c.age [aw = distance]
   # (sum of wgt is   1.7498e+05)
-
+  #
   #       Source |       SS       df       MS              Number of obs =    2992
   # -------------+------------------------------           F(  2,  2989) =  302.48
   #        Model |  235155.511     2  117577.756           Prob > F      =  0.0000
@@ -517,20 +517,14 @@ test_that("Missing covariate, outcome, and weight data", {
   #          age |  -.6161595   .0322077   -19.13   0.000    -.6793111   -.5530079
   #        _cons |   83.25147   1.279858    65.05   0.000     80.74198    85.76097
   # ------------------------------------------------------------------------------
-
-  # . estout . using mod1.txt, cells("b se t p") stats(N) replace
-  # (note: file mod1.txt not found)
-  # (output written to mod1.txt)
-
-  # . estimates store t1
-
+  #
   # . margins i.treatment
-
+  #
   # Predictive margins                                Number of obs   =       2992
   # Model VCE    : OLS
-
+  #
   # Expression   : Linear prediction, predict()
-
+  #
   # ------------------------------------------------------------------------------
   #              |            Delta-method
   #              |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
