@@ -29,4 +29,3 @@ A fictitious dataset outcome, treatment, and demographic variables for 3000
 observations.
 }
 \keyword{datasets}
-

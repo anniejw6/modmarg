@@ -134,4 +134,3 @@ z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
 z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
 
 }
-

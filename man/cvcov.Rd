@@ -26,4 +26,3 @@ with \code{margex} data in this package.
 See data-raw/make_cluster_vcov.R for details.
 }
 \keyword{datasets}
-
