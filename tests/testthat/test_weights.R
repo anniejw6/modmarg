@@ -192,7 +192,8 @@ test_that("pweights work with OLS + complete dataset", {
   expect_equal(z2$Margin[2], 15.21605, tolerance = 0.00001)
   expect_equal(z2$Standard.Error[2], 2.43451, tolerance = 0.00001)
 
-  # Binomial ----
+test_that("pweights work with logit + complete dataset", {
+
   # See also https://stackoverflow.com/questions/27367974/different-robust-standard-errors-of-logit-regression-in-stata-and-r
   sandwich1 <- function(object, ...){
     sandwich::sandwich(object) * nobs(object) / (nobs(object) - 1)
@@ -279,7 +280,7 @@ test_that("pweights work with OLS + complete dataset", {
 
 })
 
-test_that("Partial Dataset: Missing covariate data, full weight data", {
+test_that("aweights work with OLS and missing covariates", {
 
   data(margex)
   margex$age[c(18, 28, 190, 2830)] <- NA
@@ -348,7 +349,7 @@ test_that("Partial Dataset: Missing covariate data, full weight data", {
 
 })
 
-test_that("Partial Dataset: Full covariate data, missing weight data", {
+test_that("aweights work with OLS and missing weights", {
 
   data(margex)
   margex$distance[c(5, 29, 2, 14, 920)] <- NA
@@ -418,7 +419,7 @@ test_that("Partial Dataset: Full covariate data, missing weight data", {
 
 })
 
-test_that("Partial Dataset: Missing covariate data, missing weight data", {
+test_that("aweights work with OLS and missing covariates, outcome, and weights", {
 
   data(margex)
   margex$age[c(18, 28, 190, 2830)] <- NA
@@ -491,7 +492,7 @@ test_that("Partial Dataset: Missing covariate data, missing weight data", {
 
 })
 
-test_that("Missing covariate, outcome, and weight data", {
+test_that("aweights work for OLS with missing covariate, outcome, and weight data", {
 
   data(margex)
 
