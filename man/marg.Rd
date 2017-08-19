@@ -11,7 +11,8 @@ marg(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
 
 \method{marg}{glm}(mod, var_interest, type = "levels", vcov_mat = NULL,
   dof = NULL, at = NULL, base_rn = 1, at_var_interest = NULL,
-  data = mod$data, weights = mod$prior.weights, cofint = 0.95)
+  data = mod$data[names(mod$prior.weights), ], weights = mod$prior.weights,
+  cofint = 0.95)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}}
