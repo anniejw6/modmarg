@@ -135,12 +135,6 @@ marg <- function(mod, var_interest,
                   'provided weights. Your calculated margins may be odd.',
                   'See Details.'))
 
-  # Check for polynomials
-  if(sum(grepl("poly\\(.*\\)", names(mod$model))) !=
-     sum(grepl("raw = T", names(mod$model))))
-    warning(paste("If you're using 'poly()' for higher-order terms,",
-                  "use the raw = T option (see ?poly)"))
-
   # Keep only complete variables ---
   data <- clean_glm_data(mod, data, weights)
   # Add weights back
