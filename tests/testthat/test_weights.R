@@ -191,6 +191,7 @@ test_that("pweights work with OLS + complete dataset", {
              vcov_mat = sandwich::vcovHC(mm, 'HC1'))[[1]]
   expect_equal(z2$Margin[2], 15.21605, tolerance = 0.00001)
   expect_equal(z2$Standard.Error[2], 2.43451, tolerance = 0.00001)
+})
 
 test_that("pweights work with logit + complete dataset", {
 
