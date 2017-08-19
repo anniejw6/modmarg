@@ -157,8 +157,44 @@ test_that("robust SEs work with OLS", {
     vcov_mat = v, dof = mod$df.residual)[[1]]
 
   # stata
-  # reg outcome i.treatment c.distance, robust
-  # margins i.treatment
-  # set sformat %8.5f
-  # set pformat %5.4f"
+  # . reg outcome i.treatment c.distance, robust
+  #
+  # Linear regression                                      Number of obs =    3000
+  # F(  2,  2997) =  211.53
+  # Prob > F      =  0.0000
+  # R-squared     =  0.0701
+  # Root MSE      =  .36212
+  #
+  # ------------------------------------------------------------------------------
+  #              |               Robust
+  #      outcome |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #  1.treatment |   .1786453   .0131956    13.54   0.000     .1527721    .2045186
+  #     distance |  -.0002314   .0000128   -18.10   0.000    -.0002564   -.0002063
+  #        _cons |   .0937792   .0073598    12.74   0.000     .0793484    .1082101
+  # ------------------------------------------------------------------------------
+  #
+  # . margins i.treatment
+  #
+  # Predictive margins                                Number of obs   =       3000
+  # Model VCE    : Robust
+  #
+  # Expression   : Linear prediction, predict()
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #    treatment |
+  #           0  |   .0802249   .0070072    11.45   0.000     .0664855    .0939643
+  #           1  |   .2588702   .0111928    23.13   0.000     .2369238    .2808167
+  # ------------------------------------------------------------------------------
+
+  expect_equal(z$Label, as.factor(c('treatment = 0', 'treatment = 1')))
+  expect_equal(z$Margin, c(.0802249, .2588702), tolerance = 0.0000001)
+  expect_equal(z$Standard.Error, c(.0070072, .0111928), tolerance = 0.0000001)
+  expect_equal(z$Test.Stat, c(11.45, 23.13), tolerance = 0.0001)
+  expect_equal(z$P.Value, c(0, 0), tolerance = 0.00001)
+  expect_equal(z$`Lower CI (95%)`, c(.0664855, .2369238), tolerance = 0.000001)
+  expect_equal(z$`Upper CI (95%)`, c(.0939643, .2808167), tolerance = 0.000001)
 })
