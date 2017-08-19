@@ -1,7 +1,7 @@
 library(modmarg)
-context("Calculate things with weights works")
+context("Weights")
 
-test_that("Complete dataset: Analytic Weights", {
+test_that("aweights work with OLS + complete dataset", {
 
   data(margex)
   mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
@@ -64,12 +64,14 @@ test_that("Complete dataset: Analytic Weights", {
   z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
   expect_equal(z2$Margin[2], 15.21605, tolerance = 0.00001)
   expect_equal(z2$Standard.Error[2], .7505776, tolerance = 0.00001)
+})
+
+test_that("aweights work with logit + complete dataset", {
 
   # Now with a binomial!
   data(margex)
   mm <- glm(outcome ~ as.factor(treatment) + age, data = margex,
             family = 'binomial', weights = distance)
-  # summary(mm)
 
   # . glm outcome i.treatment c.age [aweight = distance], link(logit)
   # (sum of wgt is   1.7576e+05)
@@ -120,12 +122,12 @@ test_that("Complete dataset: Analytic Weights", {
   #           1  |   .0484142   .0040881    11.84   0.000     .0404018    .0564267
   # ------------------------------------------------------------------------------
 
-  # Please note that a binomial glm with weights DOES NOT REPLICATE across
+  # Please note that a binomial glm with aweights DOES NOT REPLICATE across
   # Stata and R
 
 })
 
-test_that("Complete dataset: Probability Weights", {
+test_that("pweights work with OLS + complete dataset", {
 
   data(margex)
   mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',

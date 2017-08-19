@@ -1,7 +1,11 @@
 library(modmarg)
+
 context("Jacobian matricies")
 
-test_that("jacobian works correctly", {
+binom_family <- make.link('logit')
+ld_fun <- binom_family$mu.eta
+
+test_that("calc_jacob works with margex data", {
 
   data(margex)
   mm <- glm(outcome ~ treatment + distance, margex, family = 'binomial')
@@ -16,9 +20,6 @@ test_that("jacobian works correctly", {
   p0 <- predict(mm, newdata = df0)
   p1 <- predict(mm, newdata = df1)
 
-  binom_family <- make.link('logit')
-  ld_fun <- binom_family$mu.eta
-
   expect_equal(calc_jacob(pred_values = p0, covar_matrix = as.matrix(covar0),
                           deriv_func = ld_fun),
                c(0, 0.74390659, 0.07240388)[c(3, 1, 2)],
@@ -27,7 +28,9 @@ test_that("jacobian works correctly", {
   expect_equal(calc_jacob(p1, as.matrix(covar1), ld_fun),
                c(0.18766468, 2.1907626, 0.18766468)[c(3, 1, 2)],
                tolerance = .0001)
+})
 
+test_that("calc_jacob works with mtcars data", {
 
   data(mtcars)
   mtcars$gear <- factor(mtcars$gear)
@@ -64,7 +67,7 @@ test_that("jacobian works correctly", {
 })
 
 
-test_that("jacobian of discrete variables works correctly", {
+test_that("discrete_effect_jacob works correctly", {
 
   z <- as.matrix(data.frame(a = 1:3,
                             b = 4:6,
