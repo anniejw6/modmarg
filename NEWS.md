@@ -1,3 +1,7 @@
+# Version 0.7.0
+
+* Refactors to use generic functions
+
 # Version 0.6.0
 
 * Incorporates frequency weights into predictive margins and levels
