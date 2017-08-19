@@ -74,7 +74,7 @@ marg <- function(mod, var_interest,
                  at = NULL, base_rn = 1,
                  at_var_interest = NULL,
                  data = NULL,
-                 weights = mod$prior.weights,
+                 weights = NULL,
                  cofint = 0.95){
 
   stopifnot(type %in% c('levels', 'effects'))

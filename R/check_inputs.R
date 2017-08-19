@@ -25,4 +25,13 @@ check_inputs <- function(weights, data, var_interest,
     cofint < 1, cofint > 0
   )
 
+  # Check for extrapolated values
+  for(i in seq_along(at)){
+    if(is.numeric(data[[names(at)[i]]]) &
+       ! all(at[[i]] <= max(data[[names(at)[i]]]) &
+             at[[i]] >= min(data[[names(at)[i]]])))
+      warning(sprintf("Not all values in 'at' are in the range of '%s'",
+                      names(at)[i]))
+  }
+
 }

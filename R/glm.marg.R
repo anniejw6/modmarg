@@ -89,30 +89,17 @@ marg.glm <- function(mod, var_interest,
   if(is.null(dof))
     dof <- mod$df.residual
 
-  # Check for extrapolated values
-  for(i in seq_along(at)){
-    if(is.numeric(data[[names(at)[i]]]) &
-       ! all(at[[i]] <= max(data[[names(at)[i]]]) &
-             at[[i]] >= min(data[[names(at)[i]]])))
-      warning(sprintf("Not all values in 'at' are in the range of '%s'",
-                      names(at)[i]))
-  }
-
-  # Transform the ats ---
+  # Transform covariates that are NOT the variable of interest
   if(!is.null(at)){
-
     data <- at_transforms(data, at)
-
   } else {
-
     data <- list(data)
-
   }
-
 
   # Calculate pred and se ---
   res <- lapply(data, function(x){
 
+    # Transform the variable of interest
     df_levels <- at_transforms(
       model_df = x,
       at_list = gen_at_list(df = x, var_interest = var_interest,

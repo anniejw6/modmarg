@@ -7,12 +7,12 @@ test_that("applying a single transformation", {
   df <- mtcars
   df$gear <- factor(df$gear)
 
-  d0 <- at_transform(var = df[['gear']], value = 3)
+  d0 <- trans(var = df[['gear']], value = 3)
   d1 <- transform(df, gear = factor(3, levels = levels(df$gear)))
 
   expect_identical(d0, d1[['gear']])
 
-  d0 <- at_transform(var = df[['mpg']], value = 20)
+  d0 <- trans(var = df[['mpg']], value = 20)
   d1 <- transform(df, mpg = 20)
 
   expect_identical(d0, d1$mpg)

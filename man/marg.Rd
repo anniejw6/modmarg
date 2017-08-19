@@ -7,7 +7,7 @@
 \usage{
 marg(mod, var_interest, type = "levels", vcov_mat = NULL, dof = NULL,
   at = NULL, base_rn = 1, at_var_interest = NULL, data = NULL,
-  weights = mod$prior.weights, cofint = 0.95)
+  weights = NULL, cofint = 0.95)
 
 \method{marg}{glm}(mod, var_interest, type = "levels", vcov_mat = NULL,
   dof = NULL, at = NULL, base_rn = 1, at_var_interest = NULL,
