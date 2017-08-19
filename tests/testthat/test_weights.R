@@ -534,8 +534,7 @@ test_that("Missing covariate, outcome, and weight data", {
   #           1  |   74.02433   .5383886   137.49   0.000     72.96868    75.07998
   # ------------------------------------------------------------------------------
 
-  z1 <- modmarg::marg(mod = mm, var_interest = 'treatment', type = 'levels',
-                      weights = mm$data$distance)[[1]]
+  z1 <- modmarg::marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
 
   expect_equal(z1$Label, as.factor(c('treatment = 0', 'treatment = 1')))
   expect_equal(z1$Margin, c(58.73447, 74.02433), tolerance = 0.0000001)

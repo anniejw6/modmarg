@@ -52,7 +52,7 @@ marg.glm <- function(mod, var_interest,
                      dof = NULL,
                      at = NULL, base_rn = 1,
                      at_var_interest = NULL,
-                     data = mod$data,
+                     data = mod$data[names(mod$prior.weights), ],
                      weights = mod$prior.weights,
                      cofint = 0.95){
 
