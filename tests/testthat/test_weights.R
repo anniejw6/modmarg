@@ -489,6 +489,63 @@ test_that("Partial Dataset: Missing covariate data, missing weight data", {
 
 })
 
+test_that("Missing covariate, outcome, and weight data", {
+
+  data(margex)
+
+  margex$distance[c(1,3,5)] <- NA
+  margex$age[c(10, 24, 390)] <- NA
+  margex$y[c(12, 220)] <- NA
+
+  mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
+            weights = distance)
+
+  # . reg y i.treatment c.age [aw = distance]
+  # (sum of wgt is   1.7498e+05)
+  #
+  #       Source |       SS       df       MS              Number of obs =    2992
+  # -------------+------------------------------           F(  2,  2989) =  302.48
+  #        Model |  235155.511     2  117577.756           Prob > F      =  0.0000
+  #     Residual |  1161876.02  2989  388.717305           R-squared     =  0.1683
+  # -------------+------------------------------           Adj R-squared =  0.1678
+  #        Total |  1397031.54  2991  467.078414           Root MSE      =  19.716
+
+  # ------------------------------------------------------------------------------
+  #            y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #  1.treatment |   15.28986   .7537398    20.29   0.000     13.81196    16.76776
+  #          age |  -.6161595   .0322077   -19.13   0.000    -.6793111   -.5530079
+  #        _cons |   83.25147   1.279858    65.05   0.000     80.74198    85.76097
+  # ------------------------------------------------------------------------------
+  #
+  # . margins i.treatment
+  #
+  # Predictive margins                                Number of obs   =       2992
+  # Model VCE    : OLS
+  #
+  # Expression   : Linear prediction, predict()
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #    treatment |
+  #           0  |   58.73447    .505075   116.29   0.000     57.74414     59.7248
+  #           1  |   74.02433   .5383886   137.49   0.000     72.96868    75.07998
+  # ------------------------------------------------------------------------------
+
+  z1 <- modmarg::marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
+
+  expect_equal(z1$Label, as.factor(c('treatment = 0', 'treatment = 1')))
+  expect_equal(z1$Margin, c(58.73447, 74.02433), tolerance = 0.0000001)
+  expect_equal(z1$Standard.Error, c(0.505075, 0.5383886), tolerance = 0.0000001)
+  expect_equal(z1$Test.Stat, c(116.29, 137.49), tolerance = 0.0001)
+  expect_equal(z1$P.Value, c(0.000, 0.000), tolerance = 0.0001)
+  expect_equal(z1$`Lower CI (95%)`, c(57.74414, 72.96868), tolerance = 0.0000001)
+  expect_equal(z1$`Upper CI (95%)`, c(59.7248, 75.07998), tolerance = 0.0000001)
+
+})
+
 test_that("Errors and warnings work", {
 
   data(margex)

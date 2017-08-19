@@ -92,8 +92,6 @@ test_that("works correctly even when rows are dropped", {
 
   mod <- glm(outcome ~ treatment + distance,
              data = margex, family = 'binomial')
-  expect_warning(marg(mod, 'treatment', 'levels', at = NULL),
-                 'Dropping 5 rows due to missing data')
 
   z <- marg(mod, 'treatment', 'levels', at = NULL)[[1]]
 
@@ -450,3 +448,27 @@ test_that("Setting base level works", {
 
 })
 
+
+test_that('using period works', {
+
+  # Put as.character in the equation
+  data(margex)
+  margex <- margex[, c('outcome', 'treatment', 'distance')]
+  mod1 <- glm(outcome ~ ., data = margex, family = 'binomial')
+  z1 <- marg(mod1, var_interest = 'treatment',
+             type = 'levels', at = NULL)[[1]]
+
+  expect_equal(z1$Margin, c(.0791146, .2600204),
+               tolerance = 0.0001)
+  expect_equal(z1$Standard.Error,
+               c(.0069456, .0111772), tolerance = 0.0001)
+  expect_equal(z1$Test.Stat,
+               c(11.39, 23.26), tolerance = 0.001)
+  expect_equal(z1$P.Value,
+               c(0, 0), tolerance = 0.001)
+  expect_equal(z1$`Lower CI (95%)`,
+               c(.0655016, .2381135), tolerance = 0.0001)
+  expect_equal(z1$`Upper CI (95%)`,
+               c(.0927277, .2819272), tolerance = 0.0001)
+
+})
