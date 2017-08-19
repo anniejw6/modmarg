@@ -500,9 +500,6 @@ test_that("Missing covariate, outcome, and weight data", {
   mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
             weights = distance)
 
-  s1 <- aiEstimation::mod_marg("reg y i.treatment c.age [aw = distance]", df = margex,
-                         list(pred = "margins i.treatment"))
-
   # . reg y i.treatment c.age [aw = distance]
   # (sum of wgt is   1.7498e+05)
 
