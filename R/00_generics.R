@@ -67,142 +67,40 @@
 #'
 #' @importFrom stats complete.cases terms vcov
 #' @export
-#' @examples
-#'
-#' data(mtcars)
-#' mod <- glm(vs ~ as.factor(gear) + mpg, data = mtcars, family = 'binomial')
-#'
-#' # Get the level of the outcome variable at different values of `gear`
-#' marg(mod, var_interest = 'gear', type = 'levels')
-#'
-#' # Get the effect of `gear` on the outcome value, holding values of `mpg`
-#' # constant
-#' marg(mod, var_interest = 'gear', type = 'effects',
-#'      at = list(mpg = c(15, 21)))
-#'
-#'
-#' data(margex)
-#' mod <- glm(outcome ~ as.factor(treatment) + distance,
-#'        data = margex, family = 'binomial')
-#' # Get the level of the outcome variable at different values of `treatment`
-#' marg(mod, var_interest = 'treatment', type = 'levels', at = NULL)
-#' # Get the effect of `treatment` on the outcome variable
-#' marg(mod, var_interest = 'treatment', type = 'effects', at = NULL)
-#' # Get the level of the outcome variable at different values of `distance`
-#' marg(mod, var_interest = 'distance', type = 'levels',
-#'           at = NULL, at_var_interest = c(10, 20, 30))
-#'
-#' # Using a custom variance-covariance matrix for clustered standard errors
-#' # (also requires custom degrees of freedom for T statistic with OLS model),
-#' # clustering on the "arm" variable
-#'
-#' data(margex)
-#' data(cvcov)
-#' ?cvcov
-#' v <- cvcov$ols$clust
-#' d <- cvcov$ols$stata_dof
-#' mod <- glm(outcome ~ treatment + distance,
-#'            data = margex, family = 'binomial')
-#' marg(mod, var_interest = 'treatment', type = 'levels',
-#'           vcov_mat = v, dof = d)
-#'
-#' # Using weights
-#'
-#' data(margex)
-#' mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
-#'           weights = distance)
-#' z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
-#' z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
-#'
 marg <- function(mod, var_interest,
                  type = 'levels',
                  vcov_mat = NULL,
                  dof = NULL,
                  at = NULL, base_rn = 1,
                  at_var_interest = NULL,
-                 data = mod$data,
+                 data = NULL,
                  weights = mod$prior.weights,
                  cofint = 0.95){
 
-  stopifnot('glm' %in% class(mod))
+  stopifnot(type %in% c('levels', 'effects'))
 
-  # Remove weights if no weights
-  if(all(weights == 1)) weights <- NULL
-
-  # Check if no weights when model was built was weights
-  if(is.null(weights) & !all(mod$prior.weights == 1))
-    warning(paste('The model was built with weights, but you have not',
-                  'provided weights. Your calculated margins may be odd.',
-                  'See Details.'))
-
-  # Keep only complete variables ---
-  data <- clean_glm_data(mod, data, weights)
-  # Add weights back
-  if(!is.null(data$`_weights`)) weights <- data$`_weights`
-
-
-  stopifnot(
-    var_interest %in% names(data),
-    all(names(at) %in% names(data)),
-    is.numeric(cofint),
-    cofint < 1, cofint > 0
-  )
-
-  if(is.null(dof) & !is.null(vcov_mat) & mod$family$family == 'gaussian')
-    warning(paste(
-      "You provided a new variance-covariance matrix for an OLS model",
-      "but no degrees of freedom for the T test. P-value calculations",
-      "may be incorrect - see ?modmarg::marg for details."))
-
-  if(is.null(vcov_mat))
-    vcov_mat <- vcov(mod)
-
-  if(is.null(dof))
-    dof <- mod$df.residual
-
-  # Check for extrapolated values
-  for(i in seq_along(at)){
-    if(is.numeric(data[[names(at)[i]]]) &
-       ! all(at[[i]] <= max(data[[names(at)[i]]]) &
-             at[[i]] >= min(data[[names(at)[i]]])))
-      warning(sprintf("Not all values in 'at' are in the range of '%s'",
-                      names(at)[i]))
-  }
-
-  # Warn if base_rn set but type != 'effects'
-  if(base_rn != 1 & type != 'effects')
-    warning(paste("Setting base_rn when type == 'levels' is ignored."))
-
-  # Transform the ats ---
-  if(!is.null(at)){
-
-    data <- at_transforms(data, at)
-
-  } else {
-
-    data <- list(data)
-
-  }
-
-
-  # Calculate pred and se ---
-  res <- lapply(data, function(x){
-    pred_se(df_trans = x, var_interest = var_interest,
-            model = mod, type = type, base_rn = base_rn,
-            at_var_interest = at_var_interest,
-            vcov_mat = vcov_mat, weights = weights)
-  })
-
-  lapply(res, function(x) {
-    format_output(
-      margin_labels = x$labels,
-      pred_margins = x$pred_margins,
-      se = x$se,
-      family = mod$family$family,
-      dof = dof,
-      cofint = c( (1 - cofint)/2, 1 - (1 - cofint)/2 )
-    )})
+  UseMethod("marg", mod)
 
 }
 
+
+#' Main wrapper function to calculate margins and standard errors
+#'
+#' For one set of transformed covariates (not including the variable of
+#' interest), calculate the predicted level and standard error for the
+#' variable of interest.
+#'
+#' @param df_levels data.frame, already transformed for variables not related
+#'                  to the variable of interest
+#' @param model model object
+#' @param type either effects or levels
+#' @param base_rn numeric, row number of the base level
+#' @param vcov_mat matrix, variance-covariance matrix
+#' @param weights vector of weights, or NULL
+#' @importFrom stats coef predict model.matrix
+pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights){
+
+  UseMethod("pred_se", model)
+
+}
 
