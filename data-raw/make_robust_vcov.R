@@ -13,9 +13,7 @@ robust_se <- function(model){
   }
 }
 
-# Create sample vcov matrix + degrees of freedom for vcov test
-# Page 29 "Improved Critical Values using a T-distribution"
-# http://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015_February.pdf
+# Create sample vcov matrix for vcov test
 
 # OLS
 data(margex)

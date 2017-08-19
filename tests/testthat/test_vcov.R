@@ -148,20 +148,17 @@ test_that("robust SEs work with OLS", {
   data(margex)
   mod <- glm(outcome ~ treatment + distance,
              data = margex, family = 'gaussian')
-  v <- robust_se(mod)
 
   data(rvcov)
-  v <- rvcov$ols$clust
-  d <- rvcov$ols$stata_dof
+  v <- rvcov$ols
 
   z <- marg(
-    mod = mod, var_interest = 'cyl', type = 'levels',
-    at = list('disp' = 400),
-    vcov_mat = v, dof = d)[[1]]
+    mod = mod, var_interest = 'treatment', type = 'levels',
+    vcov_mat = v, dof = mod$df.residual)[[1]]
 
   # stata
-  # reg mpg cyl##c.disp##c.disp hp, robust
-  # margins cyl, at(disp = 400)
+  # reg outcome i.treatment c.distance, robust
+  # margins i.treatment
   # set sformat %8.5f
   # set pformat %5.4f"
 })

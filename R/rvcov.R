@@ -6,10 +6,7 @@
 #'
 #' See data-raw/make_robust_vcov.R for details.
 #'
-#' @format A list of three lists, from an OLS model, logit model, and OLS with a polynomial
-#' interaction with missing data, each containing
-#' \describe{
-#'   \item{clust}{3-by-3 variance-covariance matrix}
-#'   \item{dof}{integer, degrees of freedom for the T statistic}
-#' }
+#' @format A list of three variance-covariance matrices, from an OLS model, logit model, and OLS with a polynomial
+#' interaction with missing data.
 #'
+"rvcov"
