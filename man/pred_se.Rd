@@ -25,4 +25,3 @@ For one set of transformed covariates (not including the variable of
 interest), calculate the predicted level and standard error for the
 variable of interest.
 }
-

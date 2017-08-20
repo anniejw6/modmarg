@@ -34,15 +34,15 @@
 #' # Get the level of the outcome variable at different values of `gear`
 #' marg(mod, var_interest = 'gear', type = 'levels')
 #'
-marg.ivreg <- function(mod, var_interest,
+marg.ivreg <- function(mod, var_interest, data,
                        type = 'levels',
                        vcov_mat = NULL,
                        dof = NULL,
                        at = NULL, base_rn = 1,
                        at_var_interest = NULL,
-                       data = NULL,
                        weights = mod$weights,
                        cofint = 0.95){
+  # require AER for lots of un-exported methods (sigh)
 
   # Set params and Run checks ----
 
@@ -50,27 +50,28 @@ marg.ivreg <- function(mod, var_interest,
                at = at, cofint = cofint, base_rn = base_rn, type = type,
                dof = dof, vcov_mat = vcov_mat)
 
-  # Chekcs specific to glm-----
+  # Checks specific to ivreg
   # See if we're looking for continuous variables
   if(type == 'effects' & is.numeric(data[[var_interest]]) &
      ! all(unique(data[[var_interest]]) %in% c(0, 1)) &
-     ! sprintf("as.character(%s)", var_interest) %in% names(mod$mod) &
-     ! sprintf("as.factor(%s)", var_interest) %in% names(mod$mod))
+     ! sprintf("as.character(%s)", var_interest) %in% names(data) &
+     ! sprintf("as.factor(%s)", var_interest) %in% names(data))
     stop('We do not support effects for continuous variables at this time.')
 
   # Check if no weights when model was built was weights
-  if(is.null(weights) & !all(mod$prior.weights == 1))
+  if(is.null(weights) & !is.null(mod$weights))
     warning('The model was built with weights, but you have not ',
             'provided weights. Your calculated margins may be odd. ',
             'See Details.')
 
   # Keep only complete variables ---
   data <- clean_glm_data(mod, data, weights)
+
   # Add weights back
   if(!is.null(data$`_weights`)) weights <- data$`_weights`
 
   if(is.null(vcov_mat))
-    vcov_mat <- vcov(mod)
+    vcov_mat <- vcov.ivreg(mod)
 
   if(is.null(dof))
     dof <- mod$df.residual
@@ -116,7 +117,7 @@ marg.ivreg <- function(mod, var_interest,
       margin_labels = x$labels,
       pred_margins = x$pred_margins,
       se = x$se,
-      family = mod$family$family,
+      family = 'gaussian',
       dof = dof,
       cofint = c( (1 - cofint)/2, 1 - (1 - cofint)/2 )
     )})
@@ -155,3 +156,9 @@ clean_glm_data <- function(mod, data, weights){
 
 }
 
+vcov.ivreg <- function(mod){
+  # Method taken from unexported AER::vcov.ivreg method
+  # (https://github.com/cran/AER/blob/master/R/ivreg.R)
+  # and modified to match Stata dof correction
+  mod$sigma^2 * mod$cov.unscaled * mod$df.residual / mod$nobs
+}

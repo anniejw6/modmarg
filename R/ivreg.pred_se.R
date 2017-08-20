@@ -1,5 +1,5 @@
 # Main wrapper function to calculate margins and se
-pred_se.glm <- function(df_levels, model, type, base_rn, vcov_mat, weights){
+pred_se.ivreg <- function(df_levels, model, type, base_rn, vcov_mat, weights){
 
 
   res <- lapply(df_levels, function(x){
@@ -7,25 +7,24 @@ pred_se.glm <- function(df_levels, model, type, base_rn, vcov_mat, weights){
     p <- predict(model, newdata = x)
 
     # Calculate mean values
-    preds <- model$family$linkinv(p)
     if(is.null(weights)){
-      preds <- mean(preds)
+      preds <- mean(p)
     } else {
-      preds <- sum(preds * weights)/sum(weights)
+      preds <- sum(p * weights)/sum(weights)
     }
 
-    # Get covariate matrix
+    # Get covariate matrices
     covar_matrix <- model.matrix(
-      object = model$formula, data = x,
-      contrasts.arg = model$contrasts,
-      xlev = model$xlevels)[, !is.na(coef(model))]
+      object = model,
+      data = x,
+      component = 'projected')
 
     list(
       # Calculate Jacobian
       jacobs = calc_jacob(
         pred_values = p,
         covar_matrix = covar_matrix,
-        deriv_func = model$family$mu.eta,
+        deriv_func = identity,
         weights = weights),
       # Calculate predicted values
       preds = preds
