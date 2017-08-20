@@ -31,8 +31,10 @@
 #'
 #' summary(mod, vcov = v)
 #'
-#' # Get the level of the outcome variable at different values of `gear`
-#' marg(mod, var_interest = 'gear', type = 'levels')
+#' # Get the level of the outcome variable at different values of `actual`
+#' # Note data is a *required* parameter here
+#' marg(mod, var_interest = 'actual', data = margex, type = 'levels')
+#' marg(mod, var_interest = 'actual', data = margex, type = 'effects')
 #'
 marg.ivreg <- function(mod, var_interest, data,
                        type = 'levels',

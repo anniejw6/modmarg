@@ -22,8 +22,8 @@
 #' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
 #' @param dof integer, the degrees of freedom used for the T statistic in an
 #' OLS model. Defaults to NULL in which case \code{mod$df.residual} is used.
-#' @param data data.frame that margins should run over, defaults to
-#' \code{mod$data}
+#' @param data data.frame that margins should run over. For glm method, defaults to
+#' \code{mod$data}; must be provided for ivreg method.
 #' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
 #' @param weights numeric, vector of weights used to generate predicted levels,
 #' defaults to \code{mod$prior.weights}. Must be equal to the number of rows

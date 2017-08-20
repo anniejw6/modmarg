@@ -47,8 +47,8 @@ index of one of the ordered unique values in \code{var_interest}). if
 variable of interest at which levels should be calculated.
 If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}}
 
-\item{data}{data.frame that margins should run over, defaults to
-\code{mod$data}}
+\item{data}{data.frame that margins should run over. For glm method, defaults to
+\code{mod$data}; must be provided for ivreg method.}
 
 \item{weights}{numeric, vector of weights used to generate predicted levels,
 defaults to \code{mod$prior.weights}. Must be equal to the number of rows
@@ -173,7 +173,9 @@ v <- function(object, ...){
 
 summary(mod, vcov = v)
 
-# Get the level of the outcome variable at different values of `gear`
-marg(mod, var_interest = 'gear', type = 'levels')
+# Get the level of the outcome variable at different values of `actual`
+# Note data is a *required* parameter here
+marg(mod, var_interest = 'actual', data = margex, type = 'levels')
+marg(mod, var_interest = 'actual', data = margex, type = 'effects')
 
 }
