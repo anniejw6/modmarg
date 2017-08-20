@@ -14,17 +14,19 @@ pred_se.ivreg <- function(df_levels, model, type, base_rn, vcov_mat, weights){
     }
 
     # Get covariate matrices
+    mf <- model.frame(
+      delete.response(model$terms$full), x,
+      na.action = na.pass, xlev = model$levels)
     covar_matrix <- model.matrix(
-      object = model,
-      data = x,
-      component = 'projected')
+      delete.response(model$terms$regressors), mf,
+      contrasts = model$contrasts$regressors)[, !is.na(model$coefficients), drop = FALSE]
 
     list(
       # Calculate Jacobian
       jacobs = calc_jacob(
         pred_values = p,
         covar_matrix = covar_matrix,
-        deriv_func = identity,
+        deriv_func = function(x) rep.int(1, length(x)),
         weights = weights),
       # Calculate predicted values
       preds = preds
