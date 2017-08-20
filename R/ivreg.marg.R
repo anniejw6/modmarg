@@ -45,15 +45,13 @@ marg.ivreg <- function(mod, var_interest,
                        data,
                        weights = mod$weights,
                        cofint = 0.95){
-  # require AER for lots of un-exported methods (sigh)
-
   # Set params and Run checks ----
 
   check_inputs(weights = weights, data = data, var_interest = var_interest,
                at = at, cofint = cofint, base_rn = base_rn, type = type,
                dof = dof, vcov_mat = vcov_mat)
 
-  # Checks specific to ivreg
+  # Checks specific to ivreg ----
   # See if we're looking for continuous variables
   if(type == 'effects' & is.numeric(data[[var_interest]]) &
      ! all(unique(data[[var_interest]]) %in% c(0, 1)) &
@@ -67,10 +65,10 @@ marg.ivreg <- function(mod, var_interest,
             'provided weights. Your calculated margins may be odd. ',
             'See Details.')
 
-  # Keep only complete variables ---
+  # Keep only complete variables ----
   data <- clean_glm_data(mod, data, weights)
 
-  # Add weights back
+  # Add weights back ----
   if(!is.null(data$`_weights`)) weights <- data$`_weights`
 
   if(is.null(vcov_mat))
@@ -79,7 +77,7 @@ marg.ivreg <- function(mod, var_interest,
   if(is.null(dof))
     dof <- Inf
 
-  # Check for extrapolated values
+  # Check for extrapolated values ----
   for(i in seq_along(at)){
     if(is.numeric(data[[names(at)[i]]]) &
        ! all(at[[i]] <= max(data[[names(at)[i]]]) &
@@ -88,19 +86,14 @@ marg.ivreg <- function(mod, var_interest,
                       names(at)[i]))
   }
 
-  # Transform the ats ---
+  # Transform the ats ----
   if(!is.null(at)){
-
     data <- at_transforms(data, at)
-
   } else {
-
     data <- list(data)
-
   }
 
-
-  # Calculate pred and se ---
+  # Calculate pred and se ----
   res <- lapply(data, function(x){
 
     df_levels <- at_transforms(
