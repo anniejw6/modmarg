@@ -2,22 +2,37 @@
 #' @rdname marg
 #' @examples
 #'
-#' # Example from ?AER::ivreg
-#' data("CigarettesSW", package = "AER")
-#' CigarettesSW$rprice <- with(CigarettesSW, price/cpi)
-#' CigarettesSW$rincome <- with(CigarettesSW, income/population/cpi)
-#' CigarettesSW$tdiff <- with(CigarettesSW, (taxs - tax)/cpi)
+#' # --------------------------------------
+#' # 2SLS using AER::ivreg (example adapted from ?AER::ivreg)
 #'
-#' # model
-#' fm <- ivreg(log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff + I(tax/cpi),
-#'             data = CigarettesSW, subset = year == "1995")
+#' data(margex)
+#' margex$assign <- margex$treatment
+#'
+#' # Probability of getting treatment increases with age and distance
+#' margex$pr_treat <- plogis(
+#'   margex$age / sd(margex$age) +
+#'   margex$distance / sd(margex$distance))
+#'
+#' # One-way non-compliance
+#' margex$actual <- margex$assign
+#' margex$actual[margex$assign == 1] <- rbinom(
+#'   n = sum(margex$assign == 1), size = 1,
+#'   prob = margex$pr_treat[margex$assign == 1]
+#' )
+#'
+#' mod <- AER::ivreg(y ~ as.factor(actual) + age + distance |
+#'                     as.factor(assign) + age + distance,
+#'                   data = margex)
+#'
 #'
 #' v <- function(object, ...){
 #'   vcov(object) * object$df.residual / nobs(object)
 #' }
 #'
-#' summary(r, vcov = v)
+#' summary(mod, vcov = v)
 #'
+#' # Get the level of the outcome variable at different values of `gear`
+#' marg(mod, var_interest = 'gear', type = 'levels')
 #'
 marg.ivreg <- function(mod, var_interest,
                        type = 'levels',
@@ -25,13 +40,11 @@ marg.ivreg <- function(mod, var_interest,
                        dof = NULL,
                        at = NULL, base_rn = 1,
                        at_var_interest = NULL,
-                       data = mod$data[names(mod$prior.weights), ],
-                       weights = mod$prior.weights,
+                       data = NULL,
+                       weights = mod$weights,
                        cofint = 0.95){
 
   # Set params and Run checks ----
-  # Remove weights if no weights
-  if(all(weights == 1)) weights <- NULL
 
   check_inputs(weights = weights, data = data, var_interest = var_interest,
                at = at, cofint = cofint, base_rn = base_rn, type = type,
