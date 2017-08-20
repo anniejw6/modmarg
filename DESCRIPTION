@@ -1,6 +1,6 @@
 Package: modmarg
 Title: Calculating Marginal Effects and Levels with Errors
-Version: 0.7.1
+Version: 0.8.0
 Authors@R: c(
 	person("Alex", "Gold", email = "alex.k.gold@gmail.com", role = "aut"),
 	person("Nat", "Olin", email = "nathaniel.olin@gmail.com", role = c("ctb")),
@@ -20,6 +20,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat,
-    sandwich
+    sandwich,
+    AER
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
