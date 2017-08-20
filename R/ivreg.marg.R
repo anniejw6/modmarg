@@ -36,12 +36,13 @@
 #' marg(mod, var_interest = 'actual', data = margex, type = 'levels')
 #' marg(mod, var_interest = 'actual', data = margex, type = 'effects')
 #'
-marg.ivreg <- function(mod, var_interest, data,
+marg.ivreg <- function(mod, var_interest,
                        type = 'levels',
                        vcov_mat = NULL,
                        dof = NULL,
                        at = NULL, base_rn = 1,
                        at_var_interest = NULL,
+                       data,
                        weights = mod$weights,
                        cofint = 0.95){
   # require AER for lots of un-exported methods (sigh)
