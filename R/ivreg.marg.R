@@ -74,7 +74,7 @@ marg.ivreg <- function(mod, var_interest, data,
     vcov_mat <- vcov.ivreg(mod)
 
   if(is.null(dof))
-    dof <- mod$df.residual
+    dof <- Inf
 
   # Check for extrapolated values
   for(i in seq_along(at)){
