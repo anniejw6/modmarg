@@ -171,3 +171,27 @@ marg <- function(mod, var_interest, data = NULL,
 
 }
 
+
+get_default_data <- function(model, ...){
+  UseMethod("get_default_data", model)
+}
+
+get_default_weights <- function(model, ...){
+  UseMethod("get_default_weights", model)
+}
+
+get_default_vcov_mat <- function(model, ...){
+  UseMethod("get_default_vcov_mat", model)
+}
+
+get_default_dof <- function(model, ...){
+  UseMethod("get_default_dof", model)
+}
+
+get_clean_data <- function(model, ...){
+  UseMethod("get_clean_data", model)
+}
+
+get_clean_weights <- function(model, ...){
+  UseMethod("get_clean_weights", model)
+}
