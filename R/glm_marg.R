@@ -49,28 +49,39 @@
 marg.glm <- function(mod, var_interest,
                      data = mod$data[names(mod$prior.weights), ],
                      weights = mod$prior.weights,
-                     vcov_mat = NULL, dof = NULL,
                      ...){
+
+  if(all(weights == 1)) weights <- NULL
 
   .marg(mod = mod, var_interest = var_interest,
         data = data,
         weights = weights,
-        vcov_mat = vcov_mat, dof = dof,
         ...)
 }
 
-get_clean_data.glm <- function(mod, data, weights){
+pred_se.glm <- function(model,
+                        deriv_func = model$family$mu.eta,
+                        link_func = model$family$linkinv, ...){
+
+  .pred_se(model = model,
+           deriv_func = model$family$mu.eta,
+           link_func = model$family$linkinv, ...)
+
+}
+
+get_data.glm <- function(model, data, weights){
 
   # Store original number of rows
   nrow_orig <- nrow(data)
 
   # Grab only necessary variables
-  data <- get_all_vars(mod, data)
+  data <- get_all_vars(model, data)
 
   # Add weights
-  if('_weights' %in% all.vars(mod$formula))
+  if('_weights' %in% all.vars(model$formula))
     stop("You cannot use the name '_weights' in the model formula. ",
          "Please rename to another variable.")
+  if(is.null(weights)) weights <- 1
   data$`_weights` <- weights
 
   # Keep completes only
@@ -82,13 +93,36 @@ get_clean_data.glm <- function(mod, data, weights){
   if(all(data$`F` == FALSE))
     data$`F` <- NULL
 
+  # Remove weights
+  weights <- data[['_weights']]
+  data[['_weights']] <- NULL
+
   # Throw warning if rows were dropped
   if(nrow(data) != nrow_orig)
     warning(sprintf('Dropping %s rows due to missing data',
                     nrow_orig - nrow(data)))
 
-  data
+  list(data = data,
+       weights = weights)
 
 }
 
 
+get_vcov.glm <- function(model){
+  vcov(model)
+}
+
+get_dof.glm <- function(model, ...){
+  model$df.residual
+}
+
+
+get_covar.glm <- function(model, data){
+
+  mm <- model.matrix(
+    object = model$formula, data = data,
+    contrasts.arg = model$contrasts,
+    xlev = model$xlevels)
+
+  mm[, !is.na(model$coefficients)]
+}

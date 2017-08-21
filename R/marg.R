@@ -106,7 +106,13 @@ marg <- function(mod, var_interest, data = NULL,
     stop('`weights` and `data` must be the same length.')
 
   # Get Clean Data (NOT UNIVERSAL) -----
-  data <- get_clean_data(mod = mod, data = data, weights = weights)
+
+  data_wgt <- get_data(model = mod, data = data, weights = weights)
+  data <- data_wgt$data
+  weights <- data_wgt$weights
+
+  if(is.null(vcov_mat)) vcov_mat <- get_vcov(model = mod)
+  if(is.null(dof)) dof <- get_dof(model = mod)
 
   # Check (transformed) inputs -----
   stopifnot(var_interest %in% names(data),
@@ -120,7 +126,7 @@ marg <- function(mod, var_interest, data = NULL,
     stop('We do not support effects for continuous variables at this time.')
 
   # Check if no weights when model was built was weights
-  if(is.null(weights) & !all(mod$prior.weights == 1))
+  if(all(weights == 1) & !all(mod$prior.weights == 1))
     warning('The model was built with weights, but you have not ',
             'provided weights. Your calculated margins may be odd. ',
             'See Details.')
@@ -172,10 +178,14 @@ marg <- function(mod, var_interest, data = NULL,
 
 }
 
-get_clean_data <- function(model, ...){
-  UseMethod("get_clean_data", model)
+get_data <- function(model, ...){
+  UseMethod("get_data", model)
 }
 
-get_clean_weights <- function(model, ...){
-  UseMethod("get_clean_weights", model)
+get_vcov <- function(model, ...){
+  UseMethod("get_vcov", model)
+}
+
+get_dof <- function(model, ...){
+  UseMethod("get_dof", model)
 }

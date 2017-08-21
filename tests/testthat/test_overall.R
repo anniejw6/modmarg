@@ -93,7 +93,7 @@ test_that("works correctly even when rows are dropped", {
   mod <- glm(outcome ~ treatment + distance,
              data = margex, family = 'binomial')
 
-  z <- marg(mod, 'treatment', 'levels', at = NULL)[[1]]
+  z <- marg(mod, var_interest = 'treatment', type = 'levels', at = NULL)[[1]]
 
   expect_equal(z$Margin, c(0.07911049, 0.25890416), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0.006945149, 0.011181260),
