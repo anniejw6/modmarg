@@ -121,7 +121,9 @@ marg.glm <- function(mod, var_interest,
 
     pred_se(df_levels = df_levels,
             model = mod, type = type, base_rn = base_rn,
-            vcov_mat = vcov_mat, weights = weights)
+            vcov_mat = vcov_mat, weights = weights,
+            link_func = mod$family$linkinv,
+            deriv_func = mod$family$mu.eta)
   })
 
   # Format Output ----
