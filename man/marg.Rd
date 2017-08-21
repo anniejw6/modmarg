@@ -14,20 +14,18 @@ marg(mod, var_interest, data = NULL, weights = NULL, vcov_mat = NULL,
 \item{var_interest}{name of the variable of interest, must correspond to a
 covariate in the model}
 
-\item{data}{data.frame that margins should run over, defaults to
-\code{mod$data}}
+\item{data}{data.frame that margins should run over, defaults changes based
+on class-specific method}
 
 \item{weights}{numeric, vector of weights used to generate predicted levels,
-defaults to \code{mod$prior.weights}. Must be equal to the number of rows
-in \code{data}, which means that if there are missing values, in \code{data},
-then the default will not work because \code{prior.weights} are the weights
-after subsetting.}
+defaults changes based on class-specific method. Must be equal to the number
+of rows in \code{data}.}
 
-\item{vcov_mat}{the variance-covariance matrix, defaults to \code{NULL} in which
-case \code{vcov(model)} is used.}
+\item{vcov_mat}{the variance-covariance matrix,
+defaults changes based on class-specific method}
 
 \item{dof}{integer, the degrees of freedom used for the T statistic in an
-OLS model. Defaults to NULL in which case \code{mod$df.residual} is used.}
+OLS model, defaults changes based on class-specific method}
 
 \item{type}{either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
 defaults to \code{'levels'}}

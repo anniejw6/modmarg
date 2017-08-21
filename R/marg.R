@@ -8,8 +8,8 @@
 #' covariate in the model
 #' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
 #' defaults to \code{'levels'}
-#' @param vcov_mat the variance-covariance matrix, defaults to \code{NULL} in which
-#' case \code{vcov(model)} is used.
+#' @param vcov_mat the variance-covariance matrix,
+#' defaults changes based on class-specific method
 #' @param at list, should be in the format of \code{list('var_name' = c(values))},
 #' defaults to \code{NULL}. This calculates the margins of the variable at these
 #' particular variables. If all values are needed, suggested syntax is
@@ -21,15 +21,13 @@
 #' variable of interest at which levels should be calculated.
 #' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
 #' @param dof integer, the degrees of freedom used for the T statistic in an
-#' OLS model. Defaults to NULL in which case \code{mod$df.residual} is used.
-#' @param data data.frame that margins should run over, defaults to
-#' \code{mod$data}
+#' OLS model, defaults changes based on class-specific method
+#' @param data data.frame that margins should run over, defaults changes based
+#' on class-specific method
 #' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
 #' @param weights numeric, vector of weights used to generate predicted levels,
-#' defaults to \code{mod$prior.weights}. Must be equal to the number of rows
-#' in \code{data}, which means that if there are missing values, in \code{data},
-#' then the default will not work because \code{prior.weights} are the weights
-#' after subsetting.
+#' defaults changes based on class-specific method. Must be equal to the number
+#' of rows in \code{data}.
 #' @param ... additional parameters passed to class-specific methods
 #'
 #' @return list of dataframes with predicted margins/effects, standard errors, p-values,

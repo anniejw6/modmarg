@@ -14,14 +14,12 @@
 \item{var_interest}{name of the variable of interest, must correspond to a
 covariate in the model}
 
-\item{data}{data.frame that margins should run over, defaults to
-\code{mod$data}}
+\item{data}{data.frame that margins should run over, defaults changes based
+on class-specific method}
 
 \item{weights}{numeric, vector of weights used to generate predicted levels,
-defaults to \code{mod$prior.weights}. Must be equal to the number of rows
-in \code{data}, which means that if there are missing values, in \code{data},
-then the default will not work because \code{prior.weights} are the weights
-after subsetting.}
+defaults changes based on class-specific method. Must be equal to the number
+of rows in \code{data}.}
 
 \item{...}{additional parameters passed to \code{?marg}.}
 }
