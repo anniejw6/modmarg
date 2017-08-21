@@ -14,13 +14,9 @@ calc_jacob <- function(pred_values, covar_matrix, deriv_func, weights = NULL,
   # Calculate derivative of the predicted values
   x1 <- do.call(deriv_func, list(pred_values))
 
-  if(is.null(weights)){
-    jacob <- crossprod(x1, covar_matrix)/nrow(covar_matrix)
-  } else {
-    jacob <- crossprod(x1 * weights, covar_matrix) / sum(weights)
-  }
+  if(is.null(weights)) weights <- rep(1, nrow(covar_matrix))
 
-  as.numeric(jacob)
+  as.numeric(crossprod(x1 * weights, covar_matrix) / sum(weights))
 
 }
 

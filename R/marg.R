@@ -67,12 +67,24 @@
 #'
 #' @importFrom stats complete.cases terms vcov
 #' @export
+#'
 marg <- function(mod, var_interest, data = NULL,
                  weights = NULL,
                  vcov_mat = NULL, dof = NULL,
                  type = 'levels', base_rn = 1,
                  at_var_interest = NULL,  at = NULL,
                  cofint = 0.95){
+
+  UseMethod("marg", mod)
+
+}
+
+.marg <- function(mod, var_interest, data = NULL,
+                  weights = NULL,
+                  vcov_mat = NULL, dof = NULL,
+                  type = 'levels', base_rn = 1,
+                  at_var_interest = NULL,  at = NULL,
+                  cofint = 0.95){
 
   # Check arguments ---
   stopifnot(type %in% c('levels', 'effects'),
@@ -90,26 +102,15 @@ marg <- function(mod, var_interest, data = NULL,
       "may be incorrect if the model is gaussian - ",
       "see ?modmarg::marg for details.")
 
-  # Figure out default params ---
-  data <- get_default_data(...)
-  weights <- get_default_weights(...)
-
-  if(is.null(vcov_mat)) vcov_mat <- get_default_vcov_mat(...)
-  if(is.null(dof)) dof <- get_default_dof(...)
-
-  # Check data validity  -----
-  stopifnot(var_interest %in% names(data),
-            all(names(at) %in% names(data)))
-
   if(!is.null(weights) & length(weights) != nrow(data))
     stop('`weights` and `data` must be the same length.')
 
   # Get Clean Data (NOT UNIVERSAL) -----
-
-  data <- get_clean_data(...)
-  weights <- get_clean_weights(...)
+  data <- get_clean_data(mod = mod, data = data, weights = weights)
 
   # Check (transformed) inputs -----
+  stopifnot(var_interest %in% names(data),
+            all(names(at) %in% names(data)))
 
   # See if we're looking for continuous variables
   if(type == 'effects' & is.numeric(data[[var_interest]]) &
@@ -169,23 +170,6 @@ marg <- function(mod, var_interest, data = NULL,
     )})
 
 
-}
-
-
-get_default_data <- function(model, ...){
-  UseMethod("get_default_data", model)
-}
-
-get_default_weights <- function(model, ...){
-  UseMethod("get_default_weights", model)
-}
-
-get_default_vcov_mat <- function(model, ...){
-  UseMethod("get_default_vcov_mat", model)
-}
-
-get_default_dof <- function(model, ...){
-  UseMethod("get_default_dof", model)
 }
 
 get_clean_data <- function(model, ...){

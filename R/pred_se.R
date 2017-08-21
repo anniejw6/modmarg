@@ -26,11 +26,7 @@ pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
 
     # Calculate mean values
     preds <- link_func(p)
-    if(is.null(weights)){
-      preds <- mean(preds)
-    } else {
-      preds <- sum(preds * weights)/sum(weights)
-    }
+    preds <- sum(preds * weights)/sum(weights)
 
     # Get covariate matrix
     covar_matrix <- get_covar(model, data = x)
