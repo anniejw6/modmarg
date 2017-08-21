@@ -30,6 +30,7 @@
 #' in \code{data}, which means that if there are missing values, in \code{data},
 #' then the default will not work because \code{prior.weights} are the weights
 #' after subsetting.
+#' @param ... additional parameters passed to class-specific methods
 #'
 #' @return list of dataframes with predicted margins/effects, standard errors, p-values,
 #' and confidence interval bounds
@@ -53,9 +54,7 @@
 #' P values are calculated with T tests for gaussian families, and Z tests
 #' otherwise. If a new variance-covariance matrix is provided (e.g. for
 #' clustering standard errors), the degrees of freedom for the T test / p-value
-#' calculation may need to be specified using \code{dof}. To replicate Stata clustering
-#' \code{vce(cluster var_name)}, \code{dof} should be set to \eqn{g - 1}, where g is
-#' the number of unique levels of the clustering variable.
+#' calculation may need to be specified using \code{dof}.
 #'
 #' This function currently only supports \code{\link[stats]{glm}} objects.
 #' If you would like to use \code{lm} objects, consider running a \code{glm}
@@ -73,7 +72,7 @@ marg <- function(mod, var_interest, data = NULL,
                  vcov_mat = NULL, dof = NULL,
                  type = 'levels', base_rn = 1,
                  at_var_interest = NULL,  at = NULL,
-                 cofint = 0.95){
+                 cofint = 0.95, ...){
 
   UseMethod("marg", mod)
 
@@ -84,7 +83,7 @@ marg <- function(mod, var_interest, data = NULL,
                   vcov_mat = NULL, dof = NULL,
                   type = 'levels', base_rn = 1,
                   at_var_interest = NULL,  at = NULL,
-                  cofint = 0.95){
+                  cofint = 0.95, ...){
 
   # Check arguments ---
   stopifnot(type %in% c('levels', 'effects'),

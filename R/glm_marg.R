@@ -1,18 +1,22 @@
-#' @export
-#' @rdname marg
-#' @examples
+#' Predicted Margins for `glm` objects
 #'
+#' Obtains predicted margins and standard errors
+#' of those predictions from a fitted generalized linear model object.
+#'
+#' @inheritParams marg
+#' @param ... additional parameters passed to \code{?marg}.
+#'
+#' @export
+#' @examples
 #' data(mtcars)
 #' mod <- glm(vs ~ as.factor(gear) + mpg, data = mtcars, family = 'binomial')
 #'
 #' # Get the level of the outcome variable at different values of `gear`
 #' marg(mod, var_interest = 'gear', type = 'levels')
-#'
 #' # Get the effect of `gear` on the outcome value, holding values of `mpg`
 #' # constant
 #' marg(mod, var_interest = 'gear', type = 'effects',
 #'      at = list(mpg = c(15, 21)))
-#'
 #'
 #' data(margex)
 #' mod <- glm(outcome ~ as.factor(treatment) + distance,
@@ -31,7 +35,7 @@
 #'
 #' data(margex)
 #' data(cvcov)
-#' ?cvcov
+#' # ?cvcov
 #' v <- cvcov$ols$clust
 #' d <- cvcov$ols$stata_dof
 #' mod <- glm(outcome ~ treatment + distance,
@@ -40,12 +44,12 @@
 #'           vcov_mat = v, dof = d)
 #'
 #' # Using weights
-#'
 #' data(margex)
 #' mm <- glm(y ~ as.factor(treatment) + age, data = margex, family = 'gaussian',
 #'           weights = distance)
 #' z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
 #' z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
+#'
 marg.glm <- function(mod, var_interest,
                      data = mod$data[names(mod$prior.weights), ],
                      weights = mod$prior.weights,
