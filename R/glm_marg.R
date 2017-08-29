@@ -86,21 +86,18 @@ get_data.glm <- function(model, data, weights){
   if('_weights' %in% all.vars(model$formula))
     stop("You cannot use the name '_weights' in the model formula. ",
          "Please rename to another variable.")
-  if(is.null(weights)) weights <- 1
-  data$`_weights` <- weights
+  if(is.null(weights)) weights <- rep(1, nrow_orig)
 
   # Keep completes only
-  data <- na.omit(data)
+  miss <- rowSums(is.na(data)) > 0 | is.na(weights)
+  weights <- weights[! miss]
+  data <- data[! miss, , drop = FALSE]
 
   # Remove any booleans
   if(all(data$`T` == TRUE))
     data$`T` <- NULL
   if(all(data$`F` == FALSE))
     data$`F` <- NULL
-
-  # Remove weights
-  weights <- data[['_weights']]
-  data[['_weights']] <- NULL
 
   # Throw warning if rows were dropped
   if(nrow(data) != nrow_orig)
