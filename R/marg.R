@@ -8,8 +8,8 @@
 #' covariate in the model
 #' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
 #' defaults to \code{'levels'}
-#' @param vcov_mat the variance-covariance matrix, defaults to \code{NULL} in which
-#' case \code{vcov(model)} is used.
+#' @param vcov_mat the variance-covariance matrix,
+#' defaults changes based on class-specific method
 #' @param at list, should be in the format of \code{list('var_name' = c(values))},
 #' defaults to \code{NULL}. This calculates the margins of the variable at these
 #' particular variables. If all values are needed, suggested syntax is
@@ -21,15 +21,14 @@
 #' variable of interest at which levels should be calculated.
 #' If \code{NULL}, indicates all levels for a factor variable, defaults to \code{NULL}
 #' @param dof integer, the degrees of freedom used for the T statistic in an
-#' OLS model. Defaults to NULL in which case \code{mod$df.residual} is used.
-#' @param data data.frame that margins should run over, defaults to
-#' \code{mod$data}
+#' OLS model, defaults changes based on class-specific method
+#' @param data data.frame that margins should run over, defaults changes based
+#' on class-specific method
 #' @param cofint numeric, confidence interval (must be less than 1), defaults to 0.95
 #' @param weights numeric, vector of weights used to generate predicted levels,
-#' defaults to \code{mod$prior.weights}. Must be equal to the number of rows
-#' in \code{data}, which means that if there are missing values, in \code{data},
-#' then the default will not work because \code{prior.weights} are the weights
-#' after subsetting.
+#' defaults changes based on class-specific method. Must be equal to the number
+#' of rows in \code{data}.
+#' @param ... additional parameters passed to class-specific methods
 #'
 #' @return list of dataframes with predicted margins/effects, standard errors, p-values,
 #' and confidence interval bounds
@@ -53,9 +52,7 @@
 #' P values are calculated with T tests for gaussian families, and Z tests
 #' otherwise. If a new variance-covariance matrix is provided (e.g. for
 #' clustering standard errors), the degrees of freedom for the T test / p-value
-#' calculation may need to be specified using \code{dof}. To replicate Stata clustering
-#' \code{vce(cluster var_name)}, \code{dof} should be set to \eqn{g - 1}, where g is
-#' the number of unique levels of the clustering variable.
+#' calculation may need to be specified using \code{dof}.
 #'
 #' This function currently only supports \code{\link[stats]{glm}} objects.
 #' If you would like to use \code{lm} objects, consider running a \code{glm}
@@ -67,12 +64,24 @@
 #'
 #' @importFrom stats complete.cases terms vcov
 #' @export
+#'
 marg <- function(mod, var_interest, data = NULL,
                  weights = NULL,
                  vcov_mat = NULL, dof = NULL,
                  type = 'levels', base_rn = 1,
                  at_var_interest = NULL,  at = NULL,
-                 cofint = 0.95){
+                 cofint = 0.95, ...){
+
+  UseMethod("marg", mod)
+
+}
+
+.marg <- function(mod, var_interest, data = NULL,
+                  weights = NULL,
+                  vcov_mat = NULL, dof = NULL,
+                  type = 'levels', base_rn = 1,
+                  at_var_interest = NULL,  at = NULL,
+                  cofint = 0.95, ...){
 
   # Check arguments ---
   stopifnot(type %in% c('levels', 'effects'),
@@ -90,26 +99,21 @@ marg <- function(mod, var_interest, data = NULL,
       "may be incorrect if the model is gaussian - ",
       "see ?modmarg::marg for details.")
 
-  # Figure out default params ---
-  data <- get_default_data(...)
-  weights <- get_default_weights(...)
-
-  if(is.null(vcov_mat)) vcov_mat <- get_default_vcov_mat(...)
-  if(is.null(dof)) dof <- get_default_dof(...)
-
-  # Check data validity  -----
-  stopifnot(var_interest %in% names(data),
-            all(names(at) %in% names(data)))
-
   if(!is.null(weights) & length(weights) != nrow(data))
     stop('`weights` and `data` must be the same length.')
 
   # Get Clean Data (NOT UNIVERSAL) -----
 
-  data <- get_clean_data(...)
-  weights <- get_clean_weights(...)
+  data_wgt <- get_data(model = mod, data = data, weights = weights)
+  data <- data_wgt$data
+  weights <- data_wgt$weights
+
+  if(is.null(vcov_mat)) vcov_mat <- get_vcov(model = mod)
+  if(is.null(dof)) dof <- get_dof(model = mod)
 
   # Check (transformed) inputs -----
+  stopifnot(var_interest %in% names(data),
+            all(names(at) %in% names(data)))
 
   # See if we're looking for continuous variables
   if(type == 'effects' & is.numeric(data[[var_interest]]) &
@@ -119,7 +123,7 @@ marg <- function(mod, var_interest, data = NULL,
     stop('We do not support effects for continuous variables at this time.')
 
   # Check if no weights when model was built was weights
-  if(is.null(weights) & !all(mod$prior.weights == 1))
+  if(all(weights == 1) & !all(mod$prior.weights == 1))
     warning('The model was built with weights, but you have not ',
             'provided weights. Your calculated margins may be odd. ',
             'See Details.')
@@ -171,27 +175,14 @@ marg <- function(mod, var_interest, data = NULL,
 
 }
 
-
-get_default_data <- function(model, ...){
-  UseMethod("get_default_data", model)
+get_data <- function(model, ...){
+  UseMethod("get_data", model)
 }
 
-get_default_weights <- function(model, ...){
-  UseMethod("get_default_weights", model)
+get_vcov <- function(model, ...){
+  UseMethod("get_vcov", model)
 }
 
-get_default_vcov_mat <- function(model, ...){
-  UseMethod("get_default_vcov_mat", model)
-}
-
-get_default_dof <- function(model, ...){
-  UseMethod("get_default_dof", model)
-}
-
-get_clean_data <- function(model, ...){
-  UseMethod("get_clean_data", model)
-}
-
-get_clean_weights <- function(model, ...){
-  UseMethod("get_clean_weights", model)
+get_dof <- function(model, ...){
+  UseMethod("get_dof", model)
 }
