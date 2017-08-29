@@ -19,6 +19,13 @@ pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
                     deriv_func,
                     link_func = function(x){x}){
 
+  UseMethod("pred_se", model)
+}
+
+.pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
+                     deriv_func,
+                     link_func = function(x){x}){
+
 
   res <- lapply(df_levels, function(x){
     # Predict function is expensive so just calling it once
@@ -26,11 +33,7 @@ pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
 
     # Calculate mean values
     preds <- link_func(p)
-    if(is.null(weights)){
-      preds <- mean(preds)
-    } else {
-      preds <- sum(preds * weights)/sum(weights)
-    }
+    preds <- sum(preds * weights)/sum(weights)
 
     # Get covariate matrix
     covar_matrix <- get_covar(model, data = x)
@@ -61,6 +64,7 @@ pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
     se = calc_pred_se(vcov_mat, jacobs)
   )
 }
+
 
 get_covar <- function(model, data){
 
