@@ -73,7 +73,7 @@ pred_se.glm <- function(model,
 
 }
 
-#' @importFrom stats get_all_vars na.omit
+#' @importFrom stats get_all_vars
 get_data.glm <- function(model, data, weights){
 
   # Store original number of rows
