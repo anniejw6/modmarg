@@ -16,8 +16,7 @@
 #' response scale
 #' @importFrom stats coef predict model.matrix
 pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
-                    deriv_func,
-                    link_func = function(x){x}){
+                    deriv_func, link_func){
 
   UseMethod("pred_se", model)
 }
