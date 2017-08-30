@@ -22,8 +22,7 @@ pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
 }
 
 .pred_se <- function(df_levels, model, type, base_rn, vcov_mat, weights,
-                     deriv_func,
-                     link_func = function(x){x}){
+                     deriv_func, link_func){
 
 
   res <- lapply(df_levels, function(x){
