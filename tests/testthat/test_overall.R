@@ -27,12 +27,9 @@ test_that("levels are calculated correctly despite different input types", {
   z3 <- marg(mod3, var_interest = 'treatment',
                   type = 'levels', at = NULL)[[1]]
 
-  expect_equal(z1$Margin, expected = c(.0791146, .2600204),
-               tolerance = 0.0001)
-  expect_equal(z2$Margin, expected = c(.0791146, .2600204),
-               tolerance = 0.0001)
-  expect_equal(z3$Margin, expected = c(.0791146, .2600204),
-               tolerance = 0.0001)
+  expect_equal(z1$Margin, c(.0791146, .2600204), tolerance = 0.0001)
+  expect_equal(z2$Margin, c(.0791146, .2600204), tolerance = 0.0001)
+  expect_equal(z3$Margin, c(.0791146, .2600204), tolerance = 0.0001)
 
   expect_equal(z1$Standard.Error, c(.0069456, .0111772), tolerance = 0.0001)
   expect_equal(z2$Standard.Error, c(.0069456, .0111772), tolerance = 0.0001)
@@ -415,8 +412,8 @@ test_that("Setting base level works", {
   expect_equal(z1$Test.Stat, c(NaN, 18.04), tolerance = 0.01)
   expect_equal(rev(-1 * z2$Test.Stat), c(NaN, 18.04), tolerance = 0.01)
 
-  expect_equal(z1$P.Value, c(NA, 0.000), tolerance = 0.001)
-  expect_equal(rev(z2$P.Value), c(NA, 0.000), tolerance = 0.001)
+  expect_equal(z1$P.Value, c(NaN, 0.000), tolerance = 0.001)
+  expect_equal(rev(z2$P.Value), c(NaN, 0.000), tolerance = 0.001)
 
   expect_equal(z1$`Lower CI (95%)`, c(0, 12.50775), tolerance = 0.0001)
   expect_equal(rev(-1 * z2$`Upper CI (95%)`), c(0, 12.50775), tolerance = 0.0001)
