@@ -62,7 +62,7 @@ get_data.ivreg <- function(model, data, weights){
   nrow_orig <- nrow(data)
 
   # Grab only necessary variables
-  data <- get_all_vars(model, data)
+  data <- data[, all.vars(model$formula)]
 
   # Add weights
   if('_weights' %in% all.vars(model$formula))
