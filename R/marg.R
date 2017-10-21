@@ -4,6 +4,7 @@
 #' a model using the delta method.
 #'
 #' @param mod model object, currently only support those of class \code{\link[stats]{glm}}
+#' or \code{\link[AER]{ivreg}}
 #' @param var_interest name of the variable of interest, must correspond to a
 #' covariate in the model
 #' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
@@ -54,9 +55,9 @@
 #' clustering standard errors), the degrees of freedom for the T test / p-value
 #' calculation may need to be specified using \code{dof}.
 #'
-#' This function currently only supports \code{\link[stats]{glm}} objects.
-#' If you would like to use \code{lm} objects, consider running a \code{glm}
-#' with family \code{gaussian}.
+#' This function currently only supports \code{\link[stats]{glm}} and
+#' \code{\link[AER]{ivreg}} objects. If you would like to use \code{lm}
+#' objects, consider running a \code{glm} with family \code{gaussian}.
 #'
 #' When calculating predicted levels and effects for models built using weights,
 #' \code{marg} returns weighted averages for levels and effects by default.

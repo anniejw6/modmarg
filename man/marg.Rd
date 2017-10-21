@@ -9,7 +9,8 @@ marg(mod, var_interest, data = NULL, weights = NULL, vcov_mat = NULL,
   at = NULL, cofint = 0.95, ...)
 }
 \arguments{
-\item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}}
+\item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}
+or \code{\link[AER]{ivreg}}}
 
 \item{var_interest}{name of the variable of interest, must correspond to a
 covariate in the model}
@@ -84,4 +85,3 @@ When calculating predicted levels and effects for models built using weights,
 \code{marg} returns weighted averages for levels and effects by default.
 Users can remove this option by setting \code{weights = NULL}.
 }
-
