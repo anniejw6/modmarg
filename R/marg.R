@@ -168,12 +168,16 @@ marg <- function(mod, var_interest, data = NULL,
       margin_labels = x$labels,
       pred_margins = x$pred_margins,
       se = x$se,
-      family = mod$family$family,
+      family = get_family(mod),
       dof = dof,
       cofint = c( (1 - cofint)/2, 1 - (1 - cofint)/2 )
     )})
 
 
+}
+
+get_family <- function(model, ...){
+  UseMethod("get_family", model)
 }
 
 get_data <- function(model, ...){

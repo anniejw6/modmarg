@@ -46,7 +46,10 @@ marg.ivreg <- function(mod, var_interest,
         ...)
 }
 
-pred_se.ivreg <- function(model){
+pred_se.ivreg <- function(model,
+                          deriv_func = function(x) rep.int(1, length(x)),
+                          link_func = identity,
+                          ...){
 
   .pred_se(model = model,
            deriv_func = function(x) rep.int(1, length(x)),
@@ -114,4 +117,8 @@ get_covar.ivreg <- function(model, data){
     contrasts = model$contrasts$regressors)
 
   covar_matrix[, !is.na(model$coefficients), drop = FALSE]
+}
+
+get_family.ivreg <- function(model){
+  'gaussian'
 }

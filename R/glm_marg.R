@@ -128,3 +128,7 @@ get_covar.glm <- function(model, data){
 
   mm[, !is.na(model$coefficients)]
 }
+
+get_family.glm <- function(model){
+  model$family$family
+}
