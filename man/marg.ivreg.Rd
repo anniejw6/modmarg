@@ -27,31 +27,23 @@ Obtains predicted margins and standard errors
 of those predictions from a fitted \code{ivreg} model object.
 }
 \examples{
-data(margex)
-margex$assign <- margex$treatment
+# From ?AER::ivreg
 
-# Probability of getting treatment increases with age
-margex$pr_treat <- plogis(
- scale(margex$age) + scale(margex$distance))
+# data
+data("CigarettesSW", package = "AER")
+CigarettesSW$rprice <- with(CigarettesSW, price/cpi)
+CigarettesSW$rincome <- with(CigarettesSW, income/population/cpi)
+CigarettesSW$tdiff <- with(CigarettesSW, (taxs - tax)/cpi)
 
-# One-way non-compliance
-margex$actual <- margex$assign
-margex$actual[margex$assign == 1] <- rbinom(
-  n = sum(margex$assign == 1), size = 1,
-  prob = margex$pr_treat[margex$assign == 1]
-)
+# model
+fm <- AER::ivreg(log(packs) ~ log(rprice) + log(rincome) |
+                   log(rincome) + tdiff + I(tax/cpi),
+                 data = CigarettesSW, subset = year == "1995")
 
-table(margex$assign, margex$actual)
+# Get margins for different levels of price/cpi
+rprice_levs <- round(quantile(CigarettesSW$rprice))
 
-# Fit the model
-mod <- AER::ivreg(
-  y ~ as.factor(actual) + age + distance |
-    as.factor(assign) + age + distance,
-  data = margex)
-
-# Get margins for different levels of "actual" treatment
-modmarg::marg(mod, data = margex, var_interest = 'actual')
-
-# TODO: weights, clustering
+marg(fm, data = subset(CigarettesSW, year == "1995"),
+     var_interest = 'rprice', at_var_interest = rprice_levs)
 
 }
