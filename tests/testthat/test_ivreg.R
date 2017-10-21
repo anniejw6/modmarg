@@ -119,3 +119,16 @@ test_that('2SLS margins are correct', {
   expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
 
 })
+
+test_that('2SLS margins handle weights', {
+  margex$wgt <- runif(nrow(margex))
+  # TODO
+})
+
+test_that('2SLS margins handle missing covariates', {
+  # TODO
+})
+
+test_that('2SLS margins handle missing weights', {
+  # TODO
+})

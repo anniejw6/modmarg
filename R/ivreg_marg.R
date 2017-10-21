@@ -33,7 +33,7 @@
 #' # Get margins for different levels of "actual" treatment
 #' modmarg::marg(mod, data = margex, var_interest = 'actual')
 #'
-#' TODO: weights, clustering
+#' # TODO: weights, clustering
 #'
 marg.ivreg <- function(mod, var_interest,
                        data,
