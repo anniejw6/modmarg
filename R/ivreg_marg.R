@@ -105,7 +105,7 @@ get_dof.ivreg <- function(model, ...){
   Inf
 }
 
-
+#' @importFrom stats delete.response model.frame na.pass
 get_covar.ivreg <- function(model, data){
 
   mf <- model.frame(
