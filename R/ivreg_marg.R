@@ -33,7 +33,6 @@
 #' # Get margins for different levels of "actual" treatment
 #' modmarg::marg(mod, data = margex, var_interest = 'actual')
 #'
-#' # TODO: weights, clustering
 #'
 marg.ivreg <- function(mod, var_interest,
                        data,
@@ -67,35 +66,13 @@ get_data.ivreg <- function(model, data, weights){
   # Grab only necessary variables
   data <- data[, all.vars(model$formula)]
 
-  # Add weights
-  if('_weights' %in% all.vars(model$formula))
-    stop("You cannot use the name '_weights' in the model formula. ",
-         "Please rename to another variable.")
-  if(is.null(weights)) weights <- rep(1, nrow_orig)
-
-  # Keep completes only
-  miss <- rowSums(is.na(data)) > 0 | is.na(weights)
-  weights <- weights[! miss]
-  data <- data[! miss, , drop = FALSE]
-
-  # Remove any booleans
-  if(all(data$`T` == TRUE))
-    data$`T` <- NULL
-  if(all(data$`F` == FALSE))
-    data$`F` <- NULL
-
-  # Throw warning if rows were dropped
-  if(nrow(data) != nrow_orig)
-    warning(sprintf('Dropping %s rows due to missing data',
-                    nrow_orig - nrow(data)))
-
-  list(data = data,
-       weights = weights)
+  # Drop to correct rows
+  handle_missing(model, data, weights, nrow_orig)
 
 }
 
 # Method taken from unexported AER::vcov.ivreg method
-# (https://github.com/cran/AER/blob/master/R/ivreg.R)
+# (https://github.com/cran/AER/blob/1530163a062bcd848cb38f5d0c8511583ed5599b/R/ivreg.R#L139-L140)
 # and modified to match Stata dof correction
 get_vcov.ivreg <- function(model){
   model$sigma^2 * model$cov.unscaled * model$df.residual / model$nobs
@@ -105,17 +82,23 @@ get_dof.ivreg <- function(model, ...){
   Inf
 }
 
+#' Create covariate matrix given arbitrary data. Adapted from
+#' https://github.com/cran/AER/blob/1530163a062bcd848cb38f5d0c8511583ed5599b/R/ivreg.R#L45-L46
 #' @importFrom stats delete.response model.frame na.pass
 get_covar.ivreg <- function(model, data){
 
+  # Format data according to formula (applies transformations,
+  # adds as.factor() to names, etc)
   mf <- model.frame(
     delete.response(model$terms$full), data,
     na.action = na.pass, xlev = model$levels)
 
+  # Convert data to model matrix (add intercept, break out factors)
   covar_matrix <- model.matrix(
     delete.response(model$terms$regressors), mf,
     contrasts = model$contrasts$regressors)
 
+  # Return, dropping coefficients that weren't estimated
   covar_matrix[, !is.na(model$coefficients), drop = FALSE]
 }
 
