@@ -1,0 +1,121 @@
+rm(list = ls())
+
+data(margex)
+set.seed(100)
+margex$assign <- margex$treatment
+
+# Probability of getting treatment increases with age
+margex$pr_treat <- plogis(
+  scale(margex$age) + scale(margex$distance))
+
+# One-way non-compliance
+margex$actual <- margex$assign
+margex$actual[margex$assign == 1] <- rbinom(
+  n = sum(margex$assign == 1), size = 1,
+  prob = margex$pr_treat[margex$assign == 1]
+)
+
+vcov.ivreg <- function(model){
+  model$sigma^2 * model$cov.unscaled * model$df.residual / model$nobs
+}
+
+# ---------------------
+context('2SLS model margins')
+
+# Stata
+
+test_that('2sls coefficients and standard errors are correct', {
+
+  mod <- AER::ivreg(
+    y ~ as.factor(actual) + age + distance |
+      as.factor(assign) + age + distance,
+    data = margex)
+
+  mm <- summary(mod, vcov.ivreg)
+
+  # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
+
+  # Instrumental variables (2SLS) regression               Number of obs =    3000
+  #                                                        Wald chi2(3)  =  340.53
+  #                                                        Prob > chi2   =  0.0000
+  #                                                        R-squared     =       .
+  #                                                        Root MSE      =  22.642
+
+  # ------------------------------------------------------------------------------
+  #            y |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #     1.actual |   29.61091    1.84763    16.03   0.000     25.98962     33.2322
+  #          age |  -.7501718   .0451406   -16.62   0.000    -.8386457   -.6616978
+  #     distance |  -.0140998   .0023245    -6.07   0.000    -.0186558   -.0095438
+  #        _cons |   92.52933    1.61735    57.21   0.000     89.35938    95.69928
+  # ------------------------------------------------------------------------------
+  # Instrumented:  1.actual
+  # Instruments:   age distance 1.assign
+
+  expect_equal(mm$coefficients[, 'Estimate'], c(
+    '(Intercept)' = 92.52933, 'as.factor(actual)1' = 29.61091,
+    'age' = -0.7501718, 'distance' = -0.0140998))
+
+  expect_equal(mm$coefficients[, 'Std. Error'], c(
+    '(Intercept)' = 1.61735, 'as.factor(actual)1' = 1.84763,
+    'age' = 0.0451406, 'distance' = 0.0023245),
+    tolerance = 0.000001)
+
+})
+
+test_that('2SLS margins are correct', {
+
+  mod <- AER::ivreg(
+    y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
+    data = margex)
+
+  z <- marg(mod, var_interest = 'actual', data = margex)[[1]]
+
+  # . margins i.actual
+
+  # Predictive margins                                Number of obs   =       3000
+  # Model VCE    : Unadjusted
+
+  # Expression   : Linear prediction, predict()
+
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #       actual |
+  #           0  |   61.84719   .6426773    96.23   0.000     60.58757    63.10682
+  #           1  |    91.4581   1.417176    64.54   0.000     88.68049    94.23572
+  # ------------------------------------------------------------------------------
+
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
+
+  # . margins, dydx(actual)
+
+  # Average marginal effects                          Number of obs   =       3000
+  # Model VCE    : Unadjusted
+
+  # Expression   : Linear prediction, predict()
+  # dy/dx w.r.t. : 1.actual
+
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #     1.actual |   29.61091    1.84763    16.03   0.000     25.98962     33.2322
+  # ------------------------------------------------------------------------------
+  # Note: dy/dx for factor levels is the discrete change from the base level.
+
+  z <- marg(mod, data = margex, var_interest = 'actual',
+            type = 'effects')[[1]]
+
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
+  expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
+})
