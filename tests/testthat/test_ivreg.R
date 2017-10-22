@@ -169,7 +169,7 @@ test_that('2SLS margins warn if weights are absent', {
 
   mod <- AER::ivreg(
     y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
-    weights = wgt, data = margex_na)
+    weights = wgt, data = margex)
 
   expect_warning(
     z <- marg(mod, var_interest = 'actual', data = margex),
