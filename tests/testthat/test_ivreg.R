@@ -129,6 +129,7 @@ test_that('2SLS margins are correct', {
 
 })
 
+
 test_that('2SLS margins handle weights', {
 
   mod <- AER::ivreg(
@@ -161,6 +162,22 @@ test_that('2SLS margins handle weights', {
   # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
   # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
   # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
+})
+
+test_that('2SLS margins warn if weights are absent', {
+
+  mod <- AER::ivreg(
+    y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
+    weights = wgt, data = margex_na)
+
+  expect_warning(
+    z <- marg(mod, var_interest = 'actual', data = margex),
+    paste("The model was built with weights, but you have not",
+          "provided weights. Your calculated margins may be odd.",
+          "See Details."),
+    fixed = TRUE
+  )
 
 })
 
@@ -215,7 +232,8 @@ test_that('2SLS margins handle missing weights', {
   # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
   # . margins i.actual
 
-  z <- marg(mod, var_interest = 'actual', data = margex_na)[[1]]
+  z <- marg(mod, var_interest = 'actual',
+            data = margex_na, weights = margex_na$wgt)[[1]]
 
   # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
   # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
@@ -227,7 +245,7 @@ test_that('2SLS margins handle missing weights', {
   # . margins, dydx(actual)
 
   z <- marg(mod, var_interest = 'actual',
-            data = margex_na[!is.na(margex_na$wgt), ],
+            data = margex_na, weights = margex_na$wgt,
             type = 'effects')[[1]]
 
   # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
@@ -254,7 +272,7 @@ test_that('2SLS margins handle missing weights and covariates', {
   # . margins i.actual
 
   z <- marg(mod, var_interest = 'actual',
-            data = margex_na)[[1]]
+            data = margex_na, weights = margex_na$wgt)[[1]]
 
   # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
   # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
@@ -266,7 +284,7 @@ test_that('2SLS margins handle missing weights and covariates', {
   # . margins, dydx(actual)
 
   z <- marg(mod, var_interest = 'actual', type = 'effects',
-            data = margex_na[!is.na(margex_na$wgt), ])[[1]]
+            data = margex_na, weights = margex_na$wgt)[[1]]
 
   # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
   # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)

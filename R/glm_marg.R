@@ -109,3 +109,7 @@ get_covar.glm <- function(model, data){
 get_family.glm <- function(model){
   model$family$family
 }
+
+has_weights.glm <- function(model){
+  !all(model$prior.weights == 1)
+}

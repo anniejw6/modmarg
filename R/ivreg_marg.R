@@ -98,3 +98,7 @@ get_covar.ivreg <- function(model, data){
 get_family.ivreg <- function(model){
   'gaussian'
 }
+
+has_weights.ivreg <- function(model){
+  !is.null(model$weights)
+}

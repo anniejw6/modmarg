@@ -124,7 +124,7 @@ marg <- function(mod, var_interest, data = NULL,
     stop('We do not support effects for continuous variables at this time.')
 
   # Check if no weights when model was built was weights
-  if(all(weights == 1) & !all(mod$prior.weights == 1))
+  if(all(weights == 1) & has_weights(mod) == TRUE)
     warning('The model was built with weights, but you have not ',
             'provided weights. Your calculated margins may be odd. ',
             'See Details.')
@@ -190,4 +190,8 @@ get_vcov <- function(model, ...){
 
 get_dof <- function(model, ...){
   UseMethod("get_dof", model)
+}
+
+has_weights <- function(model, ...){
+  UseMethod("has_weights", model)
 }
