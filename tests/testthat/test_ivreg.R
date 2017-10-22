@@ -15,6 +15,10 @@ margex$actual[margex$assign == 1] <- rbinom(
   prob = margex$pr_treat[margex$assign == 1]
 )
 
+# Weights
+margex$wgt <- runif(nrow(margex))
+
+# vcov function for summary
 vcov.ivreg <- function(model){
   model$sigma^2 * model$cov.unscaled * model$df.residual / model$nobs
 }
@@ -90,6 +94,11 @@ test_that('2SLS margins are correct', {
   expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
   expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
+  # TODO: other parameters?
+  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
 
   # . margins, dydx(actual)
 
@@ -121,14 +130,150 @@ test_that('2SLS margins are correct', {
 })
 
 test_that('2SLS margins handle weights', {
-  margex$wgt <- runif(nrow(margex))
-  # TODO
+
+  mod <- AER::ivreg(
+    y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
+    weights = wgt, data = margex)
+
+  # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
+  # . margins i.actual
+
+  z <- marg(mod, var_interest = 'actual',
+            weights = margex$wgt, data = margex)[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
+  # . margins, dydx(actual)
+
+  z <- marg(mod, var_interest = 'actual',
+            weights = margex$wgt, data = margex,
+            type = 'effects')[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
+  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
 })
 
+# ---------------------
+context('2SLS models handle missingness')
+
 test_that('2SLS margins handle missing covariates', {
-  # TODO
+
+  margex_na <- margex
+  margex_na$distance[c(1, 3, 5, 7, 9)] <- NA
+
+  mod <- AER::ivreg(
+    y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
+    data = margex_na)
+
+  # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
+  # . margins i.actual
+
+  z <- marg(mod, var_interest = 'actual', data = margex_na)[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
+  # . margins, dydx(actual)
+
+  z <- marg(mod, var_interest = 'actual', data = margex_na,
+            type = 'effects')[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
+  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
 })
 
 test_that('2SLS margins handle missing weights', {
-  # TODO
+
+  margex_na <- margex
+  margex_na$wgt[c(1, 2, 5, 8, 9)] <- NA
+
+  mod <- AER::ivreg(
+    y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
+    weights = wgt, data = margex_na)
+
+  # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
+  # . margins i.actual
+
+  z <- marg(mod, var_interest = 'actual', data = margex_na)[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
+  # . margins, dydx(actual)
+
+  z <- marg(mod, var_interest = 'actual',
+            data = margex_na[!is.na(margex_na$wgt), ],
+            type = 'effects')[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
+  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
+})
+
+test_that('2SLS margins handle missing weights and covariates', {
+
+  margex_na <- margex
+  margex_na$distance[c(1, 3, 5, 7, 9)] <- NA
+  margex_na$wgt[c(1, 4, 5, 6, 9, 10)] <- NA
+
+  mod <- AER::ivreg(
+    y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
+    weights = wgt, data = margex_na)
+
+  # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
+  # . margins i.actual
+
+  z <- marg(mod, var_interest = 'actual',
+            data = margex_na)[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
+  # . margins, dydx(actual)
+
+  z <- marg(mod, var_interest = 'actual', type = 'effects',
+            data = margex_na[!is.na(margex_na$wgt), ])[[1]]
+
+  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
+  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
+  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
+  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
+  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+
 })

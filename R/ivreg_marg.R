@@ -29,7 +29,7 @@
 #'
 marg.ivreg <- function(mod, var_interest,
                        data,
-                       weights = mod$weights,
+                       weights = NULL,
                        ...){
 
   .marg(mod = mod, var_interest = var_interest,

@@ -4,7 +4,7 @@
 \alias{marg.ivreg}
 \title{Predicted Margins for `ivreg` objects from the \code{AER} package}
 \usage{
-\method{marg}{ivreg}(mod, var_interest, data, weights = mod$weights, ...)
+\method{marg}{ivreg}(mod, var_interest, data, weights = NULL, ...)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}
