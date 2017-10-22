@@ -57,7 +57,7 @@ get_data.ivreg <- function(model, data, weights){
   nrow_orig <- nrow(data)
 
   # Grab only necessary variables
-  data <- data[, all.vars(model$formula)]
+  data <- data[, all.vars(model$formula), drop = FALSE]
 
   # Drop to correct rows
   handle_missing(model, data, weights, nrow_orig)
