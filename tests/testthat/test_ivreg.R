@@ -138,30 +138,61 @@ test_that('2SLS margins handle weights', {
 
   # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
   # . margins i.actual
+  #
+  # Predictive margins                                Number of obs   =       3000
+  # Model VCE    : Unadjusted
+  #
+  # Expression   : Linear prediction, predict()
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #       actual |
+  #           0  |   61.81683   .6938917    89.09   0.000     60.45683    63.17684
+  #           1  |   91.58006    1.73586    52.76   0.000     88.17783    94.98228
+  # ------------------------------------------------------------------------------
 
   z <- marg(mod, var_interest = 'actual',
+            vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
+            # dof = mod$df.residual,
             weights = margex$wgt, data = margex)[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(61.81683, 91.58006), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(.6938917, 1.73586), tolerance = 0.0000001)
+  expect_equal(z$Test.Stat, c(89.09, 52.76), tolerance = 0.01)
+  expect_equal(z$P.Value, c(0.000, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(60.45683, 88.17783), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(63.17684, 94.98228), tolerance = 0.0001)
 
   # . margins, dydx(actual)
 
+  # Average marginal effects                          Number of obs   =       3000
+  # Model VCE    : Robust
+  #
+  # Expression   : Linear prediction, predict()
+  # dy/dx w.r.t. : 1.actual
+  #
+  # ------------------------------------------------------------------------------
+  #            |            Delta-method
+  #            |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #   1.actual |   29.76322    2.17495    13.68   0.000      25.5004    34.02605
+  # ------------------------------------------------------------------------------
+
   z <- marg(mod, var_interest = 'actual',
+            vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             weights = margex$wgt, data = margex,
             type = 'effects')[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
-  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(0, 29.76322), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(0, 2.17495), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(NaN, 13.68), tolerance = 0.001)
+  expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0, 25.5004), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0, 34.02605), tolerance = 0.0001)
 
 })
 
@@ -196,27 +227,49 @@ test_that('2SLS margins handle missing covariates', {
   # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
   # . margins i.actual
 
+  # Predictive margins                                Number of obs   =       2995
+  # Model VCE    : Unadjusted
+  #
+  # Expression   : Linear prediction, predict()
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #       actual |
+  #           0  |   61.84185   .6423856    96.27   0.000      60.5828     63.1009
+  #           1  |   91.44042   1.416974    64.53   0.000     88.66321    94.21764
+  # ------------------------------------------------------------------------------
+
   z <- marg(mod, var_interest = 'actual', data = margex_na)[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(61.84185, 91.44042), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(.6423856, 1.416974), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(96.27, 64.54), tolerance = 0.001)
+  expect_equal(z$P.Value, c(0.000, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(60.5828, 88.66321), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(63.1009, 94.21764), tolerance = 0.0001)
 
   # . margins, dydx(actual)
+
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #     1.actual |   29.59858   1.846635    16.03   0.000     25.97924    33.21791
+  # ------------------------------------------------------------------------------
 
   z <- marg(mod, var_interest = 'actual', data = margex_na,
             type = 'effects')[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
-  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(0, 29.59858), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(0, 1.846635), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
+  expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0, 25.97924), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0, 33.21791), tolerance = 0.0001)
 
 })
 
@@ -229,32 +282,61 @@ test_that('2SLS margins handle missing weights', {
     y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
     weights = wgt, data = margex_na)
 
-  # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
+  # .ivregress 2sls y c.age c.distance (i.actual = i.assign) [pweight = wgt]
   # . margins i.actual
 
+  # Predictive margins                                Number of obs   =       2995
+  # Model VCE    : Robust
+  #
+  # Expression   : Linear prediction, predict()
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #       actual |
+  #           0  |   61.82222   .6935352    89.14   0.000     60.46291    63.18152
+  #           1  |   91.55232   1.737943    52.68   0.000     88.14601    94.95862
+  # ------------------------------------------------------------------------------
+
   z <- marg(mod, var_interest = 'actual',
+            vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             data = margex_na, weights = margex_na$wgt)[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(61.82222, 91.55232), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(.6935352, 1.737943), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(89.14, 52.68), tolerance = 0.001)
+  expect_equal(z$P.Value, c(0.000, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(60.46291, 88.14601), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(63.18152, 94.95862), tolerance = 0.0001)
 
   # . margins, dydx(actual)
 
+  # Average marginal effects                          Number of obs   =       2995
+  # Model VCE    : Robust
+  #
+  # Expression   : Linear prediction, predict()
+  # dy/dx w.r.t. : 1.actual
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #     1.actual |    29.7301   2.176272    13.66   0.000     25.46469    33.99552
+
   z <- marg(mod, var_interest = 'actual',
+            vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             data = margex_na, weights = margex_na$wgt,
             type = 'effects')[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
-  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(0, 29.7301), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(0, 2.176272), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(NaN, 13.66), tolerance = 0.001)
+  expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0, 25.46469), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0, 33.99552), tolerance = 0.0001)
 
 })
 
@@ -268,30 +350,60 @@ test_that('2SLS margins handle missing weights and covariates', {
     y ~ as.factor(actual) + age + distance | as.factor(assign) + age + distance,
     weights = wgt, data = margex_na)
 
-  # .ivregress 2sls y c.age c.distance (i.actual = i.assign)
+  # .ivregress 2sls y c.age c.distance (i.actual = i.assign) [pweight = wgt]
   # . margins i.actual
 
+  # Predictive margins                                Number of obs   =       2992
+  # Model VCE    : Robust
+  #
+  # Expression   : Linear prediction, predict()
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #       actual |
+  #           0  |   61.82219   .6934071    89.16   0.000     60.46314    63.18125
+  #           1  |   91.51205   1.736853    52.69   0.000     88.10789    94.91622
+  # ------------------------------------------------------------------------------
+
   z <- marg(mod, var_interest = 'actual',
+            vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             data = margex_na, weights = margex_na$wgt)[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(61.82219, 91.51205), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(.6934071, 1.736853), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(89.16, 52.69), tolerance = 0.001)
+  expect_equal(z$P.Value, c(0.000, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(60.46314, 88.10789), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(63.18125, 94.91622), tolerance = 0.0001)
 
   # . margins, dydx(actual)
 
+  # Average marginal effects                          Number of obs   =       2992
+  # Model VCE    : Robust
+  #
+  # Expression   : Linear prediction, predict()
+  # dy/dx w.r.t. : 1.actual
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #     1.actual |   29.68986   2.174845    13.65   0.000     25.42724    33.95248
+  # ------------------------------------------------------------------------------
+
   z <- marg(mod, var_interest = 'actual', type = 'effects',
+            vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             data = margex_na, weights = margex_na$wgt)[[1]]
 
-  # expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
-  # expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
-  # expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
-  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Margin, c(0, 29.68986), tolerance = 0.000001)
+  expect_equal(z$Standard.Error, c(0, 2.174845), tolerance = 0.000001)
+  expect_equal(z$Test.Stat, c(NaN, 13.65), tolerance = 0.001)
+  expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0, 25.42724), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0, 33.95248), tolerance = 0.0001)
 
 })
