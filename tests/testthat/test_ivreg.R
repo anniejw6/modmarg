@@ -95,10 +95,10 @@ test_that('2SLS margins are correct', {
   expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
   # TODO: other parameters?
-  # expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
-  # expect_equal(z$P.Value, c(NaN, 0.000), tolerance = 0.0001)
-  # expect_equal(z$`Lower CI (95%)`, c(0, 25.98962), tolerance = 0.0001)
-  # expect_equal(z$`Upper CI (95%)`, c(0, 33.2322), tolerance = 0.0001)
+  expect_equal(z$Test.Stat, c(96.23, 64.54), tolerance = 0.001)
+  expect_equal(z$P.Value, c(0, 0), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(60.58757, 88.68049), tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(63.10682, 94.23572), tolerance = 0.0001)
 
   # . margins, dydx(actual)
 
@@ -406,4 +406,17 @@ test_that('2SLS margins handle missing weights and covariates', {
   expect_equal(z$`Lower CI (95%)`, c(0, 25.42724), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(0, 33.95248), tolerance = 0.0001)
 
+})
+
+test_that('P values are calculated correctly', {
+  data(margex)
+  set.seed(100)
+  margex$noise <- rbinom(nrow(margex), 1, 0.5)
+
+  mod <- AER::ivreg(
+    y ~ as.factor(noise) + age + distance |
+      as.factor(treatment) + age + distance,
+    data = margex)
+
+  z <- marg(mod, var_interest = 'noise', type = 'effects', data = margex)[[1]]
 })
