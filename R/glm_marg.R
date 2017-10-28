@@ -82,31 +82,8 @@ get_data.glm <- function(model, data, weights){
   # Grab only necessary variables
   data <- get_all_vars(model, data)
 
-  # Add weights
-  if('_weights' %in% all.vars(model$formula))
-    stop("You cannot use the name '_weights' in the model formula. ",
-         "Please rename to another variable.")
-  if(is.null(weights)) weights <- rep(1, nrow_orig)
-
-  # Keep completes only
-  miss <- rowSums(is.na(data)) > 0 | is.na(weights)
-  weights <- weights[! miss]
-  data <- data[! miss, , drop = FALSE]
-
-  # Remove any booleans
-  if(all(data$`T` == TRUE))
-    data$`T` <- NULL
-  if(all(data$`F` == FALSE))
-    data$`F` <- NULL
-
-  # Throw warning if rows were dropped
-  if(nrow(data) != nrow_orig)
-    warning(sprintf('Dropping %s rows due to missing data',
-                    nrow_orig - nrow(data)))
-
-  list(data = data,
-       weights = weights)
-
+  # Drop to correct rows
+  handle_missing(model, data, weights, nrow_orig)
 }
 
 
@@ -127,4 +104,12 @@ get_covar.glm <- function(model, data){
     xlev = model$xlevels)
 
   mm[, !is.na(model$coefficients)]
+}
+
+get_family.glm <- function(model){
+  model$family$family
+}
+
+has_weights.glm <- function(model){
+  !all(model$prior.weights == 1)
 }

@@ -9,7 +9,8 @@
   ...)
 }
 \arguments{
-\item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}}
+\item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}
+or \code{\link[AER]{ivreg}}}
 
 \item{var_interest}{name of the variable of interest, must correspond to a
 covariate in the model}
@@ -71,4 +72,3 @@ z1 <- marg(mod = mm, var_interest = 'treatment', type = 'levels')[[1]]
 z2 <- marg(mod = mm, var_interest = 'treatment', type = 'effects')[[1]]
 
 }
-

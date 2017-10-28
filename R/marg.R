@@ -4,6 +4,7 @@
 #' a model using the delta method.
 #'
 #' @param mod model object, currently only support those of class \code{\link[stats]{glm}}
+#' or \code{\link[AER]{ivreg}}
 #' @param var_interest name of the variable of interest, must correspond to a
 #' covariate in the model
 #' @param type either \code{'levels'} (predicted outcomes) or \code{'effects'} \eqn{dydx},
@@ -54,9 +55,9 @@
 #' clustering standard errors), the degrees of freedom for the T test / p-value
 #' calculation may need to be specified using \code{dof}.
 #'
-#' This function currently only supports \code{\link[stats]{glm}} objects.
-#' If you would like to use \code{lm} objects, consider running a \code{glm}
-#' with family \code{gaussian}.
+#' This function currently only supports \code{\link[stats]{glm}} and
+#' \code{\link[AER]{ivreg}} objects. If you would like to use \code{lm}
+#' objects, consider running a \code{glm} with family \code{gaussian}.
 #'
 #' When calculating predicted levels and effects for models built using weights,
 #' \code{marg} returns weighted averages for levels and effects by default.
@@ -123,7 +124,7 @@ marg <- function(mod, var_interest, data = NULL,
     stop('We do not support effects for continuous variables at this time.')
 
   # Check if no weights when model was built was weights
-  if(all(weights == 1) & !all(mod$prior.weights == 1))
+  if(all(weights == 1) & has_weights(mod) == TRUE)
     warning('The model was built with weights, but you have not ',
             'provided weights. Your calculated margins may be odd. ',
             'See Details.')
@@ -167,12 +168,16 @@ marg <- function(mod, var_interest, data = NULL,
       margin_labels = x$labels,
       pred_margins = x$pred_margins,
       se = x$se,
-      family = mod$family$family,
+      family = get_family(mod),
       dof = dof,
       cofint = c( (1 - cofint)/2, 1 - (1 - cofint)/2 )
     )})
 
 
+}
+
+get_family <- function(model, ...){
+  UseMethod("get_family", model)
 }
 
 get_data <- function(model, ...){
@@ -185,4 +190,8 @@ get_vcov <- function(model, ...){
 
 get_dof <- function(model, ...){
   UseMethod("get_dof", model)
+}
+
+has_weights <- function(model, ...){
+  UseMethod("has_weights", model)
 }
