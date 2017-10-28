@@ -414,6 +414,37 @@ test_that('P values are calculated correctly', {
   margex$noise <- rbinom(nrow(margex), 1, 0.5)
 
   # . ivregress 2sls y c.age c.distance (i.noise = i.treatment)
+
+  mod <- AER::ivreg(
+    y ~ as.factor(noise) + age + distance |
+      as.factor(treatment) + age + distance,
+    data = margex)
+
+  # . margins i.noise
+  #
+  # Predictive margins                                Number of obs   =       3000
+  # Model VCE    : Unadjusted
+  #
+  # Expression   : Linear prediction, predict()
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #        noise |
+  #           0  |  -609.8165   1255.984    -0.49   0.627    -3071.499    1851.866
+  #           1  |   731.4008   1222.935     0.60   0.550    -1665.507    3128.308
+  # ------------------------------------------------------------------------------
+
+  z <- marg(mod, var_interest = 'noise', type = 'levels', data = margex)[[1]]
+
+  expect_equal(z$Margin, c(-609.8165, 731.4008), tolerance = 0.0001)
+  expect_equal(z$Standard.Error, c(1255.984, 1222.935), tolerance = 0.001)
+  expect_equal(z$Test.Stat, c(-0.49, 0.60), tolerance = 0.01)
+  expect_equal(z$P.Value, c(0.627, 0.550), tolerance = 0.001)
+  expect_equal(z$`Lower CI (95%)`, c(-3071.499, -1665.507), tolerance = 0.001)
+  expect_equal(z$`Upper CI (95%)`, c(1851.866, 3128.308), tolerance = 0.001)
+
   # . margins, dydx(noise)
   #
   # Average marginal effects                          Number of obs   =       3000
@@ -428,11 +459,6 @@ test_that('P values are calculated correctly', {
   # -------------+----------------------------------------------------------------
   #      1.noise |   1341.217   2478.797     0.54   0.588    -3517.136     6199.57
   # ------------------------------------------------------------------------------
-
-  mod <- AER::ivreg(
-    y ~ as.factor(noise) + age + distance |
-      as.factor(treatment) + age + distance,
-    data = margex)
 
   z <- marg(mod, var_interest = 'noise', type = 'effects', data = margex)[[1]]
   z <- z[2, ]
