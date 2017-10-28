@@ -413,10 +413,34 @@ test_that('P values are calculated correctly', {
   set.seed(100)
   margex$noise <- rbinom(nrow(margex), 1, 0.5)
 
+  # . ivregress 2sls y c.age c.distance (i.noise = i.treatment)
+  # . margins, dydx(noise)
+  #
+  # Average marginal effects                          Number of obs   =       3000
+  # Model VCE    : Unadjusted
+  #
+  # Expression   : Linear prediction, predict()
+  # dy/dx w.r.t. : 1.noise
+  #
+  # ------------------------------------------------------------------------------
+  #              |            Delta-method
+  #              |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  # -------------+----------------------------------------------------------------
+  #      1.noise |   1341.217   2478.797     0.54   0.588    -3517.136     6199.57
+  # ------------------------------------------------------------------------------
+
   mod <- AER::ivreg(
     y ~ as.factor(noise) + age + distance |
       as.factor(treatment) + age + distance,
     data = margex)
 
   z <- marg(mod, var_interest = 'noise', type = 'effects', data = margex)[[1]]
+  z <- z[2, ]
+
+  expect_equal(z$Margin, 1341.217, tolerance = 0.0001)
+  expect_equal(z$Standard.Error, 2478.797, tolerance = 0.0001)
+  expect_equal(z$Test.Stat, 0.54, tolerance = 0.01)
+  expect_equal(z$P.Value, 0.588, tolerance = 0.001)
+  expect_equal(z$`Lower CI (95%)`, -3517.136, tolerance = 0.001)
+  expect_equal(z$`Upper CI (95%)`, 6199.57, tolerance = 0.0001)
 })
