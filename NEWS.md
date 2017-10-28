@@ -1,3 +1,8 @@
+# Version 0.9.0
+
+* Add generic functions for `glm` 
+* Add functionality for `ivreg`
+
 # Version 0.7.0
 
 * Refactors to use generic functions
