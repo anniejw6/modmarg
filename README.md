@@ -59,7 +59,7 @@ vignette('delta-method', package = 'modmarg')
 
 * [Delta Method](http://www.phidot.org/software/mark/docs/book/pdf/app_2.pdf): This is from the appendix the book guide to the [MARK program, developed by Gary White](http://www.phidot.org/software/mark/index.html).
 
-* [How can I estimate the standard error of transformed regression parameters in R using the delta method?](http://stats.idre.ucla.edu/r/faq/how-can-i-estimate-the-standard-error-of-transformed-regression-parameters-in-r-using-the-delta-method/) from UCLA.
+* [How can I estimate the standard error of transformed regression parameters in R using the delta method?](https://stats.idre.ucla.edu/r/faq/how-can-i-estimate-the-standard-error-of-transformed-regression-parameters-in-r-using-the-delta-method/) from UCLA.
 
 * [The Delta method to estimate standard errors from a non-linear transformation](http://www.econometricsbysimulation.com/2012/12/the-delta-method-to-estimate-standard.html) from Econometrics by Simulation.
 
