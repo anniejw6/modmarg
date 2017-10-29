@@ -9,7 +9,7 @@ version of Stata's 'margins' command.
 
 Features:
 
-* Calculate predictive levels and margins for `glm` objects
+* Calculate predictive levels and margins for `glm` and `ivreg` objects
 (more models to be added - PRs welcome) using closed-form derivatives
 
 * Add custom variance-covariance matrices to all calculations to add, e.g.,
