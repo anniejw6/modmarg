@@ -131,11 +131,15 @@ marg <- function(mod, var_interest, data = NULL,
 
   # Check for extrapolated values
   for(i in seq_along(at)){
-    if(is.numeric(data[[names(at)[i]]]) &
-       ! all(at[[i]] <= max(data[[names(at)[i]]]) &
-             at[[i]] >= min(data[[names(at)[i]]])))
-      warning(sprintf("Not all values in 'at' are in the range of '%s'",
-                      names(at)[i]))
+    if(is.numeric(data[[names(at)[i]]])){
+      if(! all(at[[i]] <= max(data[[names(at)[i]]]) &
+               at[[i]] >= min(data[[names(at)[i]]])))
+        warning(sprintf("Not all values in 'at' are in the range of '%s'",
+                        names(at)[i]))
+    } else {
+      if(! at[[i]] %in% data[[names(at)[i]]])
+        stop(sprintf("'%s' is not a value in '%s'", at[[i]], names(at)[i]))
+    }
   }
 
   # Transform Data  -----
