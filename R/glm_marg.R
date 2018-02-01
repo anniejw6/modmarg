@@ -88,7 +88,7 @@ get_data.glm <- function(model, data, weights){
 
 
 get_vcov.glm <- function(model){
-  vcov(model)
+  vcov(model, complete = FALSE)
 }
 
 get_dof.glm <- function(model, ...){
