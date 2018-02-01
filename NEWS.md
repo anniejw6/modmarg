@@ -1,3 +1,7 @@
+# Version 0.9.2
+
+* Change variance covariance function for compatibility with R-devel
+
 # Version 0.9.0
 
 * Add generic functions for `glm` 
