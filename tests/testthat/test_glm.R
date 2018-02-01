@@ -346,7 +346,16 @@ test_that("marg input is checked", {
   # extrapolated values are troubling
   mm <- glm(y ~ sex + age, margex, family = 'gaussian')
   expect_warning(marg(mod = mm, var_interest = 'sex',
-                           at = list(age = 100)))
+                      at = list(age = 100)),
+                 "Not all values in 'at' are in the range of 'age'",
+                 fixed = TRUE)
+
+  # extrapolated factors are broken
+  mm <- glm(y ~ sex + agegroup, data = margex)
+  expect_error(marg(mod = mm, var_interest = 'sex',
+                    at = list(agegroup = '12')),
+               "'12' is not a value in 'agegroup'",
+               fixed = TRUE)
 })
 
 
