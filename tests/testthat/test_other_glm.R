@@ -7,7 +7,7 @@ test_that("Probit models are correct", {
   mod <- glm(outcome ~ as.factor(treatment) * distance, data = margex,
              family = binomial(link = 'probit'))
 
-  z <- mod_marg2(mod, var_interest = 'treatment', type = 'levels')[[1]]
+  z <- marg(mod, var_interest = 'treatment', type = 'levels')[[1]]
 
   # stata
   # probit outcome i.treatment##distance
@@ -39,7 +39,7 @@ test_that("Probit models are correct", {
 
   # EFFECTS
 
-  z <- mod_marg2(mod, var_interest = 'treatment', type = 'effects')[[1]]
+  z <- marg(mod, var_interest = 'treatment', type = 'effects')[[1]]
   # stata
   # probit outcome i.treatment##distance
   # margins, dydx(treatment)
@@ -71,7 +71,7 @@ test_that("Poisson models are correct", {
   mod <- glm(breaks ~ wool * tension, data = warpbreaks,
              family = "poisson")
 
-  z <- mod_marg2(mod, var_interest = 'tension', type = 'levels')[[1]]
+  z <- marg(mod, var_interest = 'tension', type = 'levels')[[1]]
 
   # stata
   # poisson breaks i.wool##i.tension
@@ -125,7 +125,7 @@ test_that("Poisson models are correct", {
   #           H  |  -14.72222   1.795914    -8.20   0.000    -18.24215   -11.20229
   # ------------------------------------------------------------------------------
 
-  z <- mod_marg2(mod, var_interest = 'tension', type = 'effects')[[1]]
+  z <- marg(mod, var_interest = 'tension', type = 'effects')[[1]]
   expect_equal(z$Margin, c(0, -10.000, -14.72222), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0, 1.867526, 1.795914),
                tolerance = 0.0001)
@@ -177,8 +177,8 @@ test_that("Poisson models are correct", {
   mod <- glm(breaks ~ wool * tension + offset(off), data = warpbreaks,
              family = "poisson")
 
-  z1 <- mod_marg2(mod, var_interest = 'tension', type = 'levels')[[1]]
-  z2 <- mod_marg2(mod, var_interest = 'tension', type = 'effects')[[1]]
+  z1 <- marg(mod, var_interest = 'tension', type = 'levels')[[1]]
+  z2 <- marg(mod, var_interest = 'tension', type = 'effects')[[1]]
 
   expect_equal(z1$Margin, c(40.03297, 22.89519, 26.3223),
                tolerance = 0.0001)
