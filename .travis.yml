@@ -1,9 +1,6 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: r
-r:
-  - release
-  - devel
+language: R
 sudo: false
 cache: packages
 r_github_packages:
@@ -11,4 +8,3 @@ r_github_packages:
 
 after_success:
   - Rscript -e 'covr::codecov()'
-
