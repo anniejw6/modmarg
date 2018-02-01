@@ -63,10 +63,25 @@ test_that("make sure we format output correctly", {
                      family = "gaussian",
                      dof = 20)
 
-  expect_equal(z$`Lower CI (95%)`, c(0.06462633, 0.23670517), tolerance = 0.0001)
-  expect_equal(z$`Upper CI (95%)`, c(0.09360287, 0.28333563), tolerance = 0.0001)
+  expect_equal(z$`Lower CI (95%)`, c(0.06462633, 0.23670517),
+               tolerance = 0.0001)
+  expect_equal(z$`Upper CI (95%)`, c(0.09360287, 0.28333563),
+               tolerance = 0.0001)
   expect_equal(z$P.Value, c(0, 0))
   expect_equal(z$Test.Stat, c(11.39, 23.26), tolerance = 0.01)
 
-  # TODO: add check in here for negative values!
+  z <- format_output(margin_labels = c('hello', 'goodbye'),
+                     pred_margins = c(.0791146, .2600204),
+                     se = c(.0069456, .0111772),
+                     family = "gaussian",
+                     dof = 20,
+                     cofint = c(0.05, 0.95))
+
+  expect_equal(z$`Lower CI (90%)`, c(0.0671354, 0.2407429),
+               tolerance = 0.0001)
+  expect_equal(z$`Upper CI (90%)`, c(0.0910938, 0.2792979),
+               tolerance = 0.0001)
+  expect_equal(z$P.Value, c(0, 0), tolerance = 0.0001)
+  expect_equal(z$Test.Stat, c(11.39061, 23.26346), tolerance = 0.0001)
+
 })

@@ -1,20 +1,38 @@
 # modmarg
+[![CRAN Version](http://www.r-pkg.org/badges/version/modmarg)](http://www.r-pkg.org/badges/version/modmarg)
 [![Build Status](https://travis-ci.org/anniejw6/modmarg.svg?branch=master)](https://travis-ci.org/anniejw6/modmarg)
 [![codecov](https://codecov.io/gh/anniejw6/modmarg/branch/master/graph/badge.svg)](https://codecov.io/gh/anniejw6/modmarg)
 
-Calculate predicted levels and marginal effects from 'glm' objects, 
+Calculate predicted levels and marginal effects 
 using the delta method to calculate standard errors. This is an R-based 
 version of Stata's 'margins' command.
 
+Features:
+
+* Calculate predictive levels and margins for `glm` and `ivreg` objects
+(more models to be added - PRs welcome) using closed-form derivatives
+
+* Add custom variance-covariance matrices to all calculations to add, e.g.,
+clustered or robust standard errors (for more information on replicating
+Stata analyses, see [here](https://github.com/anniejw6/modmarg/issues/107))
+
+* Frequency weights are incorporated into margins and effects
+
 # Usage
 
-To install this package, please run
+To install this package from CRAN, please run
+
+```
+install.packages('modmarg')
+```
+
+To install the development version of this package, please run
 
 ```
 devtools::install_github('anniejw6/modmarg', build_vignettes = TRUE)
 ```
 
-Here is an example of estimating predicted levels and effects (with standard errors)
+Here is an example of estimating predicted levels and effects
 using the `iris` dataset:
 
 ```
@@ -41,7 +59,7 @@ vignette('delta-method', package = 'modmarg')
 
 * [Delta Method](http://www.phidot.org/software/mark/docs/book/pdf/app_2.pdf): This is from the appendix the book guide to the [MARK program, developed by Gary White](http://www.phidot.org/software/mark/index.html).
 
-* [How can I estimate the standard error of transformed regression parameters in R using the delta method?](http://stats.idre.ucla.edu/r/faq/how-can-i-estimate-the-standard-error-of-transformed-regression-parameters-in-r-using-the-delta-method/) from UCLA.
+* [How can I estimate the standard error of transformed regression parameters in R using the delta method?](https://stats.idre.ucla.edu/r/faq/how-can-i-estimate-the-standard-error-of-transformed-regression-parameters-in-r-using-the-delta-method/) from UCLA.
 
 * [The Delta method to estimate standard errors from a non-linear transformation](http://www.econometricsbysimulation.com/2012/12/the-delta-method-to-estimate-standard.html) from Econometrics by Simulation.
 

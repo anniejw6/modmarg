@@ -76,3 +76,34 @@ gen_at_list <- function(df, var_interest, at_var_interest = NULL){
 
   val_interest
 }
+
+# Handle missing data and weights
+
+handle_missing <- function(model, data, weights, nrow_orig){
+
+  # Add weights
+  if('_weights' %in% all.vars(model$formula))
+    stop("You cannot use the name '_weights' in the model formula. ",
+         "Please rename to another variable.")
+  if(is.null(weights)) weights <- rep(1, nrow_orig)
+
+  # Keep completes only
+  miss <- rowSums(is.na(data)) > 0 | is.na(weights)
+  weights <- weights[! miss]
+  data <- data[! miss, , drop = FALSE]
+
+  # Remove any booleans
+  if(all(data$`T` == TRUE))
+    data$`T` <- NULL
+  if(all(data$`F` == FALSE))
+    data$`F` <- NULL
+
+  # Throw warning if rows were dropped
+  if(nrow(data) != nrow_orig)
+    warning(sprintf('Dropping %s rows due to missing data',
+                    nrow_orig - nrow(data)))
+
+  list(data = data,
+       weights = weights)
+
+}

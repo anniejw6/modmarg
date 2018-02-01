@@ -18,12 +18,11 @@ cvcov
 }
 \description{
 Variance-covariance matrices with robust clustered standard errors and
-degrees-of-freedom for T statistics, for tests and examples specifying vcov
+degrees-of-freedom for T statistics, for tests and examples specifying \code{vcov}
 (d.o.f. defined as g - 1, where g is the number of clusters). Generated
-with margex data.
+with \code{margex} data in this package.
 }
 \details{
 See data-raw/make_cluster_vcov.R for details.
 }
 \keyword{datasets}
-

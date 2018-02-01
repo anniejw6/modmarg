@@ -19,7 +19,8 @@ test_that("jacobian works correctly", {
   binom_family <- make.link('logit')
   ld_fun <- binom_family$mu.eta
 
-  expect_equal(calc_jacob(p0, as.matrix(covar0), ld_fun),
+  expect_equal(calc_jacob(pred_values = p0, covar_matrix = as.matrix(covar0),
+                          deriv_func = ld_fun),
                c(0, 0.74390659, 0.07240388)[c(3, 1, 2)],
                tolerance = .0001)
 
@@ -50,13 +51,15 @@ test_that("jacobian works correctly", {
     c(0, 0, 0.090535558, 1.316670875, 24.040145060, 0.004931502)[c(6, 1:5)],
     tolerance = .0001)
 
-  expect_equal(calc_jacob(p4, as.matrix(covar4), ld_fun),
-               c(0.02704185, 0, 0.56997483, 4.31214, 90.5598, 0.02704185)[c(6, 1:5)],
-               tolerance = .0001)
+  expect_equal(
+    calc_jacob(p4, as.matrix(covar4), ld_fun),
+    c(0.02704185, 0, 0.56997483, 4.31214, 90.5598, 0.02704185)[c(6, 1:5)],
+    tolerance = .0001)
 
-  expect_equal(calc_jacob(p5, as.matrix(covar5), ld_fun),
-               c(0, 0.00469992, 0.12826647, 0.52297052, 13.961691, 0.00469992)[c(6, 1:5)],
-               tolerance = .0001)
+  expect_equal(
+    calc_jacob(p5, as.matrix(covar5), ld_fun),
+    c(0, 0.00469992, 0.12826647, 0.52297052, 13.961691, 0.00469992)[c(6, 1:5)],
+    tolerance = .0001)
 
 })
 

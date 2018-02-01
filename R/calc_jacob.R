@@ -1,5 +1,7 @@
 # Calculate the Jacobian matrix for predictive levels or effects
-calc_jacob <- function(pred_values, covar_matrix, deriv_func){
+calc_jacob <- function(pred_values, covar_matrix, deriv_func,
+                       weights = rep(1, nrow(covar_matrix)),
+                       ...){
 
   # covar_matrix: numeric matrix of covariates
   # pred_values: numeric vector of predicted values
@@ -10,12 +12,10 @@ calc_jacob <- function(pred_values, covar_matrix, deriv_func){
   stopifnot(is.numeric(pred_values), is.matrix(covar_matrix),
             is.numeric(covar_matrix), is.function(deriv_func))
 
-  # caluclate derivative of the predicted values
+  # Calculate derivative of the predicted values
   x1 <- do.call(deriv_func, list(pred_values))
 
-  as.numeric(
-    crossprod(x1, covar_matrix)/nrow(covar_matrix)
-  )
+  as.numeric(crossprod(x1 * weights, covar_matrix) / sum(weights))
 
 }
 
