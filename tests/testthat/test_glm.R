@@ -5,8 +5,32 @@ library(modmarg)
 # -------------------------------------------------------------------
 context("Input is handled correctly")
 
+test_that('using period works', {
+
+  # Put as.character in the equation
+  data(margex)
+  margex <- margex[, c('outcome', 'treatment', 'distance')]
+  mod1 <- glm(outcome ~ ., data = margex, family = 'binomial')
+  z1 <- marg(mod1, var_interest = 'treatment',
+             type = 'levels', at = NULL)[[1]]
+
+  expect_equal(z1$Margin, c(.0791146, .2600204),
+               tolerance = 0.0001)
+  expect_equal(z1$Standard.Error,
+               c(.0069456, .0111772), tolerance = 0.0001)
+  expect_equal(z1$Test.Stat,
+               c(11.39, 23.26), tolerance = 0.001)
+  expect_equal(z1$P.Value,
+               c(0, 0), tolerance = 0.001)
+  expect_equal(z1$`Lower CI (95%)`,
+               c(.0655016, .2381135), tolerance = 0.0001)
+  expect_equal(z1$`Upper CI (95%)`,
+               c(.0927277, .2819272), tolerance = 0.0001)
+
+})
+
 test_that("lm objects aren't allowed", {
-  data(marg)
+  data(margex)
   margex$sex <- factor(margex$sex)
   ml <- lm(y ~ sex + age, margex)
   expect_error(marg(mod = lm, var_interest = 'sex'))
@@ -235,7 +259,7 @@ test_that("marg works with colinear variables", {
 
 
 # ---------------------------------------------
-context("Calculations are correct")
+context("Calculations are correct for edge cases")
 
 test_that("interaction terms are handled", {
 
@@ -378,48 +402,6 @@ test_that("subsets of data run properly", {
 
 })
 
-test_that("marg input is checked", {
-
-  # lm should fail
-  margex$sex <- factor(margex$sex)
-  ml <- lm(y ~ sex + age, margex)
-  expect_error(marg(mod = lm, var_interest = 'sex'))
-
-  # extrapolated values are troubling
-  mm <- glm(y ~ sex + age, margex, family = 'gaussian')
-  expect_warning(marg(mod = mm, var_interest = 'sex',
-                      at = list(age = 100)),
-                 "Not all values in 'at' are in the range of 'age'",
-                 fixed = TRUE)
-
-  # extrapolated factors are broken
-  mm <- glm(y ~ sex + agegroup, data = margex)
-  expect_error(marg(mod = mm, var_interest = 'sex',
-                    at = list(agegroup = '12')),
-               "'12' is not a value in 'agegroup'",
-               fixed = TRUE)
-})
-
-
-test_that("continuous effects not supported unless variable is binary",{
-
-  data(margex)
-  mod <- glm(y ~ sex + age, data = margex, family = 'gaussian')
-  expect_error(marg(mod, var_interest = 'age', type = 'effects'))
-
-  expect_true(is.numeric(margex$treatment))
-  mod <- glm(y ~ treatment + age,
-             data = margex, family = 'gaussian')
-  z1 <- marg(mod, var_interest = 'treatment', type = 'effects')
-
-  mod <- glm(y ~ as.factor(treatment) + age,
-             data = margex, family = 'gaussian')
-  z2 <- marg(mod, var_interest = 'treatment', type = 'effects')
-
-  expect_equal(z1, z2)
-
-})
-
 test_that("Setting base level works", {
 
   data(margex)
@@ -524,30 +506,5 @@ test_that("Setting base level works", {
   expect_equal(z$P.Value, c(0.6318, NaN, 0), tolerance = 0.0001)
   expect_equal(z$`Lower CI (95%)`, c(-2.17222, 0, 2.906066), tolerance = 0.0001)
   expect_equal(z$`Upper CI (95%)`, c(1.318822, 0, 6.984055), tolerance = 0.0001)
-
-})
-
-
-test_that('using period works', {
-
-  # Put as.character in the equation
-  data(margex)
-  margex <- margex[, c('outcome', 'treatment', 'distance')]
-  mod1 <- glm(outcome ~ ., data = margex, family = 'binomial')
-  z1 <- marg(mod1, var_interest = 'treatment',
-             type = 'levels', at = NULL)[[1]]
-
-  expect_equal(z1$Margin, c(.0791146, .2600204),
-               tolerance = 0.0001)
-  expect_equal(z1$Standard.Error,
-               c(.0069456, .0111772), tolerance = 0.0001)
-  expect_equal(z1$Test.Stat,
-               c(11.39, 23.26), tolerance = 0.001)
-  expect_equal(z1$P.Value,
-               c(0, 0), tolerance = 0.001)
-  expect_equal(z1$`Lower CI (95%)`,
-               c(.0655016, .2381135), tolerance = 0.0001)
-  expect_equal(z1$`Upper CI (95%)`,
-               c(.0927277, .2819272), tolerance = 0.0001)
 
 })
