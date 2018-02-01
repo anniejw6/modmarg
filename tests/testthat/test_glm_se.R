@@ -1,7 +1,10 @@
 library(modmarg)
 context("Predicted SE")
 
-test_that("se is calculated correctly", {
+binom_family <- make.link('logit')
+ld_fun <- binom_family$mu.eta
+
+test_that("se is calculated correctly with margex", {
 
   data(margex)
   mm <- glm(outcome ~ treatment + distance, margex, family = 'binomial')
@@ -16,9 +19,6 @@ test_that("se is calculated correctly", {
   p0 <- predict(mm, newdata = df0)
   p1 <- predict(mm, newdata = df1)
 
-  binom_family <- make.link('logit')
-  ld_fun <- binom_family$mu.eta
-
   expect_equal(calc_pred_se(vcov_model = vcov(mm),
                        jac = calc_jacob(p0, as.matrix(covar0), ld_fun)),
                c(.0069456),
@@ -28,6 +28,9 @@ test_that("se is calculated correctly", {
                        jac = calc_jacob(p1, as.matrix(covar1), ld_fun)),
                c(.0111772),
                tolerance = .0001)
+})
+
+test_that("se is calculated correctly with mtcars", {
 
   data(mtcars)
   mtcars$gear <- factor(mtcars$gear)
