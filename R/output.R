@@ -25,7 +25,7 @@ format_output <- function(margin_labels, pred_margins, se, family, dof,
             length(se) == length(pred_margins)
             )
 
-  test_stat <- pred_margins/se
+  test_stat <- pred_margins / se
   if(family == "gaussian"){
     pval <- 2 * pt(-1 * abs(test_stat), df = dof)
     ci <- c(qt(min(cofint), df = dof), qt(max(cofint), df = dof))

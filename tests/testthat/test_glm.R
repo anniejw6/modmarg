@@ -27,18 +27,29 @@ test_that("levels are calculated correctly despite different input types", {
   z3 <- marg(mod3, var_interest = 'treatment',
                   type = 'levels', at = NULL)[[1]]
 
-  expect_equal(z1$Margin, z2$Margin, z3$Margin, c(.0791146, .2600204),
-               tolerance = 0.0001)
-  expect_equal(z1$Standard.Error, z2$Standard.Error, z3$Standard.Error,
-               c(.0069456, .0111772), tolerance = 0.0001)
-  expect_equal(z1$Test.Stat, z2$Test.Stat, z3$Test.Stat,
-               c(11.39, 23.26), tolerance = 0.001)
-  expect_equal(z1$P.Value, z2$P.Value, z3$P.Value,
-               c(0, 0), tolerance = 0.001)
-  expect_equal(z1$`Lower CI (95%)`, z2$`Lower CI (95%)`, z3$`Lower CI (95%)`,
-               c(.0655016, .2381135), tolerance = 0.0001)
-  expect_equal(z1$`Upper CI (95%)`, z2$`Upper CI (95%)`, z3$`Upper CI (95%)`,
-               c(.0927277, .2819272), tolerance = 0.0001)
+  expect_equal(z1$Margin, c(.0791146, .2600204), tolerance = 0.0001)
+  expect_equal(z2$Margin, c(.0791146, .2600204), tolerance = 0.0001)
+  expect_equal(z3$Margin, c(.0791146, .2600204), tolerance = 0.0001)
+
+  expect_equal(z1$Standard.Error, c(.0069456, .0111772), tolerance = 0.0001)
+  expect_equal(z2$Standard.Error, c(.0069456, .0111772), tolerance = 0.0001)
+  expect_equal(z3$Standard.Error, c(.0069456, .0111772), tolerance = 0.0001)
+
+  expect_equal(z1$Test.Stat, c(11.39, 23.26), tolerance = 0.001)
+  expect_equal(z2$Test.Stat, c(11.39, 23.26), tolerance = 0.001)
+  expect_equal(z3$Test.Stat, c(11.39, 23.26), tolerance = 0.001)
+
+  expect_equal(z1$P.Value, c(0, 0), tolerance = 0.001)
+  expect_equal(z2$P.Value, c(0, 0), tolerance = 0.001)
+  expect_equal(z3$P.Value, c(0, 0), tolerance = 0.001)
+
+  expect_equal(z1$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
+  expect_equal(z2$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
+  expect_equal(z3$`Lower CI (95%)`, c(.0655016, .2381135), tolerance = 0.0001)
+
+  expect_equal(z1$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
+  expect_equal(z2$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
+  expect_equal(z3$`Upper CI (95%)`, c(.0927277, .2819272), tolerance = 0.0001)
 
 })
 
@@ -70,18 +81,29 @@ test_that("effects are calculated correctly despite different input types", {
                   type = 'effects', at = NULL)[[1]]
   z3 <- z3[2, ]
 
-  expect_equal(z1$Margin, z2$Margin, z3$Margin,
-               c(.1809057), tolerance = 0.0001)
-  expect_equal(z1$Standard.Error, z2$Standard.Error, z3$Standard.Error,
-               c(.0131684), tolerance = 0.0001)
-  expect_equal(z1$Test.Stat, z2$Test.Stat, z3$Test.Stat,
-               c(13.74), tolerance = 0.001)
-  expect_equal(z1$P.Value, z2$P.Value, z3$P.Value,
-               c(0), tolerance = 0.001)
-  expect_equal(z1$`Lower CI (95%)`, z2$`Lower CI (95%)`, z3$`Lower CI (95%)`,
-               c(.1550961), tolerance = 0.0001)
-  expect_equal(z1$`Upper CI (95%)`, z2$`Upper CI (95%)`, z3$`Upper CI (95%)`,
-               c(.2067153), tolerance = 0.0001)
+  expect_equal(z1$Margin, c(.1809057), tolerance = 0.0001)
+  expect_equal(z2$Margin, c(.1809057), tolerance = 0.0001)
+  expect_equal(z3$Margin, c(.1809057), tolerance = 0.0001)
+
+  expect_equal(z1$Standard.Error, c(.0131684), tolerance = 0.0001)
+  expect_equal(z2$Standard.Error, c(.0131684), tolerance = 0.0001)
+  expect_equal(z3$Standard.Error, c(.0131684), tolerance = 0.0001)
+
+  expect_equal(z1$Test.Stat, c(13.74), tolerance = 0.001)
+  expect_equal(z2$Test.Stat, c(13.74), tolerance = 0.001)
+  expect_equal(z3$Test.Stat, c(13.74), tolerance = 0.001)
+
+  expect_equal(z1$P.Value, c(0), tolerance = 0.001)
+  expect_equal(z2$P.Value, c(0), tolerance = 0.001)
+  expect_equal(z3$P.Value, c(0), tolerance = 0.001)
+
+  expect_equal(z1$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
+  expect_equal(z2$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
+  expect_equal(z3$`Lower CI (95%)`, c(.1550961), tolerance = 0.0001)
+
+  expect_equal(z1$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
+  expect_equal(z2$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
+  expect_equal(z3$`Upper CI (95%)`, c(.2067153), tolerance = 0.0001)
 
 })
 
@@ -93,7 +115,7 @@ test_that("works correctly even when rows are dropped", {
   mod <- glm(outcome ~ treatment + distance,
              data = margex, family = 'binomial')
 
-  z <- marg(mod, 'treatment', 'levels', at = NULL)[[1]]
+  z <- marg(mod, var_interest = 'treatment', type = 'levels', at = NULL)[[1]]
 
   expect_equal(z$Margin, c(0.07911049, 0.25890416), tolerance = 0.0001)
   expect_equal(z$Standard.Error, c(0.006945149, 0.011181260),
@@ -324,7 +346,16 @@ test_that("marg input is checked", {
   # extrapolated values are troubling
   mm <- glm(y ~ sex + age, margex, family = 'gaussian')
   expect_warning(marg(mod = mm, var_interest = 'sex',
-                           at = list(age = 100)))
+                      at = list(age = 100)),
+                 "Not all values in 'at' are in the range of 'age'",
+                 fixed = TRUE)
+
+  # extrapolated factors are broken
+  mm <- glm(y ~ sex + agegroup, data = margex)
+  expect_error(marg(mod = mm, var_interest = 'sex',
+                    at = list(agegroup = '12')),
+               "'12' is not a value in 'agegroup'",
+               fixed = TRUE)
 })
 
 
@@ -381,17 +412,23 @@ test_that("Setting base level works", {
   # ------------------------------------------------------------------------------
 
   # Make sure effects flipped right
-  expect_equal(z1$Margin, rev(-1 * z2$Margin), c(0, 14.03271),
-               tolerance = 0.0001)
-  expect_equal(z1$Standard.Error, rev(z2$Standard.Error), c(0, .7777377),
-               tolerance = 0.0001)
-  expect_equal(z1$Test.Stat, rev(-1 * z2$Test.Stat), c(NaN, 18.04),
-               tolerance = 0.01)
-  expect_equal(z1$P.Value, rev(z2$P.Value), 0.000, tolerance = 0.001)
-  expect_equal(z1$`Lower CI (95%)`, rev(-1 * z2$`Upper CI (95%)`),
-               c(0, 12.50775), tolerance = 0.0001)
-  expect_equal(z1$`Upper CI (95%)`, rev(-1 * z2$`Lower CI (95%)`),
-               c(0, 15.55766), tolerance = 0.0001)
+  expect_equal(z1$Margin, c(0, 14.03271), tolerance = 0.0001)
+  expect_equal(rev(-1 * z2$Margin), c(0, 14.03271), tolerance = 0.0001)
+
+  expect_equal(z1$Standard.Error, c(0, .7777377), tolerance = 0.0001)
+  expect_equal(rev(z2$Standard.Error), c(0, .7777377), tolerance = 0.0001)
+
+  expect_equal(z1$Test.Stat, c(NaN, 18.04), tolerance = 0.01)
+  expect_equal(rev(-1 * z2$Test.Stat), c(NaN, 18.04), tolerance = 0.01)
+
+  expect_equal(z1$P.Value, c(NaN, 0.000), tolerance = 0.001)
+  expect_equal(rev(z2$P.Value), c(NaN, 0.000), tolerance = 0.001)
+
+  expect_equal(z1$`Lower CI (95%)`, c(0, 12.50775), tolerance = 0.0001)
+  expect_equal(rev(-1 * z2$`Upper CI (95%)`), c(0, 12.50775), tolerance = 0.0001)
+
+  expect_equal(z1$`Upper CI (95%)`, c(0, 15.55766), tolerance = 0.0001)
+  expect_equal(rev(-1 * z2$`Lower CI (95%)`), c(0, 15.55766), tolerance = 0.0001)
 
   # . reg y ib2.group##c.distance
   #
