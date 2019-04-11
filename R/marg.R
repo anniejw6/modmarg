@@ -84,6 +84,10 @@ marg <- function(mod, var_interest, data = NULL,
                   at_var_interest = NULL,  at = NULL,
                   cofint = 0.95, ...){
 
+  # If mod$formula is a string, the error message is deeply uninformative
+  if(! "formula" %in% class(mod$formula))
+    stop("Estimate your model with a formula object, not a character string.")
+
   # Check arguments ---
   stopifnot(type %in% c('levels', 'effects'),
             is.numeric(cofint),

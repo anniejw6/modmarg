@@ -5,8 +5,8 @@
 \title{Predicted Margins for `glm` objects}
 \usage{
 \method{marg}{glm}(mod, var_interest,
-  data = mod$data[names(mod$prior.weights), ], weights = mod$prior.weights,
-  ...)
+  data = mod$data[names(mod$prior.weights), ],
+  weights = mod$prior.weights, ...)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}
