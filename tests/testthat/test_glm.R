@@ -341,7 +341,14 @@ test_that("marg input is checked", {
   # lm should fail
   margex$sex <- factor(margex$sex)
   ml <- lm(y ~ sex + age, margex)
-  expect_error(marg(mod = lm, var_interest = 'sex'))
+  expect_error(marg(mod = ml, var_interest = 'sex'),
+               "no applicable method for 'marg' applied to an object of class \"lm\"",
+               fixed = T)
+
+  # string formulas shouldn't work
+  mm <- glm('y ~ sex + age', margex, family = 'gaussian')
+  expect_error(marg(mod = mm, var_interest = 'sex'),
+               regexp = "Estimate your model with a formula object, not a character string.")
 
   # extrapolated values are troubling
   mm <- glm(y ~ sex + age, margex, family = 'gaussian')
