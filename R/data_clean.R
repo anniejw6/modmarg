@@ -82,9 +82,6 @@ gen_at_list <- function(df, var_interest, at_var_interest = NULL){
 handle_missing <- function(model, data, weights, nrow_orig){
 
   # Add weights
-  if('_weights' %in% all.vars(model$formula))
-    stop("You cannot use the name '_weights' in the model formula. ",
-         "Please rename to another variable.")
   if(is.null(weights)) weights <- rep(1, nrow_orig)
 
   # Keep completes only
