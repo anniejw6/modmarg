@@ -90,9 +90,9 @@ handle_missing <- function(model, data, weights, nrow_orig){
   data <- data[! miss, , drop = FALSE]
 
   # Remove any booleans
-  if(all(data$`T` == TRUE))
+  if(all(data$`T` %in% c(TRUE, NA)))
     data$`T` <- NULL
-  if(all(data$`F` == FALSE))
+  if(all(data$`F` %in% c(FALSE, NA)))
     data$`F` <- NULL
 
   # Throw warning if rows were dropped
