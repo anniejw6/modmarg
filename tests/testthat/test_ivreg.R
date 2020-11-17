@@ -91,7 +91,7 @@ test_that('2SLS margins are correct', {
   #           1  |    91.4581   1.417176    64.54   0.000     88.68049    94.23572
   # ------------------------------------------------------------------------------
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(61.84719, 91.4581), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(.6426773, 1.417176), tolerance = 0.0000001)
   # TODO: other parameters?
@@ -119,7 +119,7 @@ test_that('2SLS margins are correct', {
   z <- marg(mod, data = margex, var_interest = 'actual',
             type = 'effects')[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(0, 29.61091), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(0, 1.84763), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
@@ -158,7 +158,7 @@ test_that('2SLS margins handle weights', {
             # dof = mod$df.residual,
             weights = margex$wgt, data = margex)[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(61.81683, 91.58006), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(.6938917, 1.73586), tolerance = 0.0000001)
   expect_equal(z$Test.Stat, c(89.09, 52.76), tolerance = 0.01)
@@ -186,7 +186,7 @@ test_that('2SLS margins handle weights', {
             weights = margex$wgt, data = margex,
             type = 'effects')[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(0, 29.76322), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(0, 2.17495), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(NaN, 13.68), tolerance = 0.001)
@@ -243,7 +243,7 @@ test_that('2SLS margins handle missing covariates', {
 
   z <- marg(mod, var_interest = 'actual', data = margex_na)[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(61.84185, 91.44042), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(.6423856, 1.416974), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(96.27, 64.54), tolerance = 0.001)
@@ -263,7 +263,7 @@ test_that('2SLS margins handle missing covariates', {
   z <- marg(mod, var_interest = 'actual', data = margex_na,
             type = 'effects')[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(0, 29.59858), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(0, 1.846635), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(NaN, 16.03), tolerance = 0.001)
@@ -303,7 +303,7 @@ test_that('2SLS margins handle missing weights', {
             vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             data = margex_na, weights = margex_na$wgt)[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(61.82222, 91.55232), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(.6935352, 1.737943), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(89.14, 52.68), tolerance = 0.001)
@@ -330,7 +330,7 @@ test_that('2SLS margins handle missing weights', {
             data = margex_na, weights = margex_na$wgt,
             type = 'effects')[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(0, 29.7301), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(0, 2.176272), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(NaN, 13.66), tolerance = 0.001)
@@ -371,7 +371,7 @@ test_that('2SLS margins handle missing weights and covariates', {
             vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             data = margex_na, weights = margex_na$wgt)[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(61.82219, 91.51205), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(.6934071, 1.736853), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(89.16, 52.69), tolerance = 0.001)
@@ -398,7 +398,7 @@ test_that('2SLS margins handle missing weights and covariates', {
             vcov_mat = sandwich::vcovHC(mod, type = 'HC0'),
             data = margex_na, weights = margex_na$wgt)[[1]]
 
-  expect_equal(z$Label, as.factor(paste('actual =', c(0, 1))))
+  expect_equal(z$Label, paste('actual =', c(0, 1)))
   expect_equal(z$Margin, c(0, 29.68986), tolerance = 0.000001)
   expect_equal(z$Standard.Error, c(0, 2.174845), tolerance = 0.000001)
   expect_equal(z$Test.Stat, c(NaN, 13.65), tolerance = 0.001)
