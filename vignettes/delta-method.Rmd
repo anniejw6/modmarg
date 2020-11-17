@@ -47,7 +47,7 @@ an infinitely differentiable $G(x)$ evaluated at $a$ can be written as
 \[G(x) = G(a) + \frac{G'(a)}{1!}(x - a) + \frac{G''(a)}{2!}(x-a)^2 + 
 \frac{G'''(a)}{3!}(x-a)^3 + \dots\]
 
-If we cut off the expansion after some number of terms (two is commmon), 
+If we cut off the expansion after some number of terms (two is common), 
 we can get a useful approximation of $G(x)$.
 
 ## Taylor Series and the Delta Method
@@ -104,7 +104,7 @@ P_e(X_1 \beta) &= \frac{d(\text{link}^{-1}(X_1 \beta))}{d(X \beta)} +
 
 # How does the Delta Method Work?
 
-The equations above describe how to apprxoimate predicted levels or effects, but
+The equations above describe how to approximate predicted levels or effects, but
 why not just calculate our estimate $P(X\beta)$ directly?
 
 Well, we can do that for the point estimate, but also want to calculate errors
@@ -122,7 +122,7 @@ Because $X_1\beta$ is a known point, it has variance of zero, so this simplifies
 
 The first term in the variance is the vector of partial derivatives of our
 estimator, also known as our jacobian matrix.^[The Jacobian matrix is just the
-name of the matrix of all first partial derviatives of a vector-valued
+name of the matrix of all first partial derivatives of a vector-valued
 function.] For any predicted level indexed by $i$ in a regression, the $i,j$th
 element of the jacobian will be the derivative of predicted level $i$ with 
 respect to regressor $j$. Those are fixed quantities. We also know
