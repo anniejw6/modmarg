@@ -1,3 +1,7 @@
+# Version 0.9.5
+
+* Make compatible with versions 4.X
+
 # Version 0.9.2
 
 * Change variance covariance function for compatibility with R-devel
