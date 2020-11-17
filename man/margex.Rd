@@ -4,7 +4,8 @@
 \name{margex}
 \alias{margex}
 \title{Artificial data for margins}
-\format{A data frame with 3000 rows and 11 variables:
+\format{
+A data frame with 3000 rows and 11 variables:
 \describe{
   \item{y}{numeric}
   \item{outcome}{integer, 0 or 1}
@@ -17,9 +18,10 @@
   \item{treatment}{integer}
   \item{agegroup}{character: "20-29", "30-39", or "40+"}
   \item{arm}{integer}
-}}
+}
+}
 \source{
-\url{http://www.stata-press.com/data/r14/margex.dta}
+\url{https://www.stata-press.com/data/r14/margex.dta}
 }
 \usage{
 margex

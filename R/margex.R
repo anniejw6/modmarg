@@ -17,5 +17,5 @@
 #'   \item{agegroup}{character: "20-29", "30-39", or "40+"}
 #'   \item{arm}{integer}
 #' }
-#' @source \url{http://www.stata-press.com/data/r14/margex.dta}
+#' @source \url{https://www.stata-press.com/data/r14/margex.dta}
 "margex"

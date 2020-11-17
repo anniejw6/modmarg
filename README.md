@@ -1,5 +1,5 @@
 # modmarg
-[![CRAN Version](http://www.r-pkg.org/badges/version/modmarg)](http://www.r-pkg.org/badges/version/modmarg)
+[![CRAN Version](https://www.r-pkg.org:443/badges/version/modmarg)](https://www.r-pkg.org:443/badges/version/modmarg)
 [![Build Status](https://travis-ci.org/anniejw6/modmarg.svg?branch=master)](https://travis-ci.org/anniejw6/modmarg)
 [![codecov](https://codecov.io/gh/anniejw6/modmarg/branch/master/graph/badge.svg)](https://codecov.io/gh/anniejw6/modmarg)
 
@@ -63,11 +63,11 @@ vignette('delta-method', package = 'modmarg')
 
 * [The Delta method to estimate standard errors from a non-linear transformation](http://www.econometricsbysimulation.com/2012/12/the-delta-method-to-estimate-standard.html) from Econometrics by Simulation.
 
-* [A FAQ on Margins from the Stata Blog](http://www.stata.com/support/faqs/statistics/compute-standard-errors-with-margins/)
+* [A FAQ on Margins from the Stata Blog](https://www.stata.com/support/faqs/statistics/compute-standard-errors-with-margins/)
 
 * [Delta Method on Wikipedia](https://en.wikipedia.org/wiki/Delta_method)
 
-* [What is the intuition behind the sandwich estimator?](http://stats.stackexchange.com/questions/50778/sandwich-estimator-intuition) from StackExchange
+* [What is the intuition behind the sandwich estimator?](https://stats.stackexchange.com/questions/50778/sandwich-estimator-intuition) from StackExchange
 
 * [Least Squares Optimization](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.207.3178) by Harald E. Krogstad
 

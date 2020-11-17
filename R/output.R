@@ -41,7 +41,8 @@ format_output <- function(margin_labels, pred_margins, se, family, dof,
     `Test Stat` = test_stat,
     `P Value` = pval,
     lower_ci = pred_margins + min(ci) * se,
-    upper_ci = pred_margins + max(ci) * se
+    upper_ci = pred_margins + max(ci) * se,
+    stringsAsFactors = FALSE
   )
 
   names(res)[names(res) %in% c('lower_ci', 'upper_ci')] <-
