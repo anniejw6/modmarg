@@ -4,8 +4,16 @@
 \alias{pred_se}
 \title{Main wrapper function to calculate margins and standard errors}
 \usage{
-pred_se(df_levels, model, type, base_rn, vcov_mat, weights, deriv_func,
-  link_func)
+pred_se(
+  df_levels,
+  model,
+  type,
+  base_rn,
+  vcov_mat,
+  weights,
+  deriv_func,
+  link_func
+)
 }
 \arguments{
 \item{df_levels}{data.frame, already transformed for variables not related
