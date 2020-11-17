@@ -141,8 +141,11 @@ marg <- function(mod, var_interest, data = NULL,
         warning(sprintf("Not all values in 'at' are in the range of '%s'",
                         names(at)[i]))
     } else {
-      if(! at[[i]] %in% data[[names(at)[i]]])
-        stop(sprintf("'%s' is not a value in '%s'", at[[i]], names(at)[i]))
+      if(! all(at[[i]] %in% data[[names(at)[i]]]))
+        stop(sprintf("'%s' is not a value in '%s'",
+                     paste(at[[i]][! at[[i]] %in% data[[names(at)[i]]]],
+                           collapse = ", "),
+                     names(at)[i]))
     }
   }
 

@@ -363,6 +363,13 @@ test_that("marg input is checked", {
                     at = list(agegroup = '12')),
                "'12' is not a value in 'agegroup'",
                fixed = TRUE)
+
+  # multiple extrapolated factors are broken
+  mm <- glm(y ~ sex + agegroup, data = margex)
+  expect_error(marg(mod = mm, var_interest = 'sex',
+                    at = list(agegroup = c('12', '13'))),
+               "'12, 13' is not a value in 'agegroup'",
+               fixed = TRUE)
 })
 
 
