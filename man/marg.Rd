@@ -4,9 +4,20 @@
 \alias{marg}
 \title{Estimating predictive margins on a model}
 \usage{
-marg(mod, var_interest, data = NULL, weights = NULL, vcov_mat = NULL,
-  dof = NULL, type = "levels", base_rn = 1, at_var_interest = NULL,
-  at = NULL, cofint = 0.95, ...)
+marg(
+  mod,
+  var_interest,
+  data = NULL,
+  weights = NULL,
+  vcov_mat = NULL,
+  dof = NULL,
+  type = "levels",
+  base_rn = 1,
+  at_var_interest = NULL,
+  at = NULL,
+  cofint = 0.95,
+  ...
+)
 }
 \arguments{
 \item{mod}{model object, currently only support those of class \code{\link[stats]{glm}}
