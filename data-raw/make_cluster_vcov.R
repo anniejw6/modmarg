@@ -1,7 +1,6 @@
 
 # Create clustered variance-covariance matrix for package tests
 # Code authored and maintained by Nat Olin (@nathanielolin)
-rm(list = ls())
 
 cluster_se <- function(model, cluster, data = model$data){
   data <- data[, names(data) %in% c(all.vars(model$formula), cluster)]
