@@ -23,7 +23,7 @@ This has been resolved by specifying that the expected output should be
 data.frames with characters and by specifying stringsAsFactors = FALSE 
 where data.frames are created as part of the expected output.
 
-# Version 0.9.5
+# Version 0.9.6
 
 ## Test environments
 
