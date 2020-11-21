@@ -1,5 +1,3 @@
-rm(list = ls())
-
 data(margex)
 set.seed(100)
 margex$assign <- margex$treatment

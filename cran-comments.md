@@ -1,4 +1,27 @@
-# Version 0.9.2
+# Resubmission
+
+This is a resubmission, responding to feedback from Gregor Seyer on initial submission below. 
+
+Gregor wrote:
+
+> Please do not modify the user's global environment or the user's home
+filespace in your examples or vignettes by deleting objects
+rm(list = ls())
+
+This is now fixed.
+
+> Have the issues why your package was archived been fixed?
+Please explain this in the submission comments.
+
+This package was archived because it was not updated to comply with the 
+change in R 4.0.0 to use a stringsAsFactors = FALSE default. This change 
+caused tests expecting factors in data.frames to fail on encountering strings.
+
+This has been resolved by specifying that the expected output should be 
+data.frames with characters, and has been kept backwards-compatible by 
+specifying stringsAsFactors = FALSE where data.frames are created.
+
+# Version 0.9.6
 
 ## Test environments
 
