@@ -13,15 +13,13 @@ This is now fixed.
 > Have the issues why your package was archived been fixed?
 Please explain this in the submission comments.
 
-This package was archived because it was not updated to comply with R 4.0.0
-and specifically the switch of having data.frame() and read.table() use 
-stringsAsFactors = FALSE by default. This change caused some of the tests 
-to fail because the function outputs had data.frames with characters 
-but the expected output had data.frames with factors.
+This package was archived because it was not updated to comply with the 
+change in R 4.0.0 to use a stringsAsFactors = FALSE default. This change 
+caused tests expecting factors in data.frames to fail on encountering strings.
 
 This has been resolved by specifying that the expected output should be 
-data.frames with characters and by specifying stringsAsFactors = FALSE 
-where data.frames are created as part of the expected output.
+data.frames with characters, and has been kept backwards-compatible by 
+specifying stringsAsFactors = FALSE where data.frames are created.
 
 # Version 0.9.6
 
