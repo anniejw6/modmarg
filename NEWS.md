@@ -1,4 +1,4 @@
-# Version 0.9.5
+# Version 0.9.6
 
 * Make compatible with versions 4.X
 
