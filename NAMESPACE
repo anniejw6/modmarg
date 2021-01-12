@@ -2,6 +2,7 @@
 
 S3method(marg,glm)
 S3method(marg,ivreg)
+S3method(marg,lm_robust)
 export(marg)
 importFrom(stats,coef)
 importFrom(stats,complete.cases)
