@@ -41,7 +41,7 @@ get_data.lm_robust <- function(model, data, weights){
   nrow_orig <- nrow(data)
 
   # Grab only necessary variables
-  # data <- get_all_vars(model, data)
+  data <- get_all_vars(model, data)
 
   # Drop to correct rows
   handle_missing(model, data, weights, nrow_orig)
