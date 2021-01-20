@@ -61,7 +61,7 @@ get_covar.lm_robust <- function(model, data){
 
   mm <- model.matrix(model, data = data)
 
-  mm[, !is.na(model$term)]
+  mm[, model$term]
 }
 
 get_family.lm_robust <- function(model){
